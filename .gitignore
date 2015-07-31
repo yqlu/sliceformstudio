@@ -1,0 +1,9 @@
+# IDE
+.idea
+
+# Bower
+bower_components
+
+www
+public/bower
+public/images

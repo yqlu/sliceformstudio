@@ -1,0 +1,33 @@
+{
+  "name": "Wallpaper",
+  "version": "0.0.1",
+  "private": true,
+  "keywords": [
+    "harp",
+    "boilerplate",
+    "bootstrap"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/bower",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.1.1",
+    "jquery": "~2.1.3",
+    "d3": "~3.5.3",
+    "lodash": "~2.4.1",
+    "numeric": "https://github.com/sloisel/numeric.git#~1.2.6",
+    "graham_scan": "https://github.com/brian3kb/graham_scan_js.git#~1.0.2",
+    "twitter-bootstrap-wizard": "git://github.com/VinceG/twitter-bootstrap-wizard.git#master",
+    "jquery-simplecolorpicker": "https://github.com/tkrotoff/jquery-simplecolorpicker.git#~0.3.0",
+    "seiyria-bootstrap-slider": "https://github.com/seiyria/bootstrap-slider.git#~4.4.0",
+    "less": "~2.2.0"
+  }
+
+}

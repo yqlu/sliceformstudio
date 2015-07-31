@@ -1,0 +1,19 @@
+{
+    "contents": [{
+		"label": "Home",
+		"url": "/"
+	},
+	{
+		"label": "About",
+		"url": "/about.html"
+	},
+	{
+		"label": "App",
+		"url": "app.html"
+	},
+	{
+		"label": "Documentation",
+		"url": "documentation.html"
+	}]
+}
+

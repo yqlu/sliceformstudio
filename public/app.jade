@@ -1,0 +1,224 @@
+.container
+	.header
+		.btn-group.nav
+			button#tileView.btn.btn-default.active(type='button', data-toggle='button') Tile view
+			button#stripView.btn.btn-default(type='button', data-toggle='button') Strip view
+	#assembleTab.active
+		div(style='margin-bottom: 15px;')
+			form.form-inline
+				.form-group
+					label Polygons:
+					span.select2-wrapper
+						select#shapeDropdown.form-control(style='display: inline-block')
+				.btn-group.padded-btn-group
+					a#editPattern.btn.btn-primary(title="Select a shape in the palette first.") Edit Pattern
+				.btn-group.padded-btn-group
+					a#clear.btn.btn-primary Clear All
+					a#delete.btn.btn-primary(title="Select a shape first.") Delete
+					a#copy.btn.btn-primary(title="Select a shape first.") Copy
+				.btn-group.padded-btn-group
+					a#infer.btn.btn-primary Infer
+		#assembleSvg
+		#customShape.collapse(style='margin-top: 15px')
+			.panel.panel-default
+				.panel-heading
+					h3.panel-title Custom Shape Editor
+				.panel-body
+					.row
+						.col-md-6
+							form.form-horizontal
+								.form-group
+									label.control-label.col-md-4 Number of sides:
+									.col-md-8
+										input#sideNumber(type='text')
+								.form-group
+									label.control-label.col-md-4 Side length:
+									.col-md-8
+										input#sideLength(type='text')
+								.form-group
+									.col-md-offset-4.col-md-8
+										a#addToLineup.btn.btn-primary Add to lineup
+										a#shapeEditToggle.btn.btn-default.active(data-toggle='button') Toggle display
+								p
+									| You can customize the polygon on the right by dragging on the vertices before clicking "Add to lineup".
+								.alert.alert-warning(role='alert')
+									| If you want multiple tiles with the same shape but different patterns, create multiple copies of them here.
+						.col-md-6
+							#shapeEditSvg
+			.panel.panel-default
+				.panel-body
+					p
+						| Alternatively, you can also generate a polygon by specifying arrays of side lengths and interior angles.
+					form.form-horizontal
+						.form-group
+							label.control-label.col-md-2 Side lengths:
+							.col-md-10
+								input#sidelengths.form-control(type='text', placeholder='[1,1,1,1]')
+						.form-group
+							label.control-label.col-md-2 Interior angles:
+							.col-md-10
+								input#interiorAngles.form-control(type='text', placeholder='[60,120,60,120]')
+						.form-group
+							.col-md-offset-2.col-md-10
+								a#addToLineupManual.btn.btn-primary Add to lineup
+	#traceTab.hidden
+		#traceSvg
+		.toolbar
+			label Pick a color to assign to strips:
+			select#colorpicker
+		.alert.alert-warning(role='alert')
+			| Warning: your colors will be reset if you navigate away from this panel.
+		.panel.panel-default
+			.panel-heading
+				h3.panel-title Display parameters
+			.panel-body
+				form.form-horizontal
+					.form-group
+						label.control-label.col-md-2 Strip width
+						.col-md-4
+							input#thickness(type='text')
+						a#outlineToggle.btn.btn-default.active(data-toggle='button') Toggle outline
+						a#advancedOptions.btn.btn-default Advanced options
+					.form-group
+						label.control-label.col-md-2 Extension length
+						.col-md-4
+							input#extensionLength(type='text')
+		#stripTablePanel.toolbar
+			.panel.panel-default
+				.panel-heading
+					h3.panel-title Color-coded SVG files
+				#stripTable.panel-body
+					span#noneSoFar You haven't assigned colors to any strips yet!
+					form.form-horizontal
+		#customStripPanel.toolbar
+			.panel.panel-default
+				.panel-heading
+					h3.panel-title Manual strip generation
+				#customStrips.panel-body
+					form
+						.form-group
+							label.control-label.col-md-2 JSON input:
+							textarea#customStripJson.col-md-10(rows='4')
+						.form-group
+							a#generateCustomStripBtn.btn.btn-default Generate!
+		#stripSvg.hidden
+#advancedModal.modal.fade(tabindex='-1', role='dialog')
+	.modal-dialog.modal-lg
+		.modal-content
+			.modal-header
+				button.close(type='button', data-dismiss='modal', aria-label='Close')
+					span(aria-hidden='true') ×
+				h4.modal-title Advanced options
+			.modal-body
+				p
+					| Specify parameters for the generated SVG files here. The defaults work well for generic laser cutters, but you can tweak them to your own preferences.
+				form.form-horizontal
+					.form-group
+						label.control-label.col-md-2 Strip height
+						.col-md-3
+							input#stripHeight(type='text')
+						label.control-label.col-md-3 Printbed width
+						.col-md-3
+							input#printWidth(type='text')
+					.form-group
+						label.control-label.col-md-2 Width factor
+						.col-md-3
+							input#widthFactor(type='text')
+						label.control-label.col-md-3 Printbed height
+						.col-md-3
+							input#printHeight(type='text')
+					.form-group
+						label.control-label.col-md-2 Inter-strip spacing
+						.col-md-3
+							input#interSpacing(type='text')
+			.modal-footer
+				button.btn.btn-default(type='button', data-dismiss='modal') Close
+#patternModal.modal.fade(tabindex='-1', role='dialog')
+	.modal-dialog.modal-lg
+		.modal-content
+			.modal-header
+				button.close(type='button', data-dismiss='modal', aria-label='Close')
+					span(aria-hidden='true') ×
+				h4.modal-title Pattern Editor
+			.modal-body
+				.container-fluid
+					.row
+						.col-md-6
+							form.form-horizontal
+								.form-group
+									label.control-label.col-md-3 Motif:
+									.col-md-9
+										select#patternDropdown.form-control(style="width: 100%")
+								#presets
+									.form-group
+										label#patternLabel1.control-label.col-md-3
+										.col-md-9
+											input#patternSlider1(type='text')
+									.form-group
+										label#patternLabel2.control-label.col-md-3
+										.col-md-9
+											input#patternSlider2(type='text')
+								#inferText
+									p
+										| In this setting, this tile's pattern will be dynamically inferred from its neighbors' on its canvas.
+									p To trigger the inference algorithm, click the "Infer" button above.
+								#customPattern
+									.form-group
+										.col-md-offset-3.col-md-9
+											a#newCustomPattern.btn.btn-primary Add new pattern
+											a#deleteCustomPattern.btn.btn-primary Delete pattern
+									.form-group
+										label.control-label.col-md-3 Patterns:
+										.col-md-9
+											select#customPatternSelect.form-control(multiple='', size='3')
+									.form-group
+										label.control-label.col-md-3 Degrees of freedom:
+										.col-md-9
+											input#degreesOfFreedom(type='text')
+									.form-group
+										label.control-label.col-md-3 Edges:
+										.col-md-9
+											.radio
+												label
+													input(type='radio', name='edgeRadios', value='auto', checked='')
+													| Extends from every
+													input#patternInterval.input-small-padded.input-small(value='2', type='text')
+													| edge(s) starting from edge
+													input#patternStart.input-small-padded.input-small(value='0', type='text')
+													| and spans
+													input#patternDepth.input-small-padded.input-small(value='2', type='text')
+													| edges counting clockwise.
+											.radio
+												label
+													input(type='radio', name='edgeRadios', value='manual')
+													| Manual array specification:
+													input#manualEdges.form-control(type='text', placeholder='[[1,5],[2,3]]')
+									.form-group
+										label.control-label.col-md-3 Start offset:
+										.col-md-9
+											input#startOffset(type='text')
+									.form-group
+										label.control-label.col-md-3 End offset:
+										.col-md-9
+											input#endOffset(type='text')
+									.form-group
+										label.control-label.col-md-3 Symmetry:
+										.col-md-9
+											.radio
+												label
+													input(type='radio', name='symmetryRadios', value='mirrorCrop', checked='')
+													|  Mirror symmetry with cropping
+											.radio
+												label
+													input(type='radio', name='symmetryRadios', value='mirrorNoCrop')
+													|  Mirror symmetry without cropping
+											.radio
+												label
+													input(type='radio', name='symmetryRadios', value='noMirror')
+													|  No mirror symmetry
+						.col-md-6
+							#patternEditSvg
+			.modal-footer
+				a#confirmPattern.btn.btn-primary Confirm
+				button.btn.btn-default(type='button', data-dismiss='modal') Close
+script(src='js/init.js', charset='utf-8')

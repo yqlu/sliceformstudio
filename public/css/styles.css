@@ -1,0 +1,276 @@
+#toolbar {
+  width: 10%;
+  height: 10%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  padding: 5px;
+}
+#assembleSvg{
+      position: relative;
+}
+.input-small {
+  display: inline-block;
+  width: 40px;
+}
+svg {
+  border: solid 1px #dddddd;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+.palette-background {
+  fill: #ffd699;
+}
+g.translucent path.interior,
+g.translucent line.edge {
+  fill-opacity: 0.8;
+  stroke-opacity: 0.8;
+}
+rect.palette-button {
+  border: solid 1px #dddddd;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+path.interior {
+  transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  -webkit-transition: all 0.5s ease;
+  fill: white;
+}
+path.interior.interior.infer {
+  fill: #fffbd4;
+}
+path.interior.interior.infer.hover {
+  fill: #ffeb3b;
+}
+path.interior.interior.infer.selected {
+  fill: #fffbd4;
+}
+path.interior.hover {
+  fill: #c5ecfe;
+}
+path.interior.selected {
+  fill: #c5ecfe;
+}
+path.pattern {
+  transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  -webkit-transition: all 0.5s ease;
+  fill: none;
+  stroke: darkgrey;
+  stroke-width: 3;
+}
+path.pattern.traced {
+  stroke: silver;
+  stroke-width: 4;
+}
+path.patternHelperLine {
+  stroke: pink;
+  stroke-width: 6;
+  stroke-opacity: 50%;
+  fill: none;
+}
+path.strip-outline {
+  transition: stroke 0.5s ease;
+  -moz-transition: stroke 0.5s ease;
+  -o-transition: stroke 0.5s ease;
+  -webkit-transition: stroke 0.5s ease;
+  stroke-width: 8;
+  fill: none;
+  stroke: black;
+}
+path.strip {
+  transition: stroke 0.5s ease;
+  -moz-transition: stroke 0.5s ease;
+  -o-transition: stroke 0.5s ease;
+  -webkit-transition: stroke 0.5s ease;
+  stroke-width: 6;
+  fill: none;
+}
+path.strip.strip-above {
+  stroke: gainsboro;
+}
+path.strip.strip-below {
+  stroke: gainsboro;
+}
+line.edge {
+  transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  -webkit-transition: all 0.5s ease;
+  stroke: silver;
+  stroke-width: 5;
+}
+line.edge.hover {
+  stroke: #03a9f4;
+}
+line.edge.selected {
+  stroke: #2196f3;
+}
+line.edge.joined {
+  stroke: #4caf50;
+}
+line.edge.joined.hover {
+  stroke: #f44336;
+}
+line.edgehandle {
+  stroke: #f44336;
+  stroke-opacity: 0;
+  stroke-width: 20;
+}
+circle.vertex {
+  transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  -webkit-transition: all 0.5s ease;
+  fill: silver;
+}
+circle.vertex.actionable:hover {
+  fill: #03a9f4;
+  cursor: all-scroll;
+}
+circle.patternHandle {
+  transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  -webkit-transition: all 0.5s ease;
+  fill: pink;
+}
+circle.patternHandle:hover,
+g.active.patternHelper circle.patternHandle {
+  fill: red;
+}
+g.active.patternHelper path.patternHelperLine {
+  stroke: red;
+}
+line.edge.selectedGroup,
+path.pattern.selectedGroup {
+  stroke: #2ebcfc;
+}
+circle.vertex.selectedGroup {
+  fill: #2ebcfc;
+}
+.toolbar {
+  margin-top: 15px;
+}
+.header {
+  text-align: center;
+}
+.tab-pane {
+  height: 700px;
+}
+.tooltip {
+  pointer-events: none;
+}
+.hidden {
+  display: none;
+}
+.capitalize {
+  text-transform: capitalize;
+}
+ul.nav li a {
+  pointer-events: none;
+}
+li.inactive a {
+  color: #9e9e9e;
+}
+li.done a {
+  color: #4caf50;
+}
+.slider-selection {
+  background: #BABABA;
+}
+.label {
+  font-family: sans-serif;
+  font-size: 10px;
+}
+/* COLORPICKER 1 EXAMPLE */
+#colorPicker {
+  width: 30px;
+  height: 30px;
+  position: relative;
+  clear: both;
+  margin: 80px auto 20px;
+}
+#colorPicker .track {
+  background: #efefef url(../images/text-color.png) no-repeat 50% 50%;
+  height: 150px;
+  width: 150px;
+  padding: 10px;
+  position: absolute;
+  cursor: crosshair;
+  float: left;
+  left: -71px;
+  top: -71px;
+  display: none;
+  border: 1px solid #ccc;
+  z-index: 10;
+  -webkit-border-radius: 150px;
+  -moz-border-radius: 150px;
+  border-radius: 150px;
+}
+#colorPicker .color {
+  width: 25px;
+  height: 25px;
+  padding: 1px;
+  border: 1px solid #ccc;
+  display: block;
+  position: relative;
+  z-index: 11;
+  background-color: #EFEFEF;
+  -webkit-border-radius: 27px;
+  -moz-border-radius: 27px;
+  border-radius: 27px;
+  cursor: pointer;
+}
+#colorPicker .colorInner {
+  width: 25px;
+  height: 25px;
+  -webkit-border-radius: 27px;
+  -moz-border-radius: 27px;
+  border-radius: 27px;
+}
+#colorPicker .dropdown {
+  list-style: none;
+  display: none;
+  width: 27px;
+  position: absolute;
+  top: 28px;
+  border: 1px solid #ccc;
+  left: 0;
+  z-index: 1000;
+}
+#colorPicker .dropdown li {
+  height: 25px;
+  cursor: pointer;
+}
+
+.select2-wrapper {
+  padding: 20px;
+}
+.select2-container--default .select2-results > .select2-results__options {
+  max-height: 500px;
+}
+.input-small-padded {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+@media (min-width:1200px){
+  #patternModal > .modal-lg{
+    width:1100px
+  }
+}
+
+.padded-btn-group {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+.btn[disabled="disabled"] {
+    pointer-events: auto;
+}

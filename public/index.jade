@@ -1,0 +1,6 @@
+script(src='#{baseUrl}/js/script.js')
+.container
+	.grid
+		for image in public.images.gallery._contents
+			.grid-item
+				img(src="images/gallery/#{ image }")

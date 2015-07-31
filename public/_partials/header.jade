@@ -1,0 +1,7 @@
+.container
+	.header
+		h1 Wallpaper
+		h4 Create and design sliceform paper artwork.
+		div
+			each term in public._data.contents
+				a.nav(href="#{term.url}")= term.label

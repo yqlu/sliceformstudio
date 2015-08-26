@@ -61,7 +61,9 @@ var patternUnidirectionalTrace = function(patternData, nextEdge) {
 			// try bouncing instead
 
 			var bouncePattern = _.find(nextEdge.patterns, function(p) {
-				return p.pattern.this !== currPattern.this && p.proportion === selfPatternObject.proportion;
+				return p.pattern.this !== currPattern.this && p.proportion === selfPatternObject.proportion
+				// check that the pattern has not already been matched off
+					&& p.pattern.this.parentNode !== null;
 			});
 
 			if (bouncePattern) {

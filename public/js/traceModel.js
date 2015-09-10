@@ -394,9 +394,11 @@ var updateStripTable = function() {
 		});
 		var svg = d3.select("#stripSvg").select("svg").node();
 		var serializer = new XMLSerializer();
-		var pom = document.createElement('a');
-		pom.setAttribute('href', 'data:image/xvg+xml;charset=utf-8,' + serializer.serializeToString(svg));
-		pom.setAttribute('download', d.color.name+".svg");
+		var pom = d3.select("#downloadLink").node();
+		var bb = new Blob([serializer.serializeToString(svg)], {type: "image/svg+xml"});
+		pom.download = d.color.name+".svg";
+		pom.href = window.URL.createObjectURL(bb);
+		pom.dataset.downloadurl = ["image/svg+xml", pom.download, pom.href].join(':');
 		pom.click();
 		d3.select(svg).remove();
 	}).text("Generate SVG");

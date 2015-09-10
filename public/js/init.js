@@ -117,19 +117,21 @@ $(copyButton[0]).tooltip({container: 'body'});
 
 var editPatternButton = d3.select("#editPattern")
 	.on("click", function() {
-		$("#patternModal").modal();
-		var newTiles = selection.get().groupNode.__data__.tiles;
-		patternEditSVGDrawer.set(_.cloneDeep(newTiles));
-		patternEditSVGDrawer.draw();
+		if (editPatternButton.attr("disabled") === null) {
+			$("#patternModal").modal();
+			var newTiles = selection.get().groupNode.__data__.tiles;
+			patternEditSVGDrawer.set(_.cloneDeep(newTiles));
+			patternEditSVGDrawer.draw();
 
-		if (newTiles[0].patternParams) {
-			var params = newTiles[0].patternParams;
-			patternDropdown.node().value = params.index;
-			$("#patternDropdown").trigger("change");
-			patternSlider1.setValue(params.param1);
-			patternSlider2.setValue(params.param2);
-		} else {
-			$("#patternDropdown").trigger("change");
+			if (newTiles[0].patternParams) {
+				var params = newTiles[0].patternParams;
+				patternDropdown.node().value = params.index;
+				$("#patternDropdown").trigger("change");
+				patternSlider1.setValue(params.param1);
+				patternSlider2.setValue(params.param2);
+			} else {
+				$("#patternDropdown").trigger("change");
+			}
 		}
 	})
 	.attr("disabled", "disabled");

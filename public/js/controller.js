@@ -1,7 +1,7 @@
 // drag handler for translation, attached to top level g element
 var dragMove = d3.behavior.drag()
 .origin(function() {
-	return {x: 0, y: 0}
+	return {x: 0, y: 0};
 })
 .on("drag", function(d,i) {
 	// update x y coordinates
@@ -113,37 +113,58 @@ var dragEdit = d3.behavior.drag()
 	updateDimensions(this.parentNode.__data__);
 });
 
+var updateUIForCustomTemplate = function(template, forceFlag) {
+	if (template === null || typeof template === "undefined") {
+		resetCustomPatternUIValues();
+	} else {
+		// if forceFlag is true, always update the UI (applicable for patternDropdown on change)
+		// if forceFlag is false, only update UI if thisTemplate is not selected
+		// (applicable for switching values when dragging a different pattern handle)
+		var tile = template.this.parentNode.__data__;
+		var thisIndex = _.findIndex(tile.customTemplate, function(t) { return t === template; });
+
+		if (forceFlag ||
+			($("#customPatternSelect").val() && $("#customPatternSelect").val().length === 1 &&
+			$("#customPatternSelect").val()[0] !== ""+thisIndex)) {
+
+			$("#customPatternSelect").val(thisIndex);
+			$(":radio[value=" + template.edgesSpec + "]").prop("checked", true);
+			$(":radio[value=" + template.symmetrySpec + "]").prop("checked", true);
+			$("#patternInterval").val(template.patternInterval);
+			$("#patternStart").val(template.startEdge);
+			$("#patternDepth").val(template.patternDepth);
+			$("#manualEdges").val(JSON.stringify(template.applicableEdges));
+			startOffset.setValue(template.startProportion - 0.5);
+			endOffset.setValue(template.endProportion - 0.5);
+			degreesOfFreedom.setValue(template.points.length);
+		}
+		d3.select(template.this.parentNode).selectAll("g.patternHelper").classed("active", false);
+		d3.select(template.this).classed("active", true);
+	}
+};
+
+var resetCustomPatternUIValues = function() {
+	$("#customPatternSelect").val(0);
+	$(":radio[value=auto]").prop("checked", true);
+	$(":radio[value=mirrorCrop]").prop("checked", true);
+	$("#patternInterval").val(2);
+	$("#patternStart").val(0);
+	$("#patternDepth").val(2);
+	$("#manualEdges").val("");
+	startOffset.setValue(0);
+	endOffset.setValue(0);
+	degreesOfFreedom.setValue(1);
+};
+
 // drag handler for editing custom pattern handles
 var dragPatternHandleEdit = d3.behavior.drag()
 .on("dragstart", function(d, i) {
-	var thisTemplate = this.parentNode.__data__;
-	var tile = this.parentNode.parentNode.__data__;
-	var thisIndex = _.findIndex(tile.customTemplate, function(t) { return t === thisTemplate; });
-	if (!$("#customPatternSelect").val() || $("#customPatternSelect").val().length !== 1 ||
-		// update UI
-		$("#customPatternSelect").val()[0] !== ""+thisIndex) {
-		$("#customPatternSelect").val(thisIndex);
-		$(":radio[value=" + thisTemplate.edgesSpec + "]").prop("checked", true);
-		$(":radio[value=" + thisTemplate.symmetrySpec + "]").prop("checked", true);
-		$("#patternInterval").val(thisTemplate.patternInterval);
-		$("#patternStart").val(thisTemplate.startEdge);
-		$("#patternDepth").val(thisTemplate.patternDepth);
-		$("#manualEdges").val(JSON.stringify(thisTemplate.applicableEdges));
-		startOffset.setValue(thisTemplate.startProportion - 0.5);
-		endOffset.setValue(thisTemplate.endProportion - 0.5);
-		degreesOfFreedom.setValue(thisTemplate.points.length);
-	}
-
-	d3.select(this.parentNode.parentNode).selectAll("g.patternHelper").classed("active", false);
-	d3.select(this.parentNode).classed("active", true);
-
+	updateUIForCustomTemplate(this.parentNode.__data__, false);
 })
 .on("drag", function(d, i) {
 	d.transform = num.translateBy(d.transform, d3.event.dx, d3.event.dy);
 	d3.select(this).attr("transform", num.getTransform);
-
 	var tile = this.parentNode.parentNode.__data__;
-
 	patternFn = makePatterns(_.last(patternOptions).generator(tile));
 	polygonAddPattern(tile, patternFn);
 	patternEditSVGDrawer.redrawPatterns(true);
@@ -249,6 +270,7 @@ var patternDropdownChange = function() {
 	var index = patternDropdown.node().value;
 	var motif = patternOptions[index];
 	var tile = patternEditSVGDrawer.getTile();
+
 	var n = tile.vertices.length;
 
 	if (motif.parameters.length === 2) {
@@ -277,14 +299,31 @@ var patternDropdownChange = function() {
 		}
 	}
 
-	patternUpdate();
-
 	if (motif.name === "Custom") {
-		patternMultiSelectUpdate(tile.customTemplate);
+		if (tile.customTemplate && tile.customTemplate.length > 0) {
+			// if the tile has a pre-existing custom template,
+			// first update the multi-select, update all UI elements to reflect the parameters
+			// and then draw the pattern
+			patternMultiSelectUpdate(tile.customTemplate);
+			updateUIForCustomTemplate(tile.customTemplate[0], true);
+			patternUpdate();
+		} else {
+			// if there is no pre-existing custom template,
+			// reset all UI elements to default values,
+			// draw the default pattern and update the multi-select accordingly
+			resetCustomPatternUIValues();
+			patternUpdate();
+			patternMultiSelectUpdate(tile.customTemplate);
+		}
+	} else {
+		delete tile.customTemplate;
+		patternUpdate();
 	}
+
 };
 
 var patternMultiSelectUpdate = function(customTemplate) {
+
 	// now that customTemplate is populated
 	var sel = d3.select("#customPatternSelect").selectAll("option")
 	.data(customTemplate);

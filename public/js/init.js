@@ -122,7 +122,6 @@ var editPatternButton = d3.select("#editPattern")
 			var newTiles = selection.get().groupNode.__data__.tiles;
 			patternEditSVGDrawer.set(_.cloneDeep(newTiles));
 			patternEditSVGDrawer.draw();
-
 			if (newTiles[0].patternParams) {
 				var params = newTiles[0].patternParams;
 				patternDropdown.node().value = params.index;
@@ -130,13 +129,13 @@ var editPatternButton = d3.select("#editPattern")
 				patternSlider1.setValue(params.param1);
 				patternSlider2.setValue(params.param2);
 			} else {
+				patternDropdown.node().value = 0;
 				$("#patternDropdown").trigger("change");
 			}
 		}
 	})
 	.attr("disabled", "disabled");
 $(editPatternButton[0]).tooltip({container: 'body'});
-
 
 // initializing dropdown options
 var shapeOptionsBuilder = (function() {

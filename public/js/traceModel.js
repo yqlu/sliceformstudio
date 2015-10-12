@@ -67,6 +67,9 @@ var patternUnidirectionalTrace = function(patternData, nextEdge) {
 			});
 
 			if (bouncePattern) {
+				selfPatternObject.intersect = false;
+				bouncePattern.intersect = false;
+
 				if (currPattern.start.edge.this === nextEdge.this) {
 					currPattern.start.intersect = false;
 					currPattern.intersectedVertices[0].intersect = false;

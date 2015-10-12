@@ -403,6 +403,10 @@ var updateTileWithPatternClick = function() {
 		drawPatterns(d3.select(this), {});
 	});
 
+	var inferTiles = assembleCanvas.selectAll("g.tile").filter(function(d, i) { return d.infer; });
+	if (_.flatten(inferTiles).length === 0) {
+		inferButton.classed("hidden", true);
+	}
 };
 
 var newCustomPatternClick = function() {
@@ -451,11 +455,11 @@ var copyHandler = function(d, i) {
 var deleteHandler = function(d, i) {
 	if (selection.get().groupNode.parentNode === assembleCanvas.node()) {
 		// if there are no more inferTiles in the canvas, hide the infer button
+		selection.delete();
 		var inferTiles = assembleCanvas.selectAll("g.tile").filter(function(d, i) { return d.infer; });
 		if (_.flatten(inferTiles).length === 0) {
 			inferButton.classed("hidden", true);
 		}
-		selection.delete();
 	} else if (selection.get().groupNode.parentNode === assemblePaletteContainer.node()) {
 		selection.delete(assembleSVGDrawer);
 	}

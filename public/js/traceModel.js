@@ -6,6 +6,8 @@ var nodePatternTrace = function(patternData) {
 // given a pattern, trace out an array of contiguous patterns
 var patternTrace = function(patternData) {
 
+	console.log(patternData.start.edge.joinedTo, patternData.end.edge.joinedTo);
+
 	var currPattern = patternData;
 	var nextEdge = currPattern.end.edge;
 
@@ -37,6 +39,8 @@ var patternUnidirectionalTrace = function(patternData, nextEdge) {
 
 	var patternList = [], cycle = false;
 
+	// console.log("currPattern", currPattern);
+
 	while (nextEdge.joinedTo) {
 		var selfPatternObject = _.find(nextEdge.patterns, function(p) {
 			return p.pattern.this === currPattern.this;
@@ -49,6 +53,8 @@ var patternUnidirectionalTrace = function(patternData, nextEdge) {
 		}), function(p) {
 			return Math.abs(p.angle - selfPatternObject.angle);
 		});
+
+		// console.log(otherEdge, otherPattern);
 
 		var shouldBeSelf = _.min(_.filter(nextEdge.patterns, function(p) {
 			return approxEq(p.proportion, 1 - otherPattern.proportion, config.polygonTolerance);
@@ -228,6 +234,7 @@ var underPoints = [];
 
 var redrawCanvas = function() {
 
+	// console.log($(traceCanvas.node()).find("path.pattern"));
 	overPoints = [];
 	underPoints = [];
 	while ($(traceCanvas.node()).find("path.pattern").length > 0) {
@@ -248,19 +255,19 @@ var groupPattern = function(patternData, strictMode) {
 	var traced = patternTrace(patternData);
 	var patternList = traced.patternList;
 
-	console.log(patternList);
+	// console.log(patternList);
 
 	var allVertices = _.flatten(_.map(patternList, function(p, index) {
 		var truncate = (index !== patternList.length - 1);
 		var transform = num.dot(p.pattern.this.parentNode.parentNode.__data__.transform,
 			p.pattern.this.parentNode.__data__.transform);
 
-		console.log(transform);
+		// console.log(transform);
 		var transformedVertices = _.map(p.pattern.intersectedVertices, function(obj) {
 			var ans = num.dot(transform, obj.coords.concat([1]));
 			return {intersect: obj.intersect, x: ans[0], y: ans[1]};
 		});
-		console.log(transformedVertices);
+		// console.log(transformedVertices);
 
 		if (p.reverse) {
 			transformedVertices.reverse();

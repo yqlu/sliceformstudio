@@ -298,7 +298,18 @@ var draw = function(container, inputlist, options) {
 	// invoked upon copying elements
 
 	groups.each(function(d, i) {
-		detectSelfJoins(d3.select(this).selectAll("line.edge"), true);
+		console.log(d, d.joinedEdges);
+		_.each(d.joinedEdges, function(pair) {
+			// console.log
+			// abstract this out!!
+			var edge1 = d.tiles[pair[0][0]].edges[pair[0][1]];
+			var edge2 = d.tiles[pair[1][0]].edges[pair[1][1]];
+			edge1.joinedTo = edge2.this;
+			edge2.joinedTo = edge1.this;
+			d3.selectAll([edge1.this, edge2.this])
+			.classed("joined", true);
+			});
+		// detectSelfJoins(d3.select(this).selectAll("line.edge"), true);
 	});
 
 	if (options.autoresizeSidebar) {

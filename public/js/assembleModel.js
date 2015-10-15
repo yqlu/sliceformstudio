@@ -283,9 +283,25 @@ var joinEdges = function(thisEdgeNode, selected) {
 		d3.select(selected.groupNode).remove();
 
 		// equivalent of detectJoins
-		thisEdgeNode.__data__.joinedTo = selected.edgeNode;
+		d.joinedTo = selected.edgeNode;
 		selected.edgeNode.__data__.joinedTo = thisEdgeNode;
 		d3.selectAll([thisEdgeNode, selected.edgeNode])
 		.classed("joined", true);
+
+		// recompute joinedEdges
+		thisGroupNode.__data__.joinedEdges = [];
+		_.each(thisGroupNode.__data__.tiles, function(tile, tileIndex) {
+			_.each(tile.edges, function(edge, edgeIndex) {
+				edge.id = [tileIndex, edgeIndex];
+			});
+		});
+		_.each(thisGroupNode.__data__.tiles, function(tile, tileIndex) {
+			_.each(tile.edges, function(edge, edgeIndex) {
+				if (edge.joinedTo !== null) {
+					otherEdge = edge.joinedTo.__data__;
+					thisGroupNode.__data__.joinedEdges.push([edge.id, otherEdge.id]);
+				}
+			});
+		});
 	}
 }

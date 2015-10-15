@@ -100,7 +100,7 @@ var getSuccessors = function(thisTileNode, fromTileNode) {
 
 // activate joining of two edges
 // pass in an edge node and a selected object
-var joinEdges = function(thisEdgeNode, selected) {
+var joinEdges1 = function(thisEdgeNode, selected) {
 	if (selected === null) {
 		alert("Error: cannot join unselected edges!");
 	} else if (thisEdgeNode.parentNode.parentNode === selected.groupNode) {
@@ -230,5 +230,62 @@ var enterCanvas = function(groupNode) {
 		})
 		.transition()
 		.attr("transform", num.getTransform);
+	}
+}
+
+var joinEdges = function(thisEdgeNode, selected) {
+	if (selected === null) {
+		alert("Error: cannot join unselected edges!");
+	} else if (thisEdgeNode.parentNode.parentNode === selected.groupNode) {
+		alert("Error: cannot join edges from same group!");
+	} else if (!approxEq(thisEdgeNode.__data__.length, selected.edgeNode.__data__.length)) {
+		alert("Error: cannot join edges with different lengths!");
+	} else {
+		var d = thisEdgeNode.__data__;
+		var thisTileNode = thisEdgeNode.parentNode;
+		var thisGroupNode = thisTileNode.parentNode;
+
+		centerCoords(thisTileNode);
+		centerCoords(selected.tileNode);
+
+		// calculate equivalent transformation under new group
+		// to stay in original position
+		var orig = num.dot(
+			num.inv(thisGroupNode.__data__.transform),
+			selected.groupNode.__data__.transform);
+
+		// first transform to original equivalent transformation
+		// transition over time to destination
+		var tiles = d3.select(selected.groupNode)
+		.selectAll("g.tile")
+		.each(function(d) {
+			d.transform = num.dot(orig, d.transform);
+		})
+		.attr("transform", num.getTransform);
+
+		var theseEdges = _.cloneDeep(d3.select(thisGroupNode).selectAll("line.edge"));
+		var otherEdges = _.cloneDeep(d3.select(selected.groupNode).selectAll("line.edge"));
+
+		// move tiles to new group in the DOM
+		_.each(tiles[0], function(tile) {
+			thisGroupNode.appendChild(tile);
+		});
+
+		// update data to reflect
+		thisGroupNode.__data__.tiles.extend(selected.groupNode.__data__.tiles);
+
+		// remove original group from polylist
+		polylist.splice(_.findIndex(polylist, function(group) {
+			return group.this === selected.groupNode;
+		}),1);
+
+		// remove group node from DOM
+		d3.select(selected.groupNode).remove();
+
+		// equivalent of detectJoins
+		thisEdgeNode.__data__.joinedTo = selected.edgeNode;
+		selected.edgeNode.__data__.joinedTo = thisEdgeNode;
+		d3.selectAll([thisEdgeNode, selected.edgeNode])
+		.classed("joined", true);
 	}
 }

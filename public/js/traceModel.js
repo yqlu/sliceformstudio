@@ -248,14 +248,19 @@ var groupPattern = function(patternData, strictMode) {
 	var traced = patternTrace(patternData);
 	var patternList = traced.patternList;
 
+	console.log(patternList);
+
 	var allVertices = _.flatten(_.map(patternList, function(p, index) {
 		var truncate = (index !== patternList.length - 1);
 		var transform = num.dot(p.pattern.this.parentNode.parentNode.__data__.transform,
 			p.pattern.this.parentNode.__data__.transform);
+
+		console.log(transform);
 		var transformedVertices = _.map(p.pattern.intersectedVertices, function(obj) {
 			var ans = num.dot(transform, obj.coords.concat([1]));
 			return {intersect: obj.intersect, x: ans[0], y: ans[1]};
 		});
+		console.log(transformedVertices);
 
 		if (p.reverse) {
 			transformedVertices.reverse();

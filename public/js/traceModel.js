@@ -6,8 +6,6 @@ var nodePatternTrace = function(patternData) {
 // given a pattern, trace out an array of contiguous patterns
 var patternTrace = function(patternData) {
 
-	console.log(patternData.start.edge.joinedTo, patternData.end.edge.joinedTo);
-
 	var currPattern = patternData;
 	var nextEdge = currPattern.end.edge;
 
@@ -39,8 +37,6 @@ var patternUnidirectionalTrace = function(patternData, nextEdge) {
 
 	var patternList = [], cycle = false;
 
-	// console.log("currPattern", currPattern);
-
 	while (nextEdge.joinedTo) {
 		var selfPatternObject = _.find(nextEdge.patterns, function(p) {
 			return p.pattern.this === currPattern.this;
@@ -53,8 +49,6 @@ var patternUnidirectionalTrace = function(patternData, nextEdge) {
 		}), function(p) {
 			return Math.abs(p.angle - selfPatternObject.angle);
 		});
-
-		// console.log(otherEdge, otherPattern);
 
 		var shouldBeSelf = _.min(_.filter(nextEdge.patterns, function(p) {
 			return approxEq(p.proportion, 1 - otherPattern.proportion, config.polygonTolerance);
@@ -184,7 +178,7 @@ var buildStrip = function(traced) {
 // return line generator for an up-down alternating line
 // skips every other crossing
 // used for drawing interlaced patterns
-var altLine = function(vertices, takeIntersect, isOutline) {
+var altLineFromSegment = function(vertices, takeIntersect, isOutline) {
 	var avg = isOutline ? function(x, y) {
 		return 0.51 * x + 0.49 * y;
 	} : function(x, y) {
@@ -194,12 +188,13 @@ var altLine = function(vertices, takeIntersect, isOutline) {
 	var accumulator = ["M"+vertices[0].x+","+vertices[0].y];
 
 	_.each(vertices, function(v, i) {
+		var u;
 		var isLast = (i === vertices.length - 1);
 		if (takeIntersect && v.intersect) {
 			takeIntersect = !takeIntersect;
 			accumulator.push("L"+v.x+","+v.y);
 			if (!isLast) {
-				var u = vertices[i+1];
+				u = vertices[i+1];
 				accumulator.push("L"+avg(v.x, u.x)+","+avg(v.y, u.y));
 			}
 		} else if (takeIntersect && !v.intersect) {
@@ -210,7 +205,7 @@ var altLine = function(vertices, takeIntersect, isOutline) {
 		} else if (!takeIntersect && v.intersect) {
 			takeIntersect = !takeIntersect;
 			if (!isLast) {
-				var u = vertices[i+1];
+				u = vertices[i+1];
 				accumulator.push("M"+avg(u.x, v.x)+","+avg(u.y, v.y));
 			}
 			// push an M after this vertex
@@ -222,19 +217,42 @@ var altLine = function(vertices, takeIntersect, isOutline) {
 	return accumulator.join(" ");
 };
 
-var everyOtherIntersect = function(vertices, bool) {
-	return _.filter(_.filter(vertices, "intersect"), function(v,index) {
-		return !!(index%2) === bool;
-	});
+var altLine = function(segments, takeIntersect, isOutline) {
+	var avg = isOutline ? function(x, y) {
+		return 0.51 * x + 0.49 * y;
+	} : function(x, y) {
+		return 0.5 * (x+y);
+	};
+
+	var intersectBool = takeIntersect;
+	return _.map(segments, function(seg) {
+		var numberOfFlips = _.filter(seg, "intersect").length;
+		var generatedSeg = altLineFromSegment(seg, intersectBool, isOutline);
+		// xor operator to pass correct parity of intersectBool into next altLine
+		intersectBool = ( numberOfFlips % 2 === 0 ? !intersectBool : intersectBool );
+		return generatedSeg;
+	}).join(" ");
+};
+
+var everyOtherIntersect = function(segments, bool) {
+	var i = 0;
+	return _.flatten(_.map(segments, function(segment) {
+		return _.filter(_.filter(segment, "intersect"), function(v,index) {
+			if (i > 0 && index === 0) {
+				// first vertex of new segment
+				// same as last seen vertex, don't increment i
+			} else {
+				i += 1;
+			}
+			return !!(i%2) === bool;
+		});
+	}), true);
 };
 
 var overPoints = [];
 var underPoints = [];
 
-
 var redrawCanvas = function() {
-
-	// console.log($(traceCanvas.node()).find("path.pattern"));
 	overPoints = [];
 	underPoints = [];
 	while ($(traceCanvas.node()).find("path.pattern").length > 0) {
@@ -249,48 +267,57 @@ var redrawCanvas = function() {
 	}
 };
 
-
 var groupPattern = function(patternData, strictMode) {
 
 	var traced = patternTrace(patternData);
 	var patternList = traced.patternList;
 
-	// console.log(patternList);
-
-	var allVertices = _.flatten(_.map(patternList, function(p, index) {
-		var truncate = (index !== patternList.length - 1);
+	var rawSegments = _.map(patternList, function(p, index) {
 		var transform = num.dot(p.pattern.this.parentNode.parentNode.__data__.transform,
 			p.pattern.this.parentNode.__data__.transform);
 
-		// console.log(transform);
 		var transformedVertices = _.map(p.pattern.intersectedVertices, function(obj) {
 			var ans = num.dot(transform, obj.coords.concat([1]));
 			return {intersect: obj.intersect, x: ans[0], y: ans[1]};
 		});
-		// console.log(transformedVertices);
 
 		if (p.reverse) {
 			transformedVertices.reverse();
 		}
 
-		return truncate ? _.initial(transformedVertices) : transformedVertices;
-	}), true);
+		return transformedVertices;
+	});
+
+	var reducedSegments = _.reduce(rawSegments, function(acc, newSeg, idx) {
+		if (idx === 0) {
+			return [newSeg];
+		} else {
+			var firstPtOfNewSeg = [_.head(newSeg).x, _.head(newSeg).y];
+			var lastPtOfOldSeg = [_.last(_.last(acc)).x, _.last(_.last(acc)).y];
+			if (approxEqPoints(firstPtOfNewSeg, lastPtOfOldSeg)) {
+				_.last(acc).extend(_.tail(newSeg));
+			} else {
+				acc.push(newSeg);
+			}
+			return acc;
+		}
+	}, []);
 
 	if (traced.hasCycle) {
 		// duplicate first for last
-		allVertices.push(_.cloneDeep(allVertices[1]));
+		_.last(reducedSegments).push(_.cloneDeep(_.first(reducedSegments)[1]));
 	}
 
 	var extendedEnd = false, extendedStart = false;
 
 	// extend start and end segments as appropriate
 
-	if (_.last(allVertices).intersect && !traced.hasCycle) {
-		var finalPts = _.last(allVertices,2);
+	if (_.last(_.last(reducedSegments)).intersect && !traced.hasCycle) {
+		var finalPts = _.last(_.last(reducedSegments),2);
 		var finalCoord = [finalPts[1].x, finalPts[1].y];
 		var finalVector = [finalPts[1].x - finalPts[0].x, finalPts[1].y - finalPts[0].y];
 		var finalExtension = num.vecSum(finalCoord, num.vecProd(num.normalize(finalVector), extensionSlider.getValue() * config.sidelength));
-		allVertices.push({
+		_.last(reducedSegments).push({
 			intersect: false,
 			x: finalExtension[0],
 			y: finalExtension[1]
@@ -298,12 +325,12 @@ var groupPattern = function(patternData, strictMode) {
 		extendedEnd = true;
 	}
 
-	if (_.first(allVertices).intersect && !traced.hasCycle) {
-		var initialPts = _.first(allVertices,2);
+	if (_.first(_.first(reducedSegments)).intersect && !traced.hasCycle) {
+		var initialPts = _.first(_.first(reducedSegments),2);
 		var initialCoord = [initialPts[0].x, initialPts[0].y];
 		var initialVector = [initialPts[0].x - initialPts[1].x, initialPts[0].y - initialPts[1].y];
 		var initialExtension = num.vecSum(initialCoord, num.vecProd(num.normalize(initialVector), extensionSlider.getValue() * config.sidelength));
-		allVertices.unshift({
+		_.first(reducedSegments).unshift({
 			intersect: false,
 			x: initialExtension[0],
 			y: initialExtension[1]
@@ -311,15 +338,19 @@ var groupPattern = function(patternData, strictMode) {
 		extendedStart = true;
 	}
 
+	// boolean determined in next block,
+	// used for drawing in alt-line
+	var direction;
+
 	// assign over and under
 	if (overPoints.length === 0) {
 		// easy step: no constraints, so just arbitrarily assign over and under
-		var direction = true;
-		overPoints.extend(everyOtherIntersect(allVertices, true));
-		underPoints.extend(everyOtherIntersect(allVertices, false));
+		direction = true;
+		overPoints.extend(everyOtherIntersect(reducedSegments, true));
+		underPoints.extend(everyOtherIntersect(reducedSegments, false));
 	} else {
 		// check over and under
-		var potentialOverPoints = everyOtherIntersect(allVertices, true);
+		var potentialOverPoints = everyOtherIntersect(reducedSegments, true);
 		if (_.any(potentialOverPoints, function(p1) {
 			return _.any(overPoints, function(p2) {
 				return approxEq(p1.x, p2.x) && approxEq(p1.y, p2.y);
@@ -332,8 +363,8 @@ var groupPattern = function(patternData, strictMode) {
 			})) {
 				return true; // ERROR: try next element
 			}
-			var direction = false;
-			overPoints.extend(everyOtherIntersect(allVertices, false));
+			direction = false;
+			overPoints.extend(everyOtherIntersect(reducedSegments, false));
 			underPoints.extend(potentialOverPoints);
 		} else {
 			if (strictMode && !_.any(potentialOverPoints, function(p1) {
@@ -345,17 +376,33 @@ var groupPattern = function(patternData, strictMode) {
 				// adding it to list may result in future contradictions
 				return true; // ERROR: try next element
 			}
-			var direction = true;
+			direction = true;
 			overPoints.extend(potentialOverPoints);
-			underPoints.extend(everyOtherIntersect(allVertices, false));
+			underPoints.extend(everyOtherIntersect(reducedSegments, false));
 		}
 	}
 
 	// construct lines corresponding to over and under
-	var overOutline = traceCanvas.append("path").classed("strip-outline", true).attr("d", function() { return altLine(allVertices, direction, true); }).node();
-	var overStrip = traceCanvas.append("path").classed("strip strip-above", true).attr("d", function() { return altLine(allVertices, direction, false); }).node();
-	var underStrip = traceCanvas.insert("path", ":first-child").classed("strip strip-below", true).attr("d", function() { return line(allVertices); }).node();
-	var underOutline = traceCanvas.insert("path", ":first-child").classed("strip-outline", true).attr("d", underStrip.getAttribute("d")).node();
+	var overOutline = traceCanvas.append("path")
+					.classed("strip-outline", true)
+					.attr("d", function() {
+						return altLine(reducedSegments, direction, true);
+					}).node();
+	var overStrip = traceCanvas.append("path")
+					.classed("strip strip-above", true)
+					.attr("d", function() {
+						return altLine(reducedSegments, direction, false);
+					}).node();
+	var underStrip = traceCanvas.insert("path", ":first-child")
+					.classed("strip strip-below", true)
+					.attr("d", function() {
+						return _.map(reducedSegments, function(seg) {
+							return line(seg);
+						}).join(" ");
+					}).node();
+	var underOutline = traceCanvas.insert("path", ":first-child")
+					.classed("strip-outline", true)
+					.attr("d", underStrip.getAttribute("d")).node();
 
 	d3.selectAll([overOutline, underOutline]).attr("stroke-linejoin", "miter").style("stroke-width", thicknessSlider.getValue()+1);
 

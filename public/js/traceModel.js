@@ -304,8 +304,13 @@ var groupPattern = function(patternData, strictMode) {
 	}, []);
 
 	if (traced.hasCycle) {
-		// duplicate first for last
-		_.last(reducedSegments).push(_.cloneDeep(_.first(reducedSegments)[1]));
+		var firstPt = reducedSegments[0][0];
+		var lastPt = _.last(_.last(reducedSegments));
+		var seamIsContinuous = approxEqPoints([firstPt.x, firstPt.y], [lastPt.x, lastPt.y]);
+		if (seamIsContinuous) {
+			// duplicate first for last for smooth display
+			_.last(reducedSegments).push(_.cloneDeep(_.first(reducedSegments)[1]));
+		}
 	}
 
 	var extendedEnd = false, extendedStart = false;

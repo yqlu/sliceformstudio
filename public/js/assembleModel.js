@@ -99,24 +99,28 @@ var getSuccessors = function(thisTileNode, fromTileNode) {
 				edges: [edgeNode, edgeNode.__data__.joinedTo]
 			};
 		});
-}
+};
 
 
 // activate joining of two edges
 // pass in an edge node and a selected object
 var joinEdges = function(thisEdgeNode, selected) {
+	var autoSnapMode = $("#autoSnap").prop("checked");
+	var d = thisEdgeNode.__data__;
+	var thisTileNode = thisEdgeNode.parentNode;
+	var thisGroupNode = thisTileNode.parentNode;
+
 	if (selected === null) {
 		alert("Error: cannot join unselected edges!");
 	} else if (thisEdgeNode.parentNode.parentNode === selected.groupNode) {
-		alert("Error: cannot join edges from same group!");
+		if (autoSnapMode) {
+			alert("Error: cannot join edges from same group!");
+		} else {
+			joinNodes(thisEdgeNode, selected.edgeNode);
+		}
 	} else if (!approxEq(thisEdgeNode.__data__.length, selected.edgeNode.__data__.length)) {
 		alert("Error: cannot join edges with different lengths!");
 	} else {
-		var d = thisEdgeNode.__data__;
-		var thisTileNode = thisEdgeNode.parentNode;
-		var thisGroupNode = thisTileNode.parentNode;
-
-		var autoSnapMode = $("#autoSnap").prop("checked");
 
 		centerCoords(thisTileNode);
 		centerCoords(selected.tileNode);
@@ -180,14 +184,10 @@ var joinEdges = function(thisEdgeNode, selected) {
 		if (autoSnapMode) {
 			detectJoins(theseEdges, otherEdges, false);
 		} else {
-			d.joinedTo = selected.edgeNode;
-			selected.edgeNode.__data__.joinedTo = thisEdgeNode;
-			d3.selectAll([thisEdgeNode, selected.edgeNode])
-			.classed("joined", true);
+			joinNodes(thisEdgeNode, selected.edgeNode);
 		}
-
-		updateJoinedEdges(thisGroupNode.__data__);
 	}
+	updateJoinedEdges(thisGroupNode.__data__);
 };
 
 // detect how edges should be joined

@@ -227,14 +227,14 @@ var handleMouseover = function(edgeNode) {
 	if (hover && edgeNode !== hover.node && !d3.select(edgeNode).classed("joined")) {
 		candidate = edgeNode;
 	}
-	d3.select(edgeNode).classed('hover', true);
+	d3.selectAll([edgeNode, edgeNode.__data__.joinedTo]).classed('hover', true);
 };
 
 // mouseout handler for edge handle node
 var handleMouseout = function(edgeNode) {
 	candidate = null;
 	if (!hover || (edgeNode !== hover.node)) {
-		d3.select(edgeNode).classed('hover', false);
+		d3.selectAll([edgeNode, edgeNode.__data__.joinedTo]).classed('hover', false);
 	}
 };
 

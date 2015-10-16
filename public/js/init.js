@@ -370,7 +370,7 @@ var extensionSlider = new Slider("#extensionLength", {
 	min: 0,
 	max: 2,
 	step: 0.01,
-	value: 0.4,
+	value: 0.15,
 	formatter: function(value) {
 		return 'Current value: ' + value;
 	}
@@ -409,7 +409,7 @@ var stripHeight = new Slider("#stripHeight", {
 	min: 10,
 	max: 50,
 	step: 1,
-	value: 25,
+	value: 15,
 	formatter: function(value) {
 		return 'Current value: ' + value;
 	}
@@ -419,7 +419,7 @@ var widthFactor = new Slider("#widthFactor", {
 	min: 0.1,
 	max: 5,
 	step: 0.1,
-	value: 2,
+	value: 1.2,
 	formatter: function(value) {
 		return 'Current value: ' + value;
 	}

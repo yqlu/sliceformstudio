@@ -77,6 +77,7 @@ var drawPatterns = function(tiles, options) {
 	.attr("stroke-linecap", "round")
 	.each(function(d, i) {
 		d.this = this;
+		d.index = i;
 	})
 	.attr("d", function(d, i) {
 		return d.line;
@@ -108,6 +109,7 @@ var drawEdges = function(tiles, options) {
 	.classed("edge", true)
 	.each(function(d, i) {
 		d.this = this;
+		d.joinedTo = null;
 	})
 	.attr({
 		x1: function(d) {return d.ends[0][0];},

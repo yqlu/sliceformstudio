@@ -1,112 +1,7 @@
-Storage.prototype.setObject = function(key, value, filterTags) {
-
-	this.setItem(key, JSON.stringify(value, function(k, v) {
-		return (isNode(v)) ? "tag" : v;
-	}));
-};
-
-var reduceCircularity = function(tile) {
-
-	var tileCopy = _.cloneDeep(tile);
-	_.each(tileCopy.patterns, function(p, index) {
-		p.end.edge = p.end.edge.index; // replace reference with id
-		p.start.edge = p.start.edge.index;
-	});
-
-	_.each(tileCopy.edges, function(e) {
-		_.each(e.patterns, function(p) {
-			p.pattern = p.pattern.index;
-		});
-	});
-
-	return tileCopy;
-};
-
-var circularize = function(tile) {
-
-	var tileCopy = _.cloneDeep(tile);
-	_.each(tileCopy.patterns, function(p, index) {
-		p.end.edge = tileCopy.edges[p.end.edge]; // dereference index
-		p.start.edge = tileCopy.edges[p.start.edge];
-	});
-
-	_.each(tileCopy.edges, function(e) {
-		_.each(e.patterns, function(p) {
-			p.pattern = tileCopy.patterns[p.pattern];
-		});
-	});
-
-	return tileCopy;
-};
-
-Storage.prototype.getObject = function(key) {
-    var value = this.getItem(key);
-    return value && JSON.parse(value);
-};
-
-function isNode(o){
-  return (
-    typeof Node === "object" ? o instanceof Node :
-    o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName==="string"
-  );
-}
-
 // global UI variables
 var hover = null;
 var candidate = null;
 var polylist = [];
-
-var save = function() {
-	var circularKeys = ["this", "handle", "joinedTo"];
-	var nonCircularPolylist = _.map(polylist, function(group) {
-		var groupCopy = _.cloneDeep(group);
-		groupCopy.tiles = _.map(group.tiles, function(tile) {
-			return reduceCircularity(tile);
-		});
-		return groupCopy;
-	});
-
-	var nonCircularPalette = _.map(assembleSVGDrawer.get(), function(tile) {
-		return reduceCircularity(tile);
-	});
-
-	localStorage.setObject("polylist", nonCircularPolylist, circularKeys);
-	localStorage.setObject("palette", nonCircularPalette, circularKeys);
-	localStorage.setObject("canvasTransform", assembleCanvas.node().__data__.transform, []);
-	localStorage.setItem("shapeDropdown", shapeDropdown.node().value);
-};
-
-var load = function() {
-
-	shapeDropdown.node().value = parseInt(localStorage.getObject("shapeDropdown"), 10);
-	$("#shapeDropdown").trigger("change");
-
-	var canvasTransform = localStorage.getObject("canvasTransform");
-	assembleCanvas.each(function(d) {
-		d.transform = canvasTransform;
-	})
-	.attr("transform", num.getTransform);
-
-	var nonCircularPolylist = localStorage.getObject("polylist");
-	var nonCircularPalette = localStorage.getObject("palette");
-
-	polylist = _.map(nonCircularPolylist, function(group) {
-		var groupCopy = _.cloneDeep(group);
-		groupCopy.tiles = _.map(group.tiles, function(tile) {
-			return circularize(tile);
-		});
-		return groupCopy;
-	});
-
-	var palette = _.map(nonCircularPalette, function(tile) {
-		return circularize(tile);
-	});
-
-	// draw anything in local storage
-	draw(assembleCanvas, polylist, assembleCanvasOptions);
-	assembleSVGDrawer.set(palette);
-	assembleSVGDrawer.draw();
-};
 
 // options for each different drawer
 
@@ -198,8 +93,17 @@ var tileView = d3.select("#tileView")
 var stripView = d3.select("#stripView")
 .on("click", stripViewClick);
 
-
 // set listeners on tile view UI elements
+
+var saveButton = d3.select("#saveFile")
+.on("click", saveToFile);
+$(saveButton[0]).tooltip({container: 'body'});
+
+var loadButton = d3.select("#loadFile");
+$(loadButton[0]).tooltip({container: 'body'});
+
+$("#loadFileInput")
+.on("change", loadFromFile);
 
 var inferButton = d3.select("#infer")
 	.on("click", inferHandler)
@@ -207,10 +111,15 @@ var inferButton = d3.select("#infer")
 
 var clearButton = d3.select("#clear")
 	.on("click", function() {
-		polylist = [];
-		assembleCanvas.selectAll("g").remove();
-		inferButton.classed("hidden", true);
+		bootbox.confirm("Starting a new design will erase any unsaved progress you have. Are you sure?", function(result) {
+			if (result) {
+				polylist = [];
+				assembleCanvas.selectAll("g").remove();
+				inferButton.classed("hidden", true);
+			}
+		});
 	});
+$(clearButton[0]).tooltip({container: 'body'});
 
 var deleteButton = d3.select("#delete")
 	.on("click", deleteHandler);
@@ -583,6 +492,8 @@ $(document).ready(function() {
 		    minimumResultsForSearch: Infinity
 	})
 	.on("change", patternDropdownChange);
+
+	$("#autoSnap").bootstrapSwitch();
 
 	stylesheet.insertRule("path.strip.hover { stroke: " + $("#colorpicker").val() + " !important }", 0);
 });

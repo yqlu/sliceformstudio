@@ -14,6 +14,9 @@
   display: inline-block;
   width: 40px;
 }
+.checkbox {
+  padding-right: 10px;
+}
 svg {
   border: solid 1px #dddddd;
   -webkit-border-radius: 5px;

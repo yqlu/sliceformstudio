@@ -13,17 +13,22 @@
 				.btn-group.padded-btn-group
 					a#editPattern.btn.btn-primary(title="Select a shape in the palette first.") Edit Pattern
 				.btn-group.padded-btn-group
-					a#clear.btn.btn-primary Clear All
-					a#delete.btn.btn-primary(title="Select a shape first.") Delete
-					a#copy.btn.btn-primary(title="Select a shape first.") Copy
-				.checkbox
-					input#autoSnap(type="checkbox", checked="true")
-					|   Auto-snap edges
-				label.btn.btn-primary
-					input#loadFile(type="file", style="display:none;")
-					span.glyphicon.glyphicon-folder-open
+					label#loadFile.btn.btn-primary(title="Load design")
+						input#loadFileInput(type="file", style="display:none;", accept=".wlpr")
+						i.fa.fa-folder-open
+					a#saveFile.btn.btn-primary(title="Save design")
+						i.fa.fa-floppy-o
 				.btn-group.padded-btn-group
-					a#infer.btn.btn-primary Infer
+					a#clear.btn.btn-primary(title="New design")
+						i.fa.fa-file-o
+					a#delete.btn.btn-primary(title="Delete selection")
+						i.fa.fa-trash
+					a#copy.btn.btn-primary(title="Copy selection")
+						i.fa.fa-files-o
+				.btn-group.padded-btn-group
+					input#autoSnap(type="checkbox", checked="true", data-label-text="Auto-snap edges")
+				.btn-group.padded-btn-group
+					a#infer.btn.btn-primary(title="Infer tile patterns") Infer
 		#assembleSvg
 		#customShape.collapse(style='margin-top: 15px')
 			.panel.panel-default
@@ -68,10 +73,11 @@
 							.col-md-offset-2.col-md-10
 								a#addToLineupManual.btn.btn-primary Add to lineup
 	#traceTab.hidden
-		#traceSvg
 		.toolbar
-			label Pick a color to assign to strips:
+			span
+				| Pick a color to assign to strips:#{' '}
 			select#colorpicker
+		#traceSvg
 		.alert.alert-warning(role='alert')
 			| Warning: your colors will be reset if you navigate away from this panel.
 		.panel.panel-default

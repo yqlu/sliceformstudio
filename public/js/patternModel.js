@@ -141,11 +141,6 @@ var makePatterns = function(patterns) {
 			p.start.edge = edges[p.start.index % edges.length];
 			p.end.edge = edges[p.end.index % edges.length];
 
-			// for debugging
-			if (!p.end.edge) {
-				console.error("ERROR IN MAKE PATTERNS: ", patterns, p);
-			}
-
 			p.start.coords = num.edgeInterpolate(p.start.edge.ends, p.start.proportion);
 			p.end.coords = num.edgeInterpolate(p.end.edge.ends, p.end.proportion);
 

@@ -266,9 +266,7 @@ var enterCanvas = function(groupNode) {
 	assembleSVGDrawer.draw();
 
 	// activate infer button if new tile has inferred pattern
-	if(groupNode.__data__.tiles[0].infer) {
-		inferButton.classed("hidden", false);
-	}
+	updateInferButton();
 
 	if (((new Date()).getTime() - groupNode.__data__.startTime) < config.clickThreshold) {
 		// slide outwards

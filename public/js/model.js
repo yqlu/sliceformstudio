@@ -38,10 +38,10 @@ var selection = (function() {
 					groupNode: thisNode,
 				};
 
-				copyButton.attr("disabled", null);
-				$(copyButton[0]).tooltip('disable');
-				deleteButton.attr("disabled", null);
-				$(deleteButton[0]).tooltip('disable');
+				copyButton.attr("disabled", null).attr("title", "Copy selection");
+				$(copyButton[0]).tooltip("destroy").tooltip({container: 'body'});
+				deleteButton.attr("disabled", null).attr("title", "Delete selection");
+				$(deleteButton[0]).tooltip("destroy").tooltip({container: 'body'});
 
 				if (options.updatePatternDisplay && thisNode.parentNode === assemblePaletteContainer.node()) {
 					editPatternButton.attr("disabled", null);
@@ -75,10 +75,10 @@ var selection = (function() {
 			d3.selectAll("circle.vertex, path.pattern, line.edge")
 			.classed("selectedGroup", false);
 
-			copyButton.attr("disabled", "disabled");
-			$(copyButton[0]).tooltip("enable");
-			deleteButton.attr("disabled", "disabled");
-			$(deleteButton[0]).tooltip("enable");
+			copyButton.attr("disabled", "disabled").attr("title", "Select tiles first.");
+			$(copyButton[0]).tooltip("destroy").tooltip({container: 'body'});
+			deleteButton.attr("disabled", "disabled").attr("title", "Select tiles first.");
+			$(deleteButton[0]).tooltip("destroy").tooltip({container: 'body'});
 			editPatternButton.attr("disabled", "disabled");
 			$(editPatternButton[0]).tooltip("enable");
 			$("#patternModal").modal('hide');

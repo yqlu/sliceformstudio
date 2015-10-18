@@ -403,10 +403,7 @@ var updateTileWithPatternClick = function() {
 		drawPatterns(d3.select(this), {});
 	});
 
-	var inferTiles = assembleCanvas.selectAll("g.tile").filter(function(d, i) { return d.infer; });
-	if (_.flatten(inferTiles).length === 0) {
-		inferButton.classed("hidden", true);
-	}
+	updateInferButton();
 };
 
 var newCustomPatternClick = function() {
@@ -456,13 +453,17 @@ var deleteHandler = function(d, i) {
 	if (selection.get().groupNode.parentNode === assembleCanvas.node()) {
 		// if there are no more inferTiles in the canvas, hide the infer button
 		selection.delete();
-		var inferTiles = assembleCanvas.selectAll("g.tile").filter(function(d, i) { return d.infer; });
-		if (_.flatten(inferTiles).length === 0) {
-			inferButton.classed("hidden", true);
-		}
+		updateInferButton();
 	} else if (selection.get().groupNode.parentNode === assemblePaletteContainer.node()) {
 		selection.delete(assembleSVGDrawer);
 	}
+};
+
+var updateInferButton = function() {
+	var shouldDisplayButton = _.any(_.flatten(assembleCanvas.selectAll("g.tile")), function(n) {
+		return n.__data__.infer;
+	});
+	inferButton.classed("hidden", shouldDisplayButton);
 };
 
 var inferHandler = function(d, i) {
@@ -566,4 +567,146 @@ var stripViewClick = function() {
 	tileView.classed("active", false);
 	d3.select("#assembleTab").classed("active", false).classed("hidden", true);
 	d3.select("#traceTab").classed("active", true).classed("hidden", false);
+};
+
+var isNode = function(o){
+  return (
+    typeof Node === "object" ? o instanceof Node :
+    o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName==="string"
+  );
+};
+
+var reduceCircularity = function(tile) {
+
+	var tileCopy = _.cloneDeep(tile);
+	_.each(tileCopy.patterns, function(p, index) {
+		p.end.edge = p.end.edge.index; // replace reference with id
+		p.start.edge = p.start.edge.index;
+	});
+
+	_.each(tileCopy.edges, function(e) {
+		_.each(e.patterns, function(p) {
+			p.pattern = p.pattern.index;
+		});
+	});
+
+	return tileCopy;
+};
+
+var circularize = function(tile) {
+
+	var tileCopy = _.cloneDeep(tile);
+	_.each(tileCopy.patterns, function(p, index) {
+		p.end.edge = tileCopy.edges[p.end.edge]; // dereference index
+		p.start.edge = tileCopy.edges[p.start.edge];
+	});
+
+	_.each(tileCopy.edges, function(e) {
+		_.each(e.patterns, function(p) {
+			p.pattern = tileCopy.patterns[p.pattern];
+		});
+	});
+
+	return tileCopy;
+};
+
+
+var loadFromString = function(str) {
+	loaded = JSON.parse(str);
+	shapeDropdown.node().value = parseInt(loaded.shapeDropdown, 10);
+	$("#shapeDropdown").trigger("change");
+
+	var canvasTransform = loaded.canvasTransform;
+	assembleCanvas.each(function(d) {
+		d.transform = canvasTransform;
+	})
+	.attr("transform", num.getTransform);
+
+	var nonCircularPolylist = loaded.polylist;
+	var nonCircularPalette = loaded.palette;
+
+	polylist = _.map(nonCircularPolylist, function(group) {
+		var groupCopy = _.cloneDeep(group);
+		groupCopy.tiles = _.map(group.tiles, function(tile) {
+			return circularize(tile);
+		});
+		return groupCopy;
+	});
+
+	var palette = _.map(nonCircularPalette, function(tile) {
+		return circularize(tile);
+	});
+
+	// draw anything in local storage
+	resetAndDraw(assembleCanvas, polylist, assembleCanvasOptions);
+	assembleSVGDrawer.set(palette);
+	assembleSVGDrawer.draw();
+
+	updateInferButton();
+};
+
+var loadFromFile = function() {
+	var reader = new FileReader();
+
+	var files = $("#loadFileInput")[0].files;
+
+
+	if (files.length === 1) {
+
+		reader.onload = function() {
+			try {
+				loadFromString(reader.result);
+			} catch (err) {
+				bootbox.alert(err.message);
+			}
+		};
+
+		reader.readAsText(files[0]);
+	}
+};
+
+var saveToFileWithTitle = function(title) {
+	var circularKeys = ["this", "handle", "joinedTo"];
+	var nonCircularPolylist = _.map(polylist, function(group) {
+		var groupCopy = _.cloneDeep(group);
+		groupCopy.tiles = _.map(group.tiles, function(tile) {
+			return reduceCircularity(tile);
+		});
+		return groupCopy;
+	});
+
+	var nonCircularPalette = _.map(assembleSVGDrawer.get(), function(tile) {
+		return reduceCircularity(tile);
+	});
+
+	var saveFile = {
+		polylist: nonCircularPolylist,
+		palette: nonCircularPalette,
+		canvasTransform: assembleCanvas.node().__data__.transform,
+		shapeDropdown: shapeDropdown.node().value,
+	};
+
+	var saveFileText = JSON.stringify(saveFile, function(k,v) {
+		return (isNode(v)) ? "tag" : v;
+	});
+
+	var bb = new Blob([saveFileText], {type: "application/json"});
+	var pom = d3.select("#downloadLink").node();
+	pom.download = title;
+	pom.href = window.URL.createObjectURL(bb);
+	pom.dataset.downloadurl = ["application/json", pom.download, pom.href].join(':');
+	pom.click();
+};
+
+var saveToFile = function() {
+
+	bootbox.prompt({
+		title: "Save design as:",
+		value: "newfile.wlpr",
+		callback: function(result) {
+			if (result !== null) {
+				saveToFileWithTitle(result);
+			}
+		}
+	});
 };

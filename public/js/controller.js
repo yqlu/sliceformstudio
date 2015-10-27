@@ -552,6 +552,8 @@ var tileViewClick = function() {
 };
 
 var stripViewClick = function() {
+	console.time("StripViewClick");
+	console.time("setup");
 	traceCanvas.selectAll("path").remove();
 	resetAndDraw(traceCanvas, _.cloneDeep(polylist), tracePatternOptions);
 	traceCanvas
@@ -567,12 +569,14 @@ var stripViewClick = function() {
 	});
 	d3.select("#noneSoFar").style("display", "block");
 	d3.select("#stripTable").selectAll("div").remove();
+	console.timeEnd("setup");
 
 	redrawCanvas();
 
 	tileView.classed("active", false);
 	d3.select("#assembleTab").classed("active", false).classed("hidden", true);
 	d3.select("#traceTab").classed("active", true).classed("hidden", false);
+	console.timeEnd("StripViewClick");
 };
 
 var isNode = function(o){

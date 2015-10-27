@@ -256,6 +256,7 @@ var redrawCanvas = function() {
 	overPoints = [];
 	underPoints = [];
 
+	console.time("redrawCanvas");
 	while ($(traceCanvas.node()).find("path.pattern").length > 0) {
 		var i = 0, strictMode = true;
 
@@ -267,13 +268,18 @@ var redrawCanvas = function() {
 			}
 		}
 	}
+	console.timeEnd("redrawCanvas");
 };
 
 var groupPattern = function(patternData, strictMode) {
 
+	// console.time("groupPattern");
+	// console.time("tracePattern");
 	var traced = patternTrace(patternData);
+	// console.timeEnd("tracePattern");
 	var patternList = traced.patternList;
 
+	// console.time("parsePattern");
 	var rawSegments = _.map(patternList, function(p, index) {
 		var transform = num.dot(p.pattern.this.parentNode.parentNode.__data__.transform,
 			p.pattern.this.parentNode.__data__.transform);
@@ -345,11 +351,15 @@ var groupPattern = function(patternData, strictMode) {
 		extendedStart = true;
 	}
 
+	// console.timeEnd("parsePattern");
+
 	// boolean determined in next block,
 	// used for drawing in alt-line
 	var direction;
 
 	// assign over and under
+
+	// console.time("overUnder");
 	if (overPoints.length === 0) {
 		// easy step: no constraints, so just arbitrarily assign over and under
 		direction = true;
@@ -383,6 +393,8 @@ var groupPattern = function(patternData, strictMode) {
 			})) {
 				// current pattern does not intersect existing patterns at all
 				// adding it to list may result in future contradictions
+				// console.timeEnd("overUnder");
+				// console.timeEnd("groupPattern");
 				return true; // Try next element
 			}
 			direction = true;
@@ -390,6 +402,8 @@ var groupPattern = function(patternData, strictMode) {
 			underPoints.extend(everyOtherIntersect(reducedSegments, false));
 		}
 	}
+
+	// console.timeEnd("overUnder");
 
 	// construct lines corresponding to over and under
 	var overOutline = traceCanvas.append("path")
@@ -430,6 +444,7 @@ var groupPattern = function(patternData, strictMode) {
 
 	var groupedNodes = _.pluck(_.pluck(patternList, "pattern"), "this");
 	d3.selectAll(groupedNodes).remove();
+	// console.timeEnd("groupPattern");
 
 	return false; // successful, quit out of loop
 };

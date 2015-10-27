@@ -1,3 +1,6 @@
+var wallpaperVersion = 0.2;
+var minSupportedVersion = 0.2;
+
 // global UI variables
 var hover = null;
 var candidate = null;
@@ -490,12 +493,12 @@ $(document).ready(function() {
 	});
 
 	$("#shapeDropdown").select2({
-		    minimumResultsForSearch: Infinity
+		minimumResultsForSearch: Infinity
 	})
 	.on("change", shapeDropdownChange).trigger("change");
 
 	$("#patternDropdown").select2({
-		    minimumResultsForSearch: Infinity
+		minimumResultsForSearch: Infinity
 	})
 	.on("change", patternDropdownChange);
 

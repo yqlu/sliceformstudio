@@ -619,36 +619,50 @@ var circularize = function(tile) {
 
 var loadFromString = function(str) {
 	loaded = JSON.parse(str);
-	shapeDropdown.node().value = parseInt(loaded.shapeDropdown, 10);
-	$("#shapeDropdown").trigger("change");
+	// version number; need to put in more general spot
+	if (loaded.version >= minSupportedVersion) {
+		shapeDropdown.node().value = parseInt(loaded.shapeDropdown, 10);
+		$("#shapeDropdown").trigger("change");
 
-	var canvasTransform = loaded.canvasTransform;
-	assembleCanvas.each(function(d) {
-		d.transform = canvasTransform;
-	})
-	.attr("transform", num.getTransform);
+		var canvasTransform = loaded.canvasTransform;
 
-	var nonCircularPolylist = loaded.polylist;
-	var nonCircularPalette = loaded.palette;
+		assembleCanvas.each(function(d) {
+			d.transform = canvasTransform;
+		})
+		.attr("transform", num.getTransform);
+		commonZoomHandler.scale(num.getScale(canvasTransform));
+		commonZoomHandler.translate(num.getTranslation(canvasTransform));
 
-	polylist = _.map(nonCircularPolylist, function(group) {
-		var groupCopy = _.cloneDeep(group);
-		groupCopy.tiles = _.map(group.tiles, function(tile) {
+		var nonCircularPolylist = loaded.polylist;
+		var nonCircularPalette = loaded.palette;
+
+		polylist = _.map(nonCircularPolylist, function(group) {
+			var groupCopy = _.cloneDeep(group);
+			groupCopy.tiles = _.map(group.tiles, function(tile) {
+				return circularize(tile);
+			});
+			return groupCopy;
+		});
+
+		var palette = _.map(nonCircularPalette, function(tile) {
 			return circularize(tile);
 		});
-		return groupCopy;
-	});
 
-	var palette = _.map(nonCircularPalette, function(tile) {
-		return circularize(tile);
-	});
+		// draw anything in local storage
+		resetAndDraw(assembleCanvas, polylist, assembleCanvasOptions);
+		assembleSVGDrawer.set(palette);
+		assembleSVGDrawer.draw();
 
-	// draw anything in local storage
-	resetAndDraw(assembleCanvas, polylist, assembleCanvasOptions);
-	assembleSVGDrawer.set(palette);
-	assembleSVGDrawer.draw();
-
-	updateInferButton();
+		updateInferButton();
+	} else {
+		if (typeof loaded.version === "undefined") {
+			loaded.version = "?";
+		}
+		throw {
+			message: "File was from Wallpaper v" + loaded.version +
+				" but only >=v" + minSupportedVersion + " is supported."
+		};
+	}
 };
 
 var loadFromFile = function() {
@@ -690,6 +704,7 @@ var saveToFileWithTitle = function(title) {
 		palette: nonCircularPalette,
 		canvasTransform: assembleCanvas.node().__data__.transform,
 		shapeDropdown: shapeDropdown.node().value,
+		version: wallpaperVersion
 	};
 
 	var saveFileText = JSON.stringify(saveFile, function(k,v) {

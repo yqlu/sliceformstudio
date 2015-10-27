@@ -619,7 +619,6 @@ var circularize = function(tile) {
 
 var loadFromString = function(str) {
 	loaded = JSON.parse(str);
-	// version number; need to put in more general spot
 	if (loaded.version >= minSupportedVersion) {
 		shapeDropdown.node().value = parseInt(loaded.shapeDropdown, 10);
 		$("#shapeDropdown").trigger("change");
@@ -652,6 +651,23 @@ var loadFromString = function(str) {
 		resetAndDraw(assembleCanvas, polylist, assembleCanvasOptions);
 		assembleSVGDrawer.set(palette);
 		assembleSVGDrawer.draw();
+
+		if (loaded.stripViewParams) {
+			var p = loaded.stripViewParams;
+
+			p.thickness ? thicknessSlider.setValue(p.thickness) : null;
+			p.extension ? extensionSlider.setValue(p.extension) : null;
+			p.stripHeight ? stripHeight.setValue(p.stripHeight) : null;
+			p.widthFactor ? widthFactor.setValue(p.widthFactor) : null;
+			p.interSpacing ? interSpacing.setValue(p.interSpacing) : null;
+			p.printHeight ? printHeight.setValue(p.printHeight) : null;
+			p.printWidth ? printWidth.setValue(p.printWidth) : null;
+			if (typeof p.outline !== "undefined") {
+				outlineToggle.classed("active", p.outline);
+				outlineToggle.on("click")();
+				outlineToggle.on("click")();
+			}
+		}
 
 		updateInferButton();
 	} else {
@@ -704,7 +720,17 @@ var saveToFileWithTitle = function(title) {
 		palette: nonCircularPalette,
 		canvasTransform: assembleCanvas.node().__data__.transform,
 		shapeDropdown: shapeDropdown.node().value,
-		version: wallpaperVersion
+		version: wallpaperVersion,
+		stripViewParams: {
+			thickness: thicknessSlider.getValue(),
+			extension: extensionSlider.getValue(),
+			outline: outlineToggle.classed("active"),
+			stripHeight: stripHeight.getValue(),
+			widthFactor: widthFactor.getValue(),
+			interSpacing: interSpacing.getValue(),
+			printHeight: printHeight.getValue(),
+			printWidth: printWidth.getValue()
+		}
 	};
 
 	var saveFileText = JSON.stringify(saveFile, function(k,v) {

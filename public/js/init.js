@@ -287,6 +287,12 @@ shapeEditCustomDraw();
 
 // set listeners on edit pattern UI elements
 
+$("#customPatternSelect").change(function(i) {
+	console.log("CHANGED");
+	updateUIForCustomTemplate(
+		patternEditSVGDrawer.getTile().customTemplate[$("#customPatternSelect").val()[0]],true);
+});
+
 var confirmPatternButton = d3.select("#confirmPattern")
 	.on("click", updateTileWithPatternClick);
 

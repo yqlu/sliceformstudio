@@ -96,7 +96,7 @@ var buildIntersections = function(polygon) {
 	});
 
 	_.map(patterns, function(p, i) {
-		p.intersectedVertices = _.flatten(_.map(collated[i], function(segment, j) {
+		intersectedVerticesWithDups = _.flatten(_.map(collated[i], function(segment, j) {
 			var list = _.map(segment, function(s) { return {intersect: s.intersect, coords: s.coords}; });
 			if (j < collated[i].length - 1) {
 				// truncate by 1
@@ -105,6 +105,11 @@ var buildIntersections = function(polygon) {
 				return list;
 			}
 		}), true);
+
+		p.intersectedVertices = _.filter(intersectedVerticesWithDups, function(vertex, i) {
+			return i === 0 || !approxEqPoints(vertex.coords, intersectedVerticesWithDups[i-1].coords);
+		});
+
 		p.intersectedSegments = _.map(p.fullSegments, function(s, j) {
 			return _.map(_.range(collated[i][j].length - 1), function(k) {
 				return (collated[i][j][k+1].relative - collated[i][j][k].relative) * s;

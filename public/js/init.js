@@ -331,13 +331,19 @@ var degreesOfFreedom = new Slider('#degreesOfFreedom', {
 	}
 }).on("change", patternUpdate);
 
-var patternSlider1 = {
-	destroy : function() {}
-};
+var patternSlider1 = new Slider("#patternSlider1", {
+	value: 0,
+	min: 0,
+	max: 1,
+	step: 0.01
+});
 
-var patternSlider2 = {
-	destroy : function() {}
-};
+var patternSlider2 = new Slider("#patternSlider2", {
+	value: 0,
+	min: 0,
+	max: 1,
+	step: 0.01
+});
 
 // set listener on strip view UI elements
 

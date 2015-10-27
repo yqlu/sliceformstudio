@@ -159,15 +159,21 @@ var resetCustomPatternUIValues = function() {
 // drag handler for editing custom pattern handles
 var dragPatternHandleEdit = d3.behavior.drag()
 .on("dragstart", function(d, i) {
-	updateUIForCustomTemplate(this.parentNode.__data__, false);
+	updateUIForCustomTemplate(d.this.parentNode.__data__, false);
 })
 .on("drag", function(d, i) {
-	d.transform = num.translateBy(d.transform, d3.event.dx, d3.event.dy);
-	d3.select(this).attr("transform", num.getTransform);
-	var tile = this.parentNode.parentNode.__data__;
-	patternFn = makePatterns(_.last(patternOptions).generator(tile));
-	polygonAddPattern(tile, patternFn);
-	patternEditSVGDrawer.redrawPatterns(true);
+	// sometimes d3.event.dx and d3.event.dy abruptly return a huge value, which I don't understand
+	// hard cap drag functionality to work only if they have reasonable values
+	if (d3.event.dx < 25 && d3.event.dy < 25) {
+		d.transform = num.translateBy(d.transform, d3.event.dx, d3.event.dy);
+		d3.select(d.this).attr("transform", num.getTransform);
+		var tile = d.this.parentNode.parentNode.__data__;
+		patternFn = makePatterns(_.last(patternOptions).generator(tile));
+		polygonAddPattern(tile, patternFn);
+		patternEditSVGDrawer.redrawPatterns(true);
+	} else {
+		console.error("d3.event.dx/dy too abruptly large: ", d3.event);
+	}
 });
 
 // zoom handler for canvas
@@ -252,7 +258,6 @@ var shapeDropdownChange = function(a, b, c, d, e) {
 
 	if (currentOption.name === "Custom") {
 		$("#customShape").collapse("show");
-		bindButtonToAddNewShape();
 	} else {
 		$("#customShape").collapse("hide");
 	}
@@ -463,7 +468,7 @@ var updateInferButton = function() {
 	var shouldDisplayButton = _.any(_.flatten(assembleCanvas.selectAll("g.tile")), function(n) {
 		return n.__data__.infer;
 	});
-	inferButton.classed("hidden", shouldDisplayButton);
+	inferButton.classed("hidden", !shouldDisplayButton);
 };
 
 var inferHandler = function(d, i) {
@@ -562,6 +567,7 @@ var stripViewClick = function() {
 	});
 	d3.select("#noneSoFar").style("display", "block");
 	d3.select("#stripTable").selectAll("div").remove();
+
 	redrawCanvas();
 
 	tileView.classed("active", false);

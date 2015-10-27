@@ -255,8 +255,10 @@ var underPoints = [];
 var redrawCanvas = function() {
 	overPoints = [];
 	underPoints = [];
+
 	while ($(traceCanvas.node()).find("path.pattern").length > 0) {
 		var i = 0, strictMode = true;
+
 		while (groupPattern($(traceCanvas.node()).find("path.pattern")[i].__data__, strictMode)) {
 			i += 1;
 			if (i == $(traceCanvas.node()).find("path.pattern").length) {
@@ -366,7 +368,9 @@ var groupPattern = function(patternData, strictMode) {
 					return approxEq(p1.x, p2.x) && approxEq(p1.y, p2.y);
 				});
 			})) {
-				return true; // ERROR: try next element
+				var msg = "Error: unable to find consistent assignment of over and under.";
+				bootbox.alert(msg);
+				throw msg;
 			}
 			direction = false;
 			overPoints.extend(everyOtherIntersect(reducedSegments, false));
@@ -379,7 +383,7 @@ var groupPattern = function(patternData, strictMode) {
 			})) {
 				// current pattern does not intersect existing patterns at all
 				// adding it to list may result in future contradictions
-				return true; // ERROR: try next element
+				return true; // Try next element
 			}
 			direction = true;
 			overPoints.extend(potentialOverPoints);

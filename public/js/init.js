@@ -287,6 +287,11 @@ shapeEditCustomDraw();
 
 // set listeners on edit pattern UI elements
 
+$("#customPatternSelect").change(function(i) {
+	updateUIForCustomTemplate(
+		patternEditSVGDrawer.getTile().customTemplate[$("#customPatternSelect").val()[0]],true);
+});
+
 var confirmPatternButton = d3.select("#confirmPattern")
 	.on("click", updateTileWithPatternClick);
 
@@ -379,32 +384,6 @@ d3.select("#colorpicker").selectAll("option")
 .attr("value", function(d) { return d.hex; })
 .html(function(d) { return d.name; });
 
-var thicknessSlider = new Slider("#thickness", {
-	min: 0,
-	max: 10,
-	step: 0.1,
-	value: 3,
-	formatter: function(value) {
-		return 'Current value: ' + value;
-	}
-}).on("change", thicknessSliderChange);
-
-var extensionSlider = new Slider("#extensionLength", {
-	min: 0,
-	max: 2,
-	step: 0.01,
-	value: 0.15,
-	formatter: function(value) {
-		return 'Current value: ' + value;
-	}
-}).on("change", extensionSliderChange);
-
-var outlineToggle = d3.select("#outlineToggle")
-.on("click", function() {
-	d3.selectAll("path.strip-outline")
-	.attr("visibility", outlineToggle.classed("active") ? "hidden" : "visible");
-});
-
 // generate dyanmic stylesheet for coloring
 var newStylesheet = function() {
 	// Create the <style> tag
@@ -426,6 +405,8 @@ var stylesheet = newStylesheet();
 var advancedOptions = d3.select("#advancedOptions")
 .on("click", function() {
 	$('#advancedModal').modal();
+	// recompute widthFactor
+	widthFactor.setValue(widthFactor.getValue());
 });
 
 var stripHeight = new Slider("#stripHeight", {
@@ -434,7 +415,8 @@ var stripHeight = new Slider("#stripHeight", {
 	step: 1,
 	value: 15,
 	formatter: function(value) {
-		return 'Current value: ' + value;
+		var mm = Math.round(value / config.pixelToMm * 10) / 10;
+		return value + " px = " + mm + " mm";
 	}
 });
 
@@ -444,7 +426,28 @@ var widthFactor = new Slider("#widthFactor", {
 	step: 0.1,
 	value: 1.2,
 	formatter: function(value) {
-		return 'Current value: ' + value;
+		var totalWidthPx;
+
+		// getBBox might fail if the node is not yet rendered
+		try {
+			var maxDims = _.map(traceCanvas.selectAll("g.group")[0], function(g) {
+				var bbox = g.getBBox();
+				return Math.max(bbox.width, bbox.height);
+			});
+			totalWidthPx = Math.roundToPrecision(_.max(maxDims) * value, 1);
+		} catch (e) {
+			totalWidthPx = 0;
+		}
+		var totalWidthMm = Math.roundToPrecision(totalWidthPx / config.pixelToMm, 1);
+
+		var longestPx = Math.roundToPrecision(longestStrip * value, 1);
+		var longestMm = Math.roundToPrecision(longestPx / config.pixelToMm, 1);
+		var shortestPx = Math.roundToPrecision(shortestSegment * value, 1);
+		var shortestMm = Math.roundToPrecision(shortestPx / config.pixelToMm, 1);
+
+		return 'Total width: ' + totalWidthPx + ' px = ' + totalWidthMm + ' mm\n' +
+			'Longest strip: ' + longestPx + ' px = ' + longestMm + ' mm\n' +
+			'Shortest segment: ' + shortestPx + ' px = ' + shortestMm + ' mm';
 	}
 });
 
@@ -454,7 +457,8 @@ var interSpacing = new Slider("#interSpacing", {
 	step: 1,
 	value: 15,
 	formatter: function(value) {
-		return 'Current value: ' + value;
+		var mm = Math.round(value / config.pixelToMm * 10) / 10;
+		return value + " px = " + mm + " mm";
 	}
 });
 
@@ -464,7 +468,8 @@ var printHeight = new Slider("#printHeight", {
 	step: 10,
 	value: 1620,
 	formatter: function(value) {
-		return 'Current value: ' + value;
+		var mm = Math.round(value / config.pixelToMm * 10) / 10;
+		return value + " px = " + mm + " mm";
 	}
 });
 
@@ -474,10 +479,38 @@ var printWidth = new Slider("#printWidth", {
 	step: 10,
 	value: 2880,
 	formatter: function(value) {
-		return 'Current value: ' + value;
+		var mm = Math.round(value / config.pixelToMm * 10) / 10;
+		return value + " px = " + mm + " mm";
 	}
 });
 
+var thicknessSlider = new Slider("#thickness", {
+	min: 0,
+	max: 10,
+	step: 0.1,
+	value: 3,
+	formatter: function(value) {
+		return value + ' px';
+	}
+}).on("change", thicknessSliderChange);
+
+var extensionSlider = new Slider("#extensionLength", {
+	min: 0,
+	max: 2,
+	step: 0.01,
+	value: 0.15,
+	formatter: function(value) {
+		var pixels = value * widthFactor.getValue(); //parseFloat($("#widthFactor").val());
+		var mm = Math.round(pixels / config.pixelToMm * 10) / 10;
+		return mm + ' mm';
+	}
+}).on("change", extensionSliderChange);
+
+var outlineToggle = d3.select("#outlineToggle")
+.on("click", function() {
+	d3.selectAll("path.strip-outline")
+	.attr("visibility", outlineToggle.classed("active") ? "hidden" : "visible");
+});
 
 $(".collapse").collapse({toggle: true});
 

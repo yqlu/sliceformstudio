@@ -1,3 +1,11 @@
+#widthFactorDiv .tooltip-inner {
+white-space: pre;
+max-width: 300px;
+}
+
+#widthFactorDiv .tooltip.top {
+margin-top: -72px;
+}
 #toolbar {
   width: 10%;
   height: 10%;

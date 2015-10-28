@@ -1,3 +1,6 @@
+var longestStrip = 0;
+var shortestSegment = Infinity;
+
 // pick out all the pattern nodes from a patternTrace call
 var nodePatternTrace = function(patternData) {
 	return _.pluck(_.pluck(patternTrace(patternData), "pattern"), "this");
@@ -255,6 +258,8 @@ var underPoints = [];
 var redrawCanvas = function() {
 	overPoints = [];
 	underPoints = [];
+	longestStrip = 0;
+	shortestSegment = Infinity;
 
 	while ($(traceCanvas.node()).find("path.pattern").length > 0) {
 		var i = 0, strictMode = true;
@@ -415,6 +420,23 @@ var groupPattern = function(patternData, strictMode) {
 
 	d3.selectAll([overOutline, underOutline]).attr("stroke-linejoin", "miter").style("stroke-width", thicknessSlider.getValue()+1);
 
+	var strip = buildStrip(traced);
+
+	if (extendedStart) {
+		_.first(strip).unshift(extensionSlider.getValue() * config.sidelength);
+	}
+	if (extendedEnd) {
+		_.last(strip).push(extensionSlider.getValue() * config.sidelength);
+	}
+
+	shortestSegment = Math.min(shortestSegment, _.min(_.map(strip, function(s) { return _.min(s); })));
+	longestStrip = Math.max(longestStrip,
+		_.reduce(_.map(strip, function(s) {
+			return _.reduce(s, function(a,b) { return a + b; });
+		}), function(a,b) { return a + b; }));
+
+	// update min and max here
+
 	d3.selectAll([overStrip, underStrip])
 	.attr("stroke-linejoin", "miter")
 	.style("stroke-width", thicknessSlider.getValue())
@@ -424,7 +446,7 @@ var groupPattern = function(patternData, strictMode) {
 		d3.selectAll([overStrip, underStrip]).classed("hover", false);
 	})
 	.on("click", function() {
-		assignStripColor([overStrip, underStrip], traced, extendedStart, extendedEnd, $("#colorpicker").val());
+		assignStripColor([overStrip, underStrip], strip, $("#colorpicker").val());
 		updateStripTable();
 	});
 
@@ -513,15 +535,7 @@ var generateCustomStrip = function() {
 };
 
 // assign color to relevant strip
-var assignStripColor = function(nodes, tracedObj, extendedStart, extendedEnd, color) {
-	var strip = buildStrip(tracedObj);
-
-	if (extendedStart) {
-		_.first(strip).unshift(extensionSlider.getValue() * config.sidelength);
-	}
-	if (extendedEnd) {
-		_.last(strip).push(extensionSlider.getValue() * config.sidelength);
-	}
+var assignStripColor = function(nodes, strip, color) {
 
 	d3.selectAll(nodes).style("stroke", color);
 

@@ -15,7 +15,8 @@ var config = {
 	matrixDetTolerance: 0.01,
 	extensionLength: 30,
 	sidelength: 50,
-	debug: true
+	debug: true,
+	pixelToMm: 3.543307
 };
 
 var fullOptions = {

@@ -156,7 +156,6 @@ var joinEdges = function(thisEdgeNode, selected) {
 				d.transform = num.dot(orig, d.transform);
 			})
 			.attr("transform", num.getTransform);
-
 		}
 
 		// first transform to original equivalent transformation
@@ -181,13 +180,15 @@ var joinEdges = function(thisEdgeNode, selected) {
 		// remove group node from DOM
 		d3.select(selected.groupNode).remove();
 
-		if (autoSnapMode) {
-			detectJoins(theseEdges, otherEdges, false);
-		} else {
-			joinNodes(thisEdgeNode, selected.edgeNode);
-		}
+		setTimeout(function() {
+			if (autoSnapMode) {
+				detectJoins(theseEdges, otherEdges, false);
+			} else {
+				joinNodes(thisEdgeNode, selected.edgeNode);
+			}
+			updateJoinedEdges(thisGroupNode.__data__);
+		}, 250);
 	}
-	updateJoinedEdges(thisGroupNode.__data__);
 };
 
 // detect how edges should be joined

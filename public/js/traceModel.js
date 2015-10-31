@@ -261,7 +261,6 @@ var redrawCanvas = function() {
 	longestStrip = 0;
 	shortestSegment = Infinity;
 
-	console.time("redrawCanvas");
 	while ($(traceCanvas.node()).find("path.pattern").length > 0) {
 		var i = 0, strictMode = true;
 
@@ -273,19 +272,17 @@ var redrawCanvas = function() {
 			}
 		}
 	}
-	console.timeEnd("redrawCanvas");
 };
 
 var groupPattern = function(patternData, strictMode) {
 
-	// console.time("groupPattern");
-	// console.time("tracePattern");
 	var traced = patternTrace(patternData);
-	// console.timeEnd("tracePattern");
 	var patternList = traced.patternList;
 
-	// console.time("parsePattern");
 	var rawSegments = _.map(patternList, function(p, index) {
+		if (typeof p.pattern.this.parentNode === "undefined") {
+		}
+
 		var transform = num.dot(p.pattern.this.parentNode.parentNode.__data__.transform,
 			p.pattern.this.parentNode.__data__.transform);
 
@@ -331,7 +328,7 @@ var groupPattern = function(patternData, strictMode) {
 	// extend start and end segments as appropriate
 
 	if (_.last(_.last(reducedSegments)).intersect && !traced.hasCycle) {
-		var finalPts = _.last(_.last(reducedSegments),2);
+		var finalPts = _.takeRight(_.last(reducedSegments),2);
 		var finalCoord = [finalPts[1].x, finalPts[1].y];
 		var finalVector = [finalPts[1].x - finalPts[0].x, finalPts[1].y - finalPts[0].y];
 		var finalExtension = num.vecSum(finalCoord, num.vecProd(num.normalize(finalVector), extensionSlider.getValue() * config.sidelength));
@@ -344,7 +341,7 @@ var groupPattern = function(patternData, strictMode) {
 	}
 
 	if (_.first(_.first(reducedSegments)).intersect && !traced.hasCycle) {
-		var initialPts = _.first(_.first(reducedSegments),2);
+		var initialPts = _.first(_.take(reducedSegments),2);
 		var initialCoord = [initialPts[0].x, initialPts[0].y];
 		var initialVector = [initialPts[0].x - initialPts[1].x, initialPts[0].y - initialPts[1].y];
 		var initialExtension = num.vecSum(initialCoord, num.vecProd(num.normalize(initialVector), extensionSlider.getValue() * config.sidelength));
@@ -356,15 +353,12 @@ var groupPattern = function(patternData, strictMode) {
 		extendedStart = true;
 	}
 
-	// console.timeEnd("parsePattern");
-
 	// boolean determined in next block,
 	// used for drawing in alt-line
 	var direction;
 
 	// assign over and under
 
-	// console.time("overUnder");
 	if (overPoints.length === 0) {
 		// easy step: no constraints, so just arbitrarily assign over and under
 		direction = true;
@@ -383,6 +377,7 @@ var groupPattern = function(patternData, strictMode) {
 					return approxEq(p1.x, p2.x) && approxEq(p1.y, p2.y);
 				});
 			})) {
+				console.log(overPoints, underPoints, traced);
 				var msg = "Error: unable to find consistent assignment of over and under.";
 				bootbox.alert(msg);
 				throw msg;
@@ -398,8 +393,6 @@ var groupPattern = function(patternData, strictMode) {
 			})) {
 				// current pattern does not intersect existing patterns at all
 				// adding it to list may result in future contradictions
-				// console.timeEnd("overUnder");
-				// console.timeEnd("groupPattern");
 				return true; // Try next element
 			}
 			direction = true;
@@ -407,8 +400,6 @@ var groupPattern = function(patternData, strictMode) {
 			underPoints.extend(everyOtherIntersect(reducedSegments, false));
 		}
 	}
-
-	// console.timeEnd("overUnder");
 
 	// construct lines corresponding to over and under
 	var overOutline = traceCanvas.append("path")
@@ -466,7 +457,6 @@ var groupPattern = function(patternData, strictMode) {
 
 	var groupedNodes = _.pluck(_.pluck(patternList, "pattern"), "this");
 	d3.selectAll(groupedNodes).remove();
-	// console.timeEnd("groupPattern");
 
 	return false; // successful, quit out of loop
 };

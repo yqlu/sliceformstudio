@@ -553,7 +553,10 @@ var tileViewClick = function() {
 
 var stripViewClick = function() {
 	traceCanvas.selectAll("path").remove();
-	var clone = _.cloneDeep(polylist, deepCustomizer);
+	var clone = _.cloneDeep(polylist, deepCustomizer(false));
+	_.each(clone, function(group) {
+		_.each(group.tiles, circularize);
+	});
 	resetAndDraw(traceCanvas, clone, tracePatternOptions);
 	traceCanvas
 	.each(function(d, i) {
@@ -602,19 +605,18 @@ var reduceCircularity = function(tile) {
 
 var circularize = function(tile) {
 
-	var tileCopy = _.cloneDeep(tile);
-	_.each(tileCopy.patterns, function(p, index) {
-		p.end.edge = tileCopy.edges[p.end.edge]; // dereference index
-		p.start.edge = tileCopy.edges[p.start.edge];
+	_.each(tile.patterns, function(p, index) {
+		p.end.edge = tile.edges[p.end.edge]; // dereference index
+		p.start.edge = tile.edges[p.start.edge];
 	});
 
-	_.each(tileCopy.edges, function(e) {
+	_.each(tile.edges, function(e) {
 		_.each(e.patterns, function(p) {
-			p.pattern = tileCopy.patterns[p.pattern];
+			p.pattern = tile.patterns[p.pattern];
 		});
 	});
 
-	return tileCopy;
+	return tile;
 };
 
 
@@ -633,20 +635,14 @@ var loadFromString = function(str) {
 		commonZoomHandler.scale(num.getScale(canvasTransform));
 		commonZoomHandler.translate(num.getTranslation(canvasTransform));
 
-		var nonCircularPolylist = loaded.polylist;
-		var nonCircularPalette = loaded.palette;
+		polylist = loaded.polylist;
+		var palette = loaded.palette;
 
-		polylist = _.map(nonCircularPolylist, function(group) {
-			var groupCopy = _.cloneDeep(group);
-			groupCopy.tiles = _.map(group.tiles, function(tile) {
-				return circularize(tile);
-			});
-			return groupCopy;
+		_.each(polylist, function(group) {
+			_.each(group.tiles, circularize);
 		});
 
-		var palette = _.map(nonCircularPalette, function(tile) {
-			return circularize(tile);
-		});
+		_.each(palette, circularize);
 
 		// draw anything in local storage
 		resetAndDraw(assembleCanvas, polylist, assembleCanvasOptions);
@@ -703,14 +699,8 @@ var loadFromFile = function() {
 };
 
 var saveToFileWithTitle = function(title) {
-	var circularKeys = ["this", "handle", "joinedTo"];
-	var nonCircularPolylist = _.map(polylist, function(group) {
-		var groupCopy = _.cloneDeep(group);
-		groupCopy.tiles = _.map(group.tiles, function(tile) {
-			return reduceCircularity(tile);
-		});
-		return groupCopy;
-	});
+
+	var nonCircularPolylist = _.cloneDeep(polylist, deepCustomizer(true, true));
 
 	var nonCircularPalette = _.map(assembleSVGDrawer.get(), function(tile) {
 		return reduceCircularity(tile);

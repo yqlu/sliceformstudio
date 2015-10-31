@@ -178,8 +178,8 @@ var makePatterns = function(patterns) {
 
 				// find intersection point between the two terminating line segments
 				if (p.isCropped && p.template.length > 0) {
-					var startInterpolate = _.last([p.start.coords].concat(fromStart),2);
-					var endInterpolate = _.last([p.end.coords].concat(fromEnd),2);
+					var startInterpolate = _.takeRight([p.start.coords].concat(fromStart),2);
+					var endInterpolate = _.takeRight([p.end.coords].concat(fromEnd),2);
 
 					var matrix1 = [[1, startInterpolate[0][0], startInterpolate[0][1]],
 									[1, startInterpolate[1][0], startInterpolate[1][1]],

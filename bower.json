@@ -20,7 +20,7 @@
     "bootstrap": "~3.1.1",
     "jquery": "~2.1.3",
     "d3": "~3.5.3",
-    "lodash": "~2.4.1",
+    "lodash": "~3.10.1",
     "numeric": "https://github.com/sloisel/numeric.git#~1.2.6",
     "graham_scan": "https://github.com/brian3kb/graham_scan_js.git#~1.0.2",
     "twitter-bootstrap-wizard": "git://github.com/VinceG/twitter-bootstrap-wizard.git#master",

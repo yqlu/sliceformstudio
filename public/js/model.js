@@ -128,9 +128,12 @@ var selection = (function() {
 				}
 			} else {
 				if (current && current.type === "group") {
-					polylist.push(_.cloneDeep(_.find(polylist, function(group) {
+					var currentGroup = _.find(polylist, function(group) {
 						return group.this === current.groupNode;
-					})));
+					});
+					var clone = _.cloneDeep(currentGroup, deepCustomizer(true));
+					_.each(clone.tiles, circularize);
+					polylist.push(clone);
 
 					var newGroups = draw(assembleCanvas, polylist, assembleCanvasOptions);
 
@@ -168,6 +171,9 @@ var checkRep = function() {
 					"Error: tile object is out of sync with DOM pointer. \nTile: %o",
 					tile);
 				_.map(tile.edges, function(edge) {
+					console.assert(edge.this.__data__ === edge,
+					"Error: edge object is out of sync with DOM pointer. \nEdge: %o %o",
+					edge, edge.this);
 					if (edge.joinedTo) {
 						console.assert(edge.joinedTo.__data__.joinedTo === edge.this,
 							"Error, edge linking information is out of sync. \nEdge: %o",
@@ -176,7 +182,7 @@ var checkRep = function() {
 				});
 				_.map(tile.patterns, function(pattern) {
 					console.assert(pattern.this.__data__ === pattern,
-						"Error: pattern object is out of sync with DOM pointer. \Pattern: %o",
+						"Error: pattern object is out of sync with DOM pointer. \nPattern: %o",
 						pattern);
 				});
 			});

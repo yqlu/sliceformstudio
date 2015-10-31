@@ -7,15 +7,18 @@ var computeDimensions = function(vertices, transform) {
 	var transformedXValues = _.pluck(transformedCoords, "0");
 	var transformedYValues = _.pluck(transformedCoords, "1");
 
-	var width = transformedXValues.max() - transformedXValues.min();
-	var height = transformedYValues.max() - transformedYValues.min();
-
-	var halfheight = transformedYValues.max();
+	var top = transformedYValues.min();
+	var bottom = transformedYValues.max();
+	var right = transformedXValues.max();
+	var left = transformedXValues.min();
 
 	return {
-		width: width,
-		height: height,
-		halfheight: halfheight
+		top: top,
+		bottom: bottom,
+		left: left,
+		right: right,
+		width: right - left,
+		height: bottom - top
 	};
 };
 

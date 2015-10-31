@@ -118,9 +118,9 @@ var drawEdges = function(tiles, options) {
 		y2: function(d) {return d.ends[1][1];}
 	});
 
-	if (!options.visibleEdges) {
-		edges.attr("visibility", "hidden");
-	}
+	// if (!options.visibleEdges) {
+	// 	edges.attr("visibility", "hidden");
+	// }
 
 	if (options.clickableEdges) {
 		edges.each(function(d, i) {
@@ -366,7 +366,7 @@ var spaceOut = function(polygons, options) {
 			} else {
 				poly.dimensions.cumWidth = poly.dimensions.width/2 + config.sidebarSpacing;
 			}
-			poly.dimensions.cumHeight = - poly.dimensions.halfheight;
+			poly.dimensions.cumHeight = - poly.dimensions.bottom;
 
 			return poly;
 		});

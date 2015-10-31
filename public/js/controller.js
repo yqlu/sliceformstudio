@@ -551,11 +551,94 @@ var tileViewClick = function() {
 	d3.select("#traceTab").classed("active", false).classed("hidden", true);
 };
 
+var cropPattern = function(tile, parentGroup) {
+	var xOffset = num.dot(parentGroup.transform, tile.transform)[0][2];
+	var yOffset = num.dot(parentGroup.transform, tile.transform)[1][2];
+
+	var xThreshold = [0, 400];
+	var yThreshold = [50, 400];
+
+	var xRelativeThreshold = [xThreshold[0] - xOffset, xThreshold[1] - xOffset];
+	var yRelativeThreshold = [yThreshold[0] - yOffset, yThreshold[1] - yOffset];
+
+	var dim = tile.dimensions;
+
+	var dummyEdges = [];
+
+	var maxDimEstimate = numeric.norm2([dim.height, dim.width]) / 2;
+
+	var rotation = num.inv(num.dot(num.getRotation(parentGroup.transform),num.getRotation(tile.transform)));
+
+	console.log("comparing", yThreshold[0], maxDimEstimate + yOffset);
+	console.log("comparing", yThreshold[1], -maxDimEstimate + yOffset);
+
+	if (- maxDimEstimate + yOffset < yThreshold[0]) {
+		var ends = num.matrixToCoords(num.dot(rotation, num.coordsToMatrix(
+			[[dim.left, yRelativeThreshold[0]],[dim.right, yRelativeThreshold[0]]])));
+		dummyEdges.push({
+			ends: ends,
+			joinedTo: null,
+			length: dim.width,
+			patterns: [],
+			index: tile.edges.length
+		});
+	}
+
+	if (maxDimEstimate + yOffset > yThreshold[1]) {
+		var ends = num.matrixToCoords(num.dot(rotation, num.coordsToMatrix(
+			[[dim.left, yRelativeThreshold[1]],[dim.right, yRelativeThreshold[1]]])));
+		dummyEdges.push({
+			ends: ends,
+			joinedTo: null,
+			length: dim.width,
+			patterns: [],
+			index: tile.edges.length + 1
+		});
+	}
+
+	if (- maxDimEstimate + xOffset < xThreshold[0]) {
+		var ends = num.matrixToCoords(num.dot(rotation, num.coordsToMatrix(
+			[[xRelativeThreshold[0], dim.top],[xRelativeThreshold[0], dim.bottom]])));
+		dummyEdges.push({
+			ends: ends,
+			joinedTo: null,
+			length: dim.width,
+			patterns: [],
+			index: tile.edges.length + 2
+		});
+	}
+
+	if (maxDimEstimate + xOffset > xThreshold[1]) {
+		var ends = num.matrixToCoords(num.dot(rotation, num.coordsToMatrix(
+			[[xRelativeThreshold[1], dim.top],[xRelativeThreshold[1], dim.bottom]])));
+		dummyEdges.push({
+			ends: ends,
+			joinedTo: null,
+			length: dim.width,
+			patterns: [],
+			index: tile.edges.length + 3
+		});
+	}
+
+	if (dummyEdges.length > 0) {
+		// for each pattern, crop with thresholds as necessary
+		_.each(tile.patterns, function(p) {
+			console.log(p);
+		});
+		// rebuild pattern metadata
+	}
+
+	tile.edges.extend(dummyEdges);
+}
+
 var stripViewClick = function() {
 	traceCanvas.selectAll("path").remove();
 	var clone = _.cloneDeep(polylist, deepCustomizer(false));
 	_.each(clone, function(group) {
 		_.each(group.tiles, circularize);
+		for (var i = 0; i<group.tiles.length; i++) {
+			cropPattern(group.tiles[i], group);
+		}
 	});
 	resetAndDraw(traceCanvas, clone, tracePatternOptions);
 	traceCanvas

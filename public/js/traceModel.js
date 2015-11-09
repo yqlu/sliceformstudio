@@ -47,78 +47,97 @@ var patternUnidirectionalTrace = function(patternData, nextEdge) {
 
 		var otherEdge = nextEdge.joinedTo.__data__;
 
-		var otherPattern = _.min(_.filter(otherEdge.patterns, function(p) {
-			return approxEq(p.proportion, 1 - selfPatternObject.proportion, config.polygonTolerance);
+		// only original edges (not dummy cropped edges) have pattern interfaces
+		// but all edges we are tracing through .joinedTo are original edges
+		// so we can assume they all have pattern interfaces
+
+		var otherPatternIdentifier = _.min(_.filter(otherEdge.patternInterface, function(p) {
+			return approxEq(p.proportion, 1 - selfPatternObject.proportion, config.proportionTolerance);
 		}), function(p) {
 			return Math.abs(p.angle - selfPatternObject.angle);
 		});
 
-		var shouldBeSelf = _.min(_.filter(nextEdge.patterns, function(p) {
-			return approxEq(p.proportion, 1 - otherPattern.proportion, config.polygonTolerance);
-		}), function(p) {
-			return Math.abs(p.angle - otherPattern.angle);
-		});
+		var otherPattern = _.find(otherEdge.patterns, function(p) {
+			return approxEq(p.angle, otherPatternIdentifier.angle, config.anglesTolerance)
+			&& approxEq(p.proportion, otherPatternIdentifier.proportion, config.proportionTolerance);
+		})
 
-		if (shouldBeSelf === Infinity || shouldBeSelf.pattern.this !== selfPatternObject.pattern.this) {
-			// unsuccessful crossing an edge
-			// try bouncing instead
+		console.log(otherPatternIdentifier, otherPattern);
 
-			var bouncePattern = _.find(nextEdge.patterns, function(p) {
-				return p.pattern.this !== currPattern.this && p.proportion === selfPatternObject.proportion
-				// check that the pattern has not already been matched off
-					&& p.pattern.this.parentNode !== null;
+		if (typeof otherPattern === "undefined") {
+			// pattern should have been mapped to another pattern
+			// which has since been cropped away
+			// quit the loop
+			nextEdge = {};
+		} else {
+			var shouldBeSelf = _.min(_.filter(nextEdge.patterns, function(p) {
+				return approxEq(p.proportion, 1 - otherPattern.proportion, config.proportionTolerance);
+			}), function(p) {
+				return Math.abs(p.angle - otherPattern.angle);
 			});
 
-			if (bouncePattern) {
-				selfPatternObject.intersect = false;
-				bouncePattern.intersect = false;
+			if (shouldBeSelf === Infinity || shouldBeSelf.pattern.this !== selfPatternObject.pattern.this) {
+				// unsuccessful crossing an edge
+				// try bouncing instead
 
-				if (currPattern.start.edge.this === nextEdge.this) {
-					currPattern.start.intersect = false;
-					currPattern.intersectedVertices[0].intersect = false;
-				} else {
-					currPattern.end.intersect = false;
-					_.last(currPattern.intersectedVertices).intersect = false;
-				}
-				if (bouncePattern.pattern.start.edge.this === nextEdge.this) {
-					bouncePattern.pattern.start.intersect = false;
-					bouncePattern.pattern.intersectedVertices[0].intersect = false;
-				} else {
-					bouncePattern.pattern.end.intersect = false;
-					_.last(bouncePattern.pattern.intersectedVertices).intersect = false;
-				}
-				otherPattern = bouncePattern;
-				otherEdge = nextEdge;
-			} else {
-				otherPattern  = null;
-			}
-		}
-
-		if (otherPattern) {
-
-			currPattern = otherPattern.pattern;
-
-			var reverse;
-			if (otherEdge === currPattern.start.edge) {
-				nextEdge = currPattern.end.edge;
-				reverse = false;
-			} else {
-				nextEdge = currPattern.start.edge;
-				reverse = true;
-			}
-
-			if (currPattern.this === patternData.this) {
-				// found a cycle! terminate
-				cycle = true;
-				nextEdge = {};
-			} else {
-				patternList.push({
-					reverse: reverse,
-					pattern: currPattern
+				var bouncePattern = _.find(nextEdge.patterns, function(p) {
+					return p.pattern.this !== currPattern.this && approxEq(p.proportion, selfPatternObject.proportion, config.proportionTolerance)
+					// check that the pattern has not already been matched off
+						&& p.pattern.this.parentNode !== null;
 				});
+
+				if (bouncePattern) {
+					selfPatternObject.intersect = false;
+					bouncePattern.intersect = false;
+
+					if (currPattern.start.edge.this === nextEdge.this) {
+						currPattern.start.intersect = false;
+						currPattern.intersectedVertices[0].intersect = false;
+					} else {
+						currPattern.end.intersect = false;
+						_.last(currPattern.intersectedVertices).intersect = false;
+					}
+					if (bouncePattern.pattern.start.edge.this === nextEdge.this) {
+						bouncePattern.pattern.start.intersect = false;
+						bouncePattern.pattern.intersectedVertices[0].intersect = false;
+					} else {
+						bouncePattern.pattern.end.intersect = false;
+						_.last(bouncePattern.pattern.intersectedVertices).intersect = false;
+					}
+					otherPattern = bouncePattern;
+					otherEdge = nextEdge;
+				} else {
+					otherPattern  = null;
+				}
 			}
-		} else {
-			nextEdge = {};
+
+			if (otherPattern) {
+
+				currPattern = otherPattern.pattern;
+
+				var reverse;
+				if (otherEdge === currPattern.start.edge) {
+					nextEdge = currPattern.end.edge;
+					reverse = false;
+				} else {
+					nextEdge = currPattern.start.edge;
+					reverse = true;
+				}
+
+				if (currPattern.this === patternData.this) {
+					// found a cycle! terminate
+					cycle = true;
+					nextEdge = {};
+				} else {
+					patternList.push({
+						reverse: reverse,
+						pattern: currPattern
+					});
+				}
+			} else {
+				nextEdge = {};
+			}
+
 		}
 	}
 	return {

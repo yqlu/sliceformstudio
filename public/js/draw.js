@@ -118,9 +118,9 @@ var drawEdges = function(tiles, options) {
 		y2: function(d) {return d.ends[1][1];}
 	});
 
-	// if (!options.visibleEdges) {
-	// 	edges.attr("visibility", "hidden");
-	// }
+	if (!options.visibleEdges) {
+		edges.attr("visibility", "hidden");
+	}
 
 	if (options.clickableEdges) {
 		edges.each(function(d, i) {

@@ -13,6 +13,7 @@ var config = {
 	anglesTolerance: 0.01,
 	polygonTolerance: 0.05,
 	matrixDetTolerance: 0.01,
+	proportionTolerance: 0.001,
 	extensionLength: 30,
 	sidelength: 50,
 	debug: true,

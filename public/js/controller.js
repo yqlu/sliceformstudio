@@ -641,6 +641,27 @@ var cropPattern = function(tile, parentGroup) {
 		});
 	};
 
+	var findBestIntersection = function(lineSegment) {
+		var dummyIntersections = findDummyIntersections(lineSegment);
+
+		var results = _.chain(dummyIntersections)
+			.filter(function(obj) {
+				return obj.intersection.status === "Intersection";
+			}).sortBy(function(obj) {
+				return obj.intersection.points[0].relative;
+			}).value();
+		return results[0];
+	};
+
+	_.each(tile.edges, function(edge) {
+		edge.patternInterface = _.map(edge.patterns, function(p) {
+			return {
+				angle: p.angle,
+				proportion: p.proportion
+			};
+		});
+	});
+
 	if (dummyEdges.length > 0) {
 		// for each pattern, crop with thresholds as necessary
 		tile.patterns = _.flatten(_.map(tile.patterns, function(p) {
@@ -659,29 +680,34 @@ var cropPattern = function(tile, parentGroup) {
 			for (var ctr = 1; ctr < p.allVertices.length; ctr ++) {
 				var curSubpattern = _.last(patterns);
 
+				var lineSegment = [{x:p.allVertices[ctr-1][0],y:p.allVertices[ctr-1][1]},
+					{x:p.allVertices[ctr][0],y:p.allVertices[ctr][1]}];
+
+				var result = findBestIntersection(lineSegment);
+				var cropPt = result && result.intersection && result.intersection.points[0];
+				var cropEdge = result && result.edge;
+
+				var nextPt = p.allVertices[ctr];
+				var prevPt;
 				if (curInRegion) {
-					if (inRegion(p.allVertices[ctr])) {
-						if (ctr === p.allVertices.length - 1) {
+					prevPt = _.last(curSubpattern.internalVertices) || curSubpattern.start.coords;
+				} else {
+					prevPt = p.allVertices[ctr-1];
+				}
+
+				var isLastPt = ctr === p.allVertices.length - 1;
+
+				if (curInRegion) {
+					if (inRegion(nextPt)) {
+						if (isLastPt) {
 							curSubpattern.end = p.end;
 						} else {
 							curSubpattern.internalVertices.push(p.allVertices[ctr]);
 						}
 					} else {
+						console.assert(typeof result === "object", "If pattern is leaving region, some intersection with a cropped edge must be found.");
 						// end the pattern at the border
-						var lineSegment = [{x:p.allVertices[ctr-1][0],y:p.allVertices[ctr-1][1]},
-							{x:p.allVertices[ctr][0],y:p.allVertices[ctr][1]}];
-
-						var dummyIntersections = findDummyIntersections(lineSegment);
-
-						var results = _.sortBy(_.filter(dummyIntersections, function(obj) {
-							return obj.intersection.status === "Intersection";
-						}), function(obj) {
-							return obj.intersection.points[0].relative;
-						});
-
-						console.assert(results.length > 0, dummyIntersections);
-						console.log("end at border", results[0]);
-						if (approxEqPoints(results[0].intersection.points[0].coords, _.last(curSubpattern.internalVertices) || curSubpattern.start.coords)) {
+						if (approxEqPoints(cropPt.coords, prevPt)) {
 							console.log("APPROX ERROR 2");
 							// approximation error, the last point seen was effectively equal to this one
 							if (curSubpattern.internalVertices.length == 0) {
@@ -692,65 +718,53 @@ var cropPattern = function(tile, parentGroup) {
 								// delete last seen vertex from internal vertices, set end
 								curSubpattern.internalVertices.splice(curSubpattern.internalVertices.length - 1);
 								curSubpattern.end = {
-									proportion: results[0].intersection.points[0].relative2,
-									coords: results[0].intersection.points[0].coords,
-									edge: results[0].edge,
-									angle: 100
+									proportion: cropPt.relative2,
+									coords: cropPt.coords,
+									edge: cropEdge,
+									index: cropEdge.index
 								};
 							}
-						} else if (approxEqPoints(results[0].intersection.points[0].coords, p.allVertices[ctr])) {
+						} else if (approxEqPoints(cropPt.coords, nextPt)) {
 							console.log("APPROX ERROR 4");
-							if (ctr === p.allVertices.length - 1) {
+							if (isLastPt) {
 								// prefer to end on p.end instead of cropped edge
 								curSubpattern.end = p.end;
 							} else {
 								curSubpattern.end = {
-									proportion: results[0].intersection.points[0].relative2,
-									coords: results[0].intersection.points[0].coords,
-									edge: results[0].edge,
-									angle: 100
+									proportion: cropPt.relative2,
+									coords: cropPt.coords,
+									edge: cropEdge,
+									index: cropEdge.index
 								};
 							}
 						} else {
 							curSubpattern.end = {
-								proportion: results[0].intersection.points[0].relative2,
-								coords: results[0].intersection.points[0].coords,
-								edge: results[0].edge,
-								angle: 100
+								proportion: cropPt.relative2,
+								coords: cropPt.coords,
+								edge: cropEdge,
+								index: cropEdge.index
 							};
 						}
 
 						curInRegion = false;
 					}
 				} else {
-					if (inRegion(p.allVertices[ctr])) {
+					if (inRegion(nextPt)) {
+						console.assert(typeof result === "object", "If pattern is entering region, some intersection with a cropped edge must be found.");
 						// start a new pattern at the border
-						var lineSegment = [{x:p.allVertices[ctr-1][0],y:p.allVertices[ctr-1][1]},
-							{x:p.allVertices[ctr][0],y:p.allVertices[ctr][1]}];
-
-						var dummyIntersections = findDummyIntersections(lineSegment);
-
-						var results = _.sortBy(_.filter(dummyIntersections, function(obj) {
-							return obj.intersection.status === "Intersection";
-						}), function(obj) {
-							return - obj.intersection.points[0].relative;
-						});
-
-						console.assert(results.length > 0, dummyIntersections);
-						console.log("start at border");
-						if (approxEqPoints(p.allVertices[ctr], results[0].intersection.points[0].coords)) {
+						if (approxEqPoints(cropPt.coords, nextPt)) {
 							console.log("APPROX ERROR1");
 
 							// approximation error, the last point seen was effectively equal to this one
-							if (ctr === p.allVertices.length - 1) {
+							if (isLastPt) {
 								// this pattern technically doesn't exist, no need to add it to patterns
 							} else {
 								// since p.allVertices[ctr] is effectively the same as results[0]
 								var start = {
-									proportion: results[0].intersection.points[0].relative2,
-									coords: results[0].intersection.points[0].coords,
-									edge: results[0].edge,
-									angle: 100
+									proportion: cropPt.relative2,
+									coords: cropPt.coords,
+									edge: cropEdge,
+									index: cropEdge.index
 								};
 
 								patterns.push({
@@ -762,7 +776,7 @@ var cropPattern = function(tile, parentGroup) {
 								// don't push this vertex onto internalVertices
 							}
 
-						} else if (approxEqPoints(results[0].intersection.points[0].coords, p.allVertices[ctr - 1])) {
+						} else if (approxEqPoints(cropPt.coords, prevPt)) {
 							console.log("APPROX ERROR3");
 							if (ctr === 0) {
 								patterns.push({
@@ -772,13 +786,13 @@ var cropPattern = function(tile, parentGroup) {
 								});
 							} else {
 								var start = {
-									proportion: results[0].intersection.points[0].relative2,
-									coords: results[0].intersection.points[0].coords,
-									edge: results[0].edge,
-									angle: 100
+									proportion: cropPt.relative2,
+									coords: cropPt.coords,
+									edge: cropEdge,
+									index: cropEdge.index
 								};
 
-								if (ctr === p.allVertices.length - 1) {
+								if (isLastPt) {
 									patterns.push({
 										start: start,
 										end: p.end,
@@ -788,7 +802,7 @@ var cropPattern = function(tile, parentGroup) {
 									patterns.push({
 										start: start,
 										end: null,
-										internalVertices: [p.allVertices[ctr]]
+										internalVertices: [nextPt]
 									});
 								}
 							}
@@ -796,13 +810,13 @@ var cropPattern = function(tile, parentGroup) {
 						} else {
 
 							var start = {
-								proportion: results[0].intersection.points[0].relative2,
-								coords: results[0].intersection.points[0].coords,
-								edge: results[0].edge,
-								angle: 100
+								proportion: cropPt.relative2,
+								coords: cropPt.coords,
+								edge: cropEdge,
+								index: cropEdge.index
 							};
 
-							if (ctr === p.allVertices.length - 1) {
+							if (isLastPt) {
 								patterns.push({
 									start: start,
 									end: p.end,
@@ -812,7 +826,7 @@ var cropPattern = function(tile, parentGroup) {
 								patterns.push({
 									start: start,
 									end: null,
-									internalVertices: [p.allVertices[ctr]]
+									internalVertices: [nextPt]
 								});
 							}
 						}
@@ -821,8 +835,6 @@ var cropPattern = function(tile, parentGroup) {
 					}
 				}
 			}
-
-			_.each
 
 			_.each(patterns, function(p) {
 				computePatternDataFromInternalVertices(p);
@@ -837,11 +849,13 @@ var cropPattern = function(tile, parentGroup) {
 			p.index = idx;
 		});
 
+		tile.edges.extend(dummyEdges);
 		polygonAddPatternMetadata(tile);
 		// rebuild pattern metadata
+
+		console.log(tile.edges);
 	}
 
-	tile.edges.extend(dummyEdges);
 };
 
 var stripViewClick = function() {

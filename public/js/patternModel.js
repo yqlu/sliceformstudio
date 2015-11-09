@@ -9,51 +9,88 @@ var polygonAddPattern = function(polygon, makePatterns) {
 var polygonAddPatternMetadata = function(polygon) {
 
 	_.map(polygon.edges, function(edge) {
-		var n = polygon.vertices.length;
-		edge.patterns = _.sortBy(_.sortBy(_.map(_.filter(polygon.patterns, function(p) {
-			return (p.start.index % n) === edge.index || (p.end.index % n) === edge.index;
-		}), function(p) {
-			if ((p.start.index % n) === edge.index) {
-				return {
-					pattern: p,
-					proportion: p.start.proportion,
-					angle: p.start.angle,
-					atStart: true
-				};
-			} else {
-				return {
-					pattern: p,
-					proportion: p.end.proportion,
-					angle: p.end.angle,
-					atStart: false
-				};
-			}
-		}), "angle"), "proportion");
+		edge.patterns = _.chain(polygon.patterns)
+			.filter(function(p) {
+				return (p.start.edge === edge || p.end.edge === edge);
+			}).map(function(p) {
+				if (p.start.edge === edge) {
+					return {
+						pattern: p,
+						proportion: p.start.proportion,
+						angle: p.start.angle,
+						atStart: true
+					};
+				} else {
+					return {
+						pattern: p,
+						proportion: p.end.proportion,
+						angle: p.end.angle,
+						atStart: false
+					};
+				}
+			}).sortBy("angle").sortBy("proportion").value();
 
-		_.map(edge.patterns, function(p, i) {
-			if (i > 0 && p.proportion === edge.patterns[i-1].proportion) {
-				p.intersect = true;
-				if (p.atStart) {
-					p.pattern.start.intersect = true;
-				} else {
-					p.pattern.end.intersect = true;
+		if (edge.patternInterface) {
+			// if a pattern interface exists (i.e. a record of angles and proportions before cropping)
+			// use that to annotate intersect data
+			_.map(edge.patternInterface, function(pInt, i) {
+				var p = _.find(edge.patterns, function(p) {
+					return approxEq(p.angle, pInt.angle, config.anglesTolerance)
+					&& approxEq(p.proportion, pInt.proportion, config.proportionTolerance);
+				});
+				if (p) {
+					// annotate p's intersect information only if p exists
+					if (i > 0 && approxEq(pInt.proportion, edge.patternInterface[i-1].proportion, config.proportionTolerance)) {
+						p.intersect = true;
+						if (p.atStart) {
+							p.pattern.start.intersect = true;
+						} else {
+							p.pattern.end.intersect = true;
+						}
+					} else if (i < (edge.patternInterface.length - 1) && approxEq(pInt.proportion, edge.patternInterface[i+1].proportion, config.proportionTolerance)) {
+						p.intersect = true;
+						if (p.atStart) {
+							p.pattern.start.intersect = true;
+						} else {
+							p.pattern.end.intersect = true;
+						}
+					} else {
+						p.intersect = false;
+						if (p.atStart) {
+							p.pattern.start.intersect = false;
+						} else {
+							p.pattern.end.intersect = false;
+						}
+					}
 				}
-			} else if (i < (edge.patterns.length - 1) && p.proportion === edge.patterns[i+1].proportion) {
-				p.intersect = true;
-				if (p.atStart) {
-					p.pattern.start.intersect = true;
+			});
+		} else {
+			_.map(edge.patterns, function(p, i) {
+				if (i > 0 && approxEq(p.proportion, edge.patterns[i-1].proportion, config.proportionTolerance)) {
+					p.intersect = true;
+					if (p.atStart) {
+						p.pattern.start.intersect = true;
+					} else {
+						p.pattern.end.intersect = true;
+					}
+				} else if (i < (edge.patterns.length - 1) && approxEq(p.proportion, edge.patterns[i+1].proportion, config.proportionTolerance)) {
+					p.intersect = true;
+					if (p.atStart) {
+						p.pattern.start.intersect = true;
+					} else {
+						p.pattern.end.intersect = true;
+					}
 				} else {
-					p.pattern.end.intersect = true;
+					p.intersect = false;
+					if (p.atStart) {
+						p.pattern.start.intersect = false;
+					} else {
+						p.pattern.end.intersect = false;
+					}
 				}
-			} else {
-				p.intersect = false;
-				if (p.atStart) {
-					p.pattern.start.intersect = false;
-				} else {
-					p.pattern.end.intersect = false;
-				}
-			}
-		});
+			});
+		}
+
 	});
 
 	buildIntersections(polygon);

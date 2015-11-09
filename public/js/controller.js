@@ -569,12 +569,9 @@ var cropPattern = function(tile, parentGroup) {
 
 	var rotation = num.inv(num.dot(num.getRotation(parentGroup.transform),num.getRotation(tile.transform)));
 
-	console.log("comparing", yThreshold[0], maxDimEstimate + yOffset);
-	console.log("comparing", yThreshold[1], -maxDimEstimate + yOffset);
-
 	if (- maxDimEstimate + yOffset < yThreshold[0]) {
 		var ends = num.matrixToCoords(num.dot(rotation, num.coordsToMatrix(
-			[[dim.left, yRelativeThreshold[0]],[dim.right, yRelativeThreshold[0]]])));
+			[[dim.left - 0.1, yRelativeThreshold[0]],[dim.right + 0.1, yRelativeThreshold[0]]])));
 		dummyEdges.push({
 			ends: ends,
 			joinedTo: null,
@@ -586,7 +583,7 @@ var cropPattern = function(tile, parentGroup) {
 
 	if (maxDimEstimate + yOffset > yThreshold[1]) {
 		var ends = num.matrixToCoords(num.dot(rotation, num.coordsToMatrix(
-			[[dim.left, yRelativeThreshold[1]],[dim.right, yRelativeThreshold[1]]])));
+			[[dim.left - 0.1, yRelativeThreshold[1]],[dim.right + 0.1, yRelativeThreshold[1]]])));
 		dummyEdges.push({
 			ends: ends,
 			joinedTo: null,
@@ -598,7 +595,7 @@ var cropPattern = function(tile, parentGroup) {
 
 	if (- maxDimEstimate + xOffset < xThreshold[0]) {
 		var ends = num.matrixToCoords(num.dot(rotation, num.coordsToMatrix(
-			[[xRelativeThreshold[0], dim.top],[xRelativeThreshold[0], dim.bottom]])));
+			[[xRelativeThreshold[0], dim.top - 0.1],[xRelativeThreshold[0], dim.bottom + 0.1]])));
 		dummyEdges.push({
 			ends: ends,
 			joinedTo: null,
@@ -610,7 +607,7 @@ var cropPattern = function(tile, parentGroup) {
 
 	if (maxDimEstimate + xOffset > xThreshold[1]) {
 		var ends = num.matrixToCoords(num.dot(rotation, num.coordsToMatrix(
-			[[xRelativeThreshold[1], dim.top],[xRelativeThreshold[1], dim.bottom]])));
+			[[xRelativeThreshold[1], dim.top - 0.1],[xRelativeThreshold[1], dim.bottom + 0.1]])));
 		dummyEdges.push({
 			ends: ends,
 			joinedTo: null,
@@ -620,16 +617,232 @@ var cropPattern = function(tile, parentGroup) {
 		});
 	}
 
+	var transform = num.dot(parentGroup.transform, tile.transform);
+	var inRegion = function(vertex) {
+		var absoluteVertex = num.matrixToCoords(num.dot(transform, num.coordsToMatrix([vertex])));
+		return xThreshold[0] <= absoluteVertex[0][0] && absoluteVertex[0][0] <= xThreshold[1]
+			&& yThreshold[0] <= absoluteVertex[0][1] && absoluteVertex[0][1] <= yThreshold[1];
+	};
+
+	var findDummyIntersections = function(lineSegment) {
+		return _.map(dummyEdges, function(dummyEdge) {
+			var lineSegment2 = [{x: dummyEdge.ends[0][0], y: dummyEdge.ends[0][1]},
+				{x: dummyEdge.ends[1][0], y: dummyEdge.ends[1][1]}];
+			var intersection = Intersection.intersectLineLine(lineSegment[0], lineSegment[1],
+					lineSegment2[0], lineSegment2[1]);
+
+			if (intersection.status === "Close Intersection") {
+				intersection.status = "Intersection";
+				intersection.points = intersection.points2;
+			}
+			return {edge: dummyEdge, segment: lineSegment2,
+				intersection: intersection
+			};
+		});
+	};
+
 	if (dummyEdges.length > 0) {
 		// for each pattern, crop with thresholds as necessary
-		_.each(tile.patterns, function(p) {
-			console.log(p);
+		tile.patterns = _.flatten(_.map(tile.patterns, function(p) {
+			var curInRegion = inRegion(p.allVertices[0]);
+			var patterns;
+			if (curInRegion) {
+				patterns = [{
+					start: p.start,
+					end: null,
+					internalVertices: []
+				}];
+			} else {
+				patterns = [];
+			}
+
+			for (var ctr = 1; ctr < p.allVertices.length; ctr ++) {
+				var curSubpattern = _.last(patterns);
+
+				if (curInRegion) {
+					if (inRegion(p.allVertices[ctr])) {
+						if (ctr === p.allVertices.length - 1) {
+							curSubpattern.end = p.end;
+						} else {
+							curSubpattern.internalVertices.push(p.allVertices[ctr]);
+						}
+					} else {
+						// end the pattern at the border
+						var lineSegment = [{x:p.allVertices[ctr-1][0],y:p.allVertices[ctr-1][1]},
+							{x:p.allVertices[ctr][0],y:p.allVertices[ctr][1]}];
+
+						var dummyIntersections = findDummyIntersections(lineSegment);
+
+						var results = _.sortBy(_.filter(dummyIntersections, function(obj) {
+							return obj.intersection.status === "Intersection";
+						}), function(obj) {
+							return obj.intersection.points[0].relative;
+						});
+
+						console.assert(results.length > 0, dummyIntersections);
+						console.log("end at border", results[0]);
+						if (approxEqPoints(results[0].intersection.points[0].coords, _.last(curSubpattern.internalVertices) || curSubpattern.start.coords)) {
+							console.log("APPROX ERROR 2");
+							// approximation error, the last point seen was effectively equal to this one
+							if (curSubpattern.internalVertices.length == 0) {
+								// this pattern technically doesn't exist, delete it
+								patterns.splice(patterns.length - 1);
+							} else {
+								// this pattern's last seen vertex is equivalent to this one
+								// delete last seen vertex from internal vertices, set end
+								curSubpattern.internalVertices.splice(curSubpattern.internalVertices.length - 1);
+								curSubpattern.end = {
+									proportion: results[0].intersection.points[0].relative2,
+									coords: results[0].intersection.points[0].coords,
+									edge: results[0].edge,
+									angle: 100
+								};
+							}
+						} else if (approxEqPoints(results[0].intersection.points[0].coords, p.allVertices[ctr])) {
+							console.log("APPROX ERROR 4");
+							if (ctr === p.allVertices.length - 1) {
+								// prefer to end on p.end instead of cropped edge
+								curSubpattern.end = p.end;
+							} else {
+								curSubpattern.end = {
+									proportion: results[0].intersection.points[0].relative2,
+									coords: results[0].intersection.points[0].coords,
+									edge: results[0].edge,
+									angle: 100
+								};
+							}
+						} else {
+							curSubpattern.end = {
+								proportion: results[0].intersection.points[0].relative2,
+								coords: results[0].intersection.points[0].coords,
+								edge: results[0].edge,
+								angle: 100
+							};
+						}
+
+						curInRegion = false;
+					}
+				} else {
+					if (inRegion(p.allVertices[ctr])) {
+						// start a new pattern at the border
+						var lineSegment = [{x:p.allVertices[ctr-1][0],y:p.allVertices[ctr-1][1]},
+							{x:p.allVertices[ctr][0],y:p.allVertices[ctr][1]}];
+
+						var dummyIntersections = findDummyIntersections(lineSegment);
+
+						var results = _.sortBy(_.filter(dummyIntersections, function(obj) {
+							return obj.intersection.status === "Intersection";
+						}), function(obj) {
+							return - obj.intersection.points[0].relative;
+						});
+
+						console.assert(results.length > 0, dummyIntersections);
+						console.log("start at border");
+						if (approxEqPoints(p.allVertices[ctr], results[0].intersection.points[0].coords)) {
+							console.log("APPROX ERROR1");
+
+							// approximation error, the last point seen was effectively equal to this one
+							if (ctr === p.allVertices.length - 1) {
+								// this pattern technically doesn't exist, no need to add it to patterns
+							} else {
+								// since p.allVertices[ctr] is effectively the same as results[0]
+								var start = {
+									proportion: results[0].intersection.points[0].relative2,
+									coords: results[0].intersection.points[0].coords,
+									edge: results[0].edge,
+									angle: 100
+								};
+
+								patterns.push({
+									start: start,
+									end: null,
+									internalVertices: []
+								});
+								// this pattern's last seen vertex is equivalent to this one
+								// don't push this vertex onto internalVertices
+							}
+
+						} else if (approxEqPoints(results[0].intersection.points[0].coords, p.allVertices[ctr - 1])) {
+							console.log("APPROX ERROR3");
+							if (ctr === 0) {
+								patterns.push({
+									start: p.start,
+									end: null,
+									internalVertices: null
+								});
+							} else {
+								var start = {
+									proportion: results[0].intersection.points[0].relative2,
+									coords: results[0].intersection.points[0].coords,
+									edge: results[0].edge,
+									angle: 100
+								};
+
+								if (ctr === p.allVertices.length - 1) {
+									patterns.push({
+										start: start,
+										end: p.end,
+										internalVertices: []
+									});
+								} else {
+									patterns.push({
+										start: start,
+										end: null,
+										internalVertices: [p.allVertices[ctr]]
+									});
+								}
+							}
+
+						} else {
+
+							var start = {
+								proportion: results[0].intersection.points[0].relative2,
+								coords: results[0].intersection.points[0].coords,
+								edge: results[0].edge,
+								angle: 100
+							};
+
+							if (ctr === p.allVertices.length - 1) {
+								patterns.push({
+									start: start,
+									end: p.end,
+									internalVertices: []
+								});
+							} else {
+								patterns.push({
+									start: start,
+									end: null,
+									internalVertices: [p.allVertices[ctr]]
+								});
+							}
+						}
+
+						curInRegion = true;
+					}
+				}
+			}
+
+			_.each
+
+			_.each(patterns, function(p) {
+				computePatternDataFromInternalVertices(p);
+			});
+
+			console.log(patterns);
+
+			return patterns;
+		}));
+
+		_.each(tile.patterns, function(p, idx) {
+			p.index = idx;
 		});
+
+		polygonAddPatternMetadata(tile);
 		// rebuild pattern metadata
 	}
 
 	tile.edges.extend(dummyEdges);
-}
+};
 
 var stripViewClick = function() {
 	traceCanvas.selectAll("path").remove();
@@ -655,11 +868,12 @@ var stripViewClick = function() {
 	d3.select("#noneSoFar").style("display", "block");
 	d3.select("#stripTable").selectAll("div").remove();
 
-	redrawCanvas();
-
 	tileView.classed("active", false);
 	d3.select("#assembleTab").classed("active", false).classed("hidden", true);
 	d3.select("#traceTab").classed("active", true).classed("hidden", false);
+
+	redrawCanvas();
+
 };
 
 var isNode = function(o){

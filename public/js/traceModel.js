@@ -280,8 +280,6 @@ var groupPattern = function(patternData, strictMode) {
 	var patternList = traced.patternList;
 
 	var rawSegments = _.map(patternList, function(p, index) {
-		if (typeof p.pattern.this.parentNode === "undefined") {
-		}
 
 		var transform = num.dot(p.pattern.this.parentNode.parentNode.__data__.transform,
 			p.pattern.this.parentNode.__data__.transform);
@@ -377,7 +375,7 @@ var groupPattern = function(patternData, strictMode) {
 					return approxEq(p1.x, p2.x) && approxEq(p1.y, p2.y);
 				});
 			})) {
-				console.log(overPoints, underPoints, traced);
+				console.debug(overPoints, underPoints, traced);
 				var msg = "Error: unable to find consistent assignment of over and under.";
 				bootbox.alert(msg);
 				throw msg;

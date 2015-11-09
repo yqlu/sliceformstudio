@@ -215,34 +215,40 @@ var makePatterns = function(patterns) {
 				p.internalVertices = fromStart;
 			}
 
-			p.allVertices = [p.start.coords].concat(p.internalVertices).concat([p.end.coords]);
-
-			p.fullSegments = _.map(_.range(p.allVertices.length-1), function(i) {
-				return num.edgeLength([p.allVertices[i],p.allVertices[i+1]]);
-			});
-
-			// calculate angles with edges
-
-			var secondPoint = p.allVertices[1];
-			var startVector = num.vecSub(secondPoint, p.start.coords);
-			var startEdgeVector = num.vectorFromEnds(p.start.edge.ends);
-			p.start.angle = num.angleBetweenVectors(startVector, startEdgeVector);
-
-			var secondToLastPoint = p.allVertices[p.allVertices.length - 2];
-			var endVector = num.vecSub(secondToLastPoint, p.end.coords);
-			var endEdgeVector = num.vectorFromEnds(p.end.edge.ends);
-			p.end.angle = num.angleBetweenVectors(endVector, endEdgeVector);
-
-			// calculate line generator
-			p.line = "M" + p.start.coords[0] + "," + p.start.coords[1] +
-				_.map(p.internalVertices, function(point) {
-					return "L" + point[0] + "," + point[1];
-				}).join("") +
-				"L" + p.end.coords[0] + "," + p.end.coords[1];
+			computePatternDataFromInternalVertices(p);
 
 			return p;
 		});
 	};
+};
+
+var computePatternDataFromInternalVertices = function(p) {
+
+	p.allVertices = [p.start.coords].concat(p.internalVertices).concat([p.end.coords]);
+
+	p.fullSegments = _.map(_.range(p.allVertices.length-1), function(i) {
+		return num.edgeLength([p.allVertices[i],p.allVertices[i+1]]);
+	});
+
+	// calculate angles with edges
+
+	var secondPoint = p.allVertices[1];
+	var startVector = num.vecSub(secondPoint, p.start.coords);
+	var startEdgeVector = num.vectorFromEnds(p.start.edge.ends);
+	p.start.angle = num.angleBetweenVectors(startVector, startEdgeVector);
+
+	var secondToLastPoint = p.allVertices[p.allVertices.length - 2];
+	var endVector = num.vecSub(secondToLastPoint, p.end.coords);
+	var endEdgeVector = num.vectorFromEnds(p.end.edge.ends);
+	p.end.angle = num.angleBetweenVectors(endVector, endEdgeVector);
+
+	// calculate line generator
+	p.line = "M" + p.start.coords[0] + "," + p.start.coords[1] +
+		_.map(p.internalVertices, function(point) {
+			return "L" + point[0] + "," + point[1];
+		}).join("") +
+		"L" + p.end.coords[0] + "," + p.end.coords[1];
+
 };
 
 // Hankin inference algorithm to match up list of rays

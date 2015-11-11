@@ -137,7 +137,7 @@ var joinEdges = function(thisEdgeNode, selected) {
 
 		var tiles;
 		if (autoSnapMode) {
-			var tiles = d3.select(selected.groupNode)
+			tiles = d3.select(selected.groupNode)
 			.selectAll("g.tile")
 			.attr("transform", function(d) {
 				return num.getTransform({
@@ -150,7 +150,7 @@ var joinEdges = function(thisEdgeNode, selected) {
 			.transition()
 			.attr("transform", num.getTransform);
 		} else {
-			var tiles = d3.select(selected.groupNode)
+			tiles = d3.select(selected.groupNode)
 			.selectAll("g.tile")
 			.each(function(d) {
 				d.transform = num.dot(orig, d.transform);
@@ -208,8 +208,8 @@ var detectJoins = function(group1Edges, group2Edges, reset) {
 	// detect via a double loop when two edges are approximately equal
 	_.map(transformEdges(group1Edges), function(edge) {
 		_.map(transformEdges(group2Edges), function(other) {
-			if (edge.node !== other.node && approxEqEdges(edge.ends, other.ends)
-				&& !(edge.node.__data__.joinedTo) && !(other.node.__data__.joinedTo)) {
+			if (edge.node !== other.node && approxEqEdges(edge.ends, other.ends) &&
+				!(edge.node.__data__.joinedTo) && !(other.node.__data__.joinedTo)) {
 				joinNodes(edge.node, other.node);
 			}
 		});
@@ -252,7 +252,9 @@ var enterCanvas = function(groupNode) {
 
 	d3.select(groupNode)
 	.each(function(d, i) {
+		console.log(d.transform);
 		d.transform = translateWithoutScale(d);
+		console.log(d.transform);
 	})
 	.attr("transform", num.getTransform);
 
@@ -278,4 +280,4 @@ var enterCanvas = function(groupNode) {
 		.transition()
 		.attr("transform", num.getTransform);
 	}
-}
+};

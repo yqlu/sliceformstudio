@@ -26,7 +26,8 @@ var assembleCanvasOptions = {
 	visibleEdges: true,
 	clickableEdges: true,
 	displayInterior: true,
-	groupDraggable: true
+	groupDraggable: true,
+	croppingOverlay: true
 };
 
 var tracePatternOptions = {
@@ -61,13 +62,21 @@ var commonZoomHandler = d3.behavior.zoom().on("zoom", zoomBehavior);
 var assembleSvg = buildSvg("#assembleSvg", config.standardWidth, config.standardHeight);
 var assembleBg = buildBg(assembleSvg, true, true, commonZoomHandler);
 var assembleCanvas = buildDisplay(assembleSvg, num.id, true);
+var assembleCropOverlay = buildOverlay(assembleSvg, commonZoomHandler);
+var assembleCropCanvas = buildDisplay(assembleSvg, num.id, true);
 
-var assemblePalette = buildDisplay(assembleSvg, num.translate(config.sidebarWidth / 2, 0));
+var assembleCropCanvasPathOverlay = assembleCropCanvas.selectAll(".cropOverlayPath")
+	.data([{id: 5}])
+	.enter()
+	.append("path")
+	.classed("cropOverlayPath", true);
+
+var assemblePalette = buildDisplay(assembleSvg, num.translate(config.initSidebarWidth / 2, 0));
 var assemblePaletteBg = assemblePalette.append("rect")
 	.classed("palette-background", true)
-	.attr("width", config.sidebarWidth)
+	.attr("width", config.initSidebarWidth)
 	.attr("height", "100%")
-	.attr("x", - config.sidebarWidth / 2)
+	.attr("x", - config.initSidebarWidth / 2)
 	.attr("y", 0)
 	.style("cursor", "move")
 	.call(zoomPalette);
@@ -95,6 +104,9 @@ var tileView = d3.select("#tileView")
 
 var stripView = d3.select("#stripView")
 .on("click", stripViewClick);
+
+var cropView = d3.select("#cropView")
+.on("click", cropViewClick);
 
 // set listeners on tile view UI elements
 
@@ -153,6 +165,9 @@ var editPatternButton = d3.select("#editPattern")
 	})
 	.attr("disabled", "disabled");
 $(editPatternButton[0]).tooltip({container: 'body'});
+
+d3.select("#selectAll").on("click", cropSelectAll);
+d3.select("#unselectAll").on("click", cropUnselectAll);
 
 // initializing dropdown options
 var shapeOptionsBuilder = (function() {
@@ -536,6 +551,8 @@ $(document).ready(function() {
 	.on("change", patternDropdownChange);
 
 	$("#autoSnap").bootstrapSwitch();
+
+	$("#cropMode").bootstrapSwitch();
 
 	stylesheet.insertRule("path.strip.hover { stroke: " + $("#colorpicker").val() + " !important }", 0);
 });

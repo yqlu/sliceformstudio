@@ -288,6 +288,17 @@ var computePatternDataFromInternalVertices = function(p) {
 
 };
 
+var generatePatternInterface = function(tile) {
+	_.each(tile.edges, function(edge) {
+		edge.patternInterface = _.map(edge.patterns, function(p) {
+			return {
+				angle: p.angle,
+				proportion: p.proportion
+			};
+		});
+	});
+};
+
 // Hankin inference algorithm to match up list of rays
 var greedyInference = function(rays) {
 	var allPairs = [];

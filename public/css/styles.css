@@ -145,6 +145,22 @@ circle.vertex.actionable:hover {
   fill: #03a9f4;
   cursor: all-scroll;
 }
+circle.crop-vertex {
+  fill: blue;
+}
+circle.crop-vertex:hover {
+  fill: green;
+}
+circle.crop-vertex.selected {
+  fill: black;
+}
+circle.crop-vertex.selected:hover {
+  fill: green;
+}
+path.cropOverlayPath {
+  fill: grey;
+  opacity: 0.5;
+}
 circle.patternHandle {
   transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
@@ -167,7 +183,7 @@ circle.vertex.selectedGroup {
   fill: #2ebcfc;
 }
 .toolbar {
-  margin-top: 15px;
+  margin-top: 10px;
 }
 .header {
   text-align: center;

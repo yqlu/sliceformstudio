@@ -221,5 +221,7 @@ var translateWithoutScale = function(group) {
 	var absTrans = num.getTranslation(absCoords);
 	var equivTrans = num.translate(num.vecDiv(num.vecSub(absTrans, canvasTrans), canvasFactor));
 
+	console.log()
+
 	return num.dot(equivTrans, num.dot(num.getRotation(absCoords), num.scale(1 / paletteFactor)));
 };

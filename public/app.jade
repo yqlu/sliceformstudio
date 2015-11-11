@@ -2,10 +2,11 @@
 	.header
 		.btn-group.nav
 			button#tileView.btn.btn-default.active(type='button', data-toggle='button') Tile view
+			button#cropView.btn.btn-default(type='button', data-toggle='button') Crop view
 			button#stripView.btn.btn-default(type='button', data-toggle='button') Strip view
 	#assembleTab.active
 		div(style='margin-bottom: 15px;')
-			form.form-inline
+			form#tileViewMenu.form-inline
 				.form-group
 					label Polygons:
 					span.select2-wrapper
@@ -21,6 +22,8 @@
 					a#saveFile.btn.btn-primary(title="Save design")
 						i.fa.fa-floppy-o
 				.btn-group.padded-btn-group
+					a#addShape.btn.btn-primary(title="Add shape")
+						i.fa.fa-plus
 					a#delete.btn.btn-primary(title="Delete selection")
 						i.fa.fa-trash
 					a#copy.btn.btn-primary(title="Copy selection")
@@ -29,6 +32,12 @@
 					input#autoSnap(type="checkbox", checked="true", data-label-text="Snap edges")
 				.btn-group.padded-btn-group
 					a#infer.btn.btn-primary(title="Infer tile patterns") Infer
+			form#cropViewMenu.form-inline.hidden(style='text-align: center;')
+				.btn-group.padded-btn-group
+					input#cropMode(type="checkbox", checked="true", data-label-text="Crop mode")
+				.btn-group.padded-btn-group
+					a#selectAll.btn.btn-primary Select All
+					a#unselectAll.btn.btn-primary Unselect All
 		#assembleSvgContainer
 			#assembleSvg
 		#customShape.collapse(style='margin-top: 15px')

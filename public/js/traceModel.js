@@ -62,14 +62,19 @@ var patternUnidirectionalTrace = function(patternData, nextEdge) {
 			&& approxEq(p.proportion, otherPatternIdentifier.proportion, config.proportionTolerance);
 		})
 
-		console.log(otherPatternIdentifier, otherPattern);
-
-		if (typeof otherPattern === "undefined") {
+		if (otherPatternIdentifier !== Infinity && typeof otherPattern === "undefined") {
 			// pattern should have been mapped to another pattern
 			// which has since been cropped away
 			// quit the loop
 			nextEdge = {};
 		} else {
+
+			if (typeof otherPattern === "undefined") {
+				// no compatible pattern found, set up otherPattern
+				// for shouldBeSelf === infinity and bouncing a few lines below
+				otherPattern = {proportion: Infinity, angle: Infinity};
+			}
+
 			var shouldBeSelf = _.min(_.filter(nextEdge.patterns, function(p) {
 				return approxEq(p.proportion, 1 - otherPattern.proportion, config.proportionTolerance);
 			}), function(p) {

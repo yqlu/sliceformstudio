@@ -1,7 +1,8 @@
 var config = {
 	standardWidth: "100%",
 	standardHeight: 500,
-	sidebarWidth: 250,
+	maxSidebarWidth: 250,
+	initSidebarWidth: 143,
 	sidebarSpacing: 40,
 	labelOffset: 5,
 	editWidth: 400,
@@ -75,11 +76,27 @@ var buildDisplay = function(container, transform, isCanvas) {
 	.attr("transform", num.getTransform);
 };
 
+var buildOverlay = function(container, zoomHandler) {
+	var overlay = container.append("rect")
+	.classed("crop-overlay", true)
+	.attr("width", "100%")
+	.attr("height", "100%")
+	.attr("x", 0)
+	.attr("y", 0)
+	.attr("fill", "white")
+	.attr("opacity", 0.8)
+	.style("visibility", "hidden")
+	.style("cursor", "move")
+	.call(zoomHandler);
+
+	return overlay;
+};
+
 var buildPalette = function(selector, options) {
 
-	var svg = buildSvg(selector, config.standardWidth, config.sidebarWidth);
+	var svg = buildSvg(selector, config.standardWidth, config.initSidebarWidth);
 	var bg = buildBg(svg, false, true);
-	var display = buildDisplay(svg, num.translate(0, 0.9 * config.sidebarWidth));
+	var display = buildDisplay(svg, num.translate(0, 0.9 * config.initSidebarWidth));
 
 	return svgDrawer(display, options);
 };

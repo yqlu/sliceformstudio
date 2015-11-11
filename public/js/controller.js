@@ -539,333 +539,93 @@ var shapeEditToggle = function() {
 	.attr("visibility", shapeEditToggleButton.classed("active") ? "hidden" : "visible");
 };
 
+var cropSelectAll = function() {
+	d3.selectAll(".crop-vertex").classed("selected", true);
+	cropData.vertices = _.pluck(d3.selectAll(".crop-vertex")[0], "__data__");
+	recomputeHull();
+};
+
+var cropUnselectAll = function() {
+	d3.selectAll(".crop-vertex").classed("selected", false);
+	cropData.vertices = [];
+	recomputeHull();
+};
+
+var cropCircleClick = function(d) {
+	if (d3.select(this).classed("selected")) {
+		cropData.vertices = _.filter(cropData.vertices, function(v) {
+			return (v !== d);
+		});
+		d3.select(this).classed("selected", false);
+	} else {
+		cropData.vertices.push(d);
+		d3.select(this).classed("selected", true);
+	}
+	recomputeHull();
+};
+
 var tileViewClick = function() {
-	assembleCanvas
+	if (stripView.classed("active")) {
+		assembleCanvas
+		.each(function(d, i) {
+			d.transform = traceCanvas.datum().transform;
+		})
+		.attr("transform", num.getTransform);
+	}
+
+	d3.select("#tileViewMenu").classed("hidden", false);
+	d3.select("#cropViewMenu").classed("hidden", true);
+
+	stripView.classed("active", false);
+	cropView.classed("active", false);
+
+	d3.select("#assembleTab").classed("active", true).classed("hidden", false);
+	d3.select("#traceTab").classed("active", false).classed("hidden", true);
+
+	assemblePalette.classed("hidden", false);
+	teardownOverlay();
+};
+
+var cropViewClick = function() {
+	if (stripView.classed("active")) {
+		assembleCanvas
+		.each(function(d, i) {
+			d.transform = traceCanvas.datum().transform;
+		})
+		.attr("transform", num.getTransform);
+	}
+
+	assembleCropCanvas
 	.each(function(d, i) {
-		d.transform = traceCanvas.datum().transform;
+		d.transform = assembleCanvas.datum().transform;
 	})
 	.attr("transform", num.getTransform);
 
+	d3.select("#tileViewMenu").classed("hidden", true);
+	d3.select("#cropViewMenu").classed("hidden", false);
+
+	tileView.classed("active", false);
 	stripView.classed("active", false);
+
 	d3.select("#assembleTab").classed("active", true).classed("hidden", false);
 	d3.select("#traceTab").classed("active", false).classed("hidden", true);
-};
 
-var cropPattern = function(tile, parentGroup) {
-	var xOffset = num.dot(parentGroup.transform, tile.transform)[0][2];
-	var yOffset = num.dot(parentGroup.transform, tile.transform)[1][2];
-
-	var xThreshold = [0, 400];
-	var yThreshold = [50, 400];
-
-	var xRelativeThreshold = [xThreshold[0] - xOffset, xThreshold[1] - xOffset];
-	var yRelativeThreshold = [yThreshold[0] - yOffset, yThreshold[1] - yOffset];
-
-	var dim = tile.dimensions;
-
-	var dummyEdges = [];
-
-	var maxDimEstimate = numeric.norm2([dim.height, dim.width]) / 2;
-
-	var rotation = num.inv(num.dot(num.getRotation(parentGroup.transform),num.getRotation(tile.transform)));
-
-	if (- maxDimEstimate + yOffset < yThreshold[0]) {
-		var ends = num.matrixToCoords(num.dot(rotation, num.coordsToMatrix(
-			[[dim.left - 0.1, yRelativeThreshold[0]],[dim.right + 0.1, yRelativeThreshold[0]]])));
-		dummyEdges.push({
-			ends: ends,
-			joinedTo: null,
-			length: dim.width,
-			patterns: [],
-			index: tile.edges.length
-		});
-	}
-
-	if (maxDimEstimate + yOffset > yThreshold[1]) {
-		var ends = num.matrixToCoords(num.dot(rotation, num.coordsToMatrix(
-			[[dim.left - 0.1, yRelativeThreshold[1]],[dim.right + 0.1, yRelativeThreshold[1]]])));
-		dummyEdges.push({
-			ends: ends,
-			joinedTo: null,
-			length: dim.width,
-			patterns: [],
-			index: tile.edges.length + 1
-		});
-	}
-
-	if (- maxDimEstimate + xOffset < xThreshold[0]) {
-		var ends = num.matrixToCoords(num.dot(rotation, num.coordsToMatrix(
-			[[xRelativeThreshold[0], dim.top - 0.1],[xRelativeThreshold[0], dim.bottom + 0.1]])));
-		dummyEdges.push({
-			ends: ends,
-			joinedTo: null,
-			length: dim.width,
-			patterns: [],
-			index: tile.edges.length + 2
-		});
-	}
-
-	if (maxDimEstimate + xOffset > xThreshold[1]) {
-		var ends = num.matrixToCoords(num.dot(rotation, num.coordsToMatrix(
-			[[xRelativeThreshold[1], dim.top - 0.1],[xRelativeThreshold[1], dim.bottom + 0.1]])));
-		dummyEdges.push({
-			ends: ends,
-			joinedTo: null,
-			length: dim.width,
-			patterns: [],
-			index: tile.edges.length + 3
-		});
-	}
-
-	var transform = num.dot(parentGroup.transform, tile.transform);
-	var inRegion = function(vertex) {
-		var absoluteVertex = num.matrixToCoords(num.dot(transform, num.coordsToMatrix([vertex])));
-		return xThreshold[0] <= absoluteVertex[0][0] && absoluteVertex[0][0] <= xThreshold[1]
-			&& yThreshold[0] <= absoluteVertex[0][1] && absoluteVertex[0][1] <= yThreshold[1];
-	};
-
-	var findDummyIntersections = function(lineSegment) {
-		return _.map(dummyEdges, function(dummyEdge) {
-			var lineSegment2 = [{x: dummyEdge.ends[0][0], y: dummyEdge.ends[0][1]},
-				{x: dummyEdge.ends[1][0], y: dummyEdge.ends[1][1]}];
-			var intersection = Intersection.intersectLineLine(lineSegment[0], lineSegment[1],
-					lineSegment2[0], lineSegment2[1]);
-
-			if (intersection.status === "Close Intersection") {
-				intersection.status = "Intersection";
-				intersection.points = intersection.points2;
-			}
-			return {edge: dummyEdge, segment: lineSegment2,
-				intersection: intersection
-			};
-		});
-	};
-
-	var findBestIntersection = function(lineSegment) {
-		var dummyIntersections = findDummyIntersections(lineSegment);
-
-		var results = _.chain(dummyIntersections)
-			.filter(function(obj) {
-				return obj.intersection.status === "Intersection";
-			}).sortBy(function(obj) {
-				return obj.intersection.points[0].relative;
-			}).value();
-		return results[0];
-	};
-
-	_.each(tile.edges, function(edge) {
-		edge.patternInterface = _.map(edge.patterns, function(p) {
-			return {
-				angle: p.angle,
-				proportion: p.proportion
-			};
-		});
-	});
-
-	if (dummyEdges.length > 0) {
-		// for each pattern, crop with thresholds as necessary
-		tile.patterns = _.flatten(_.map(tile.patterns, function(p) {
-			var curInRegion = inRegion(p.allVertices[0]);
-			var patterns;
-			if (curInRegion) {
-				patterns = [{
-					start: p.start,
-					end: null,
-					internalVertices: []
-				}];
-			} else {
-				patterns = [];
-			}
-
-			for (var ctr = 1; ctr < p.allVertices.length; ctr ++) {
-				var curSubpattern = _.last(patterns);
-
-				var lineSegment = [{x:p.allVertices[ctr-1][0],y:p.allVertices[ctr-1][1]},
-					{x:p.allVertices[ctr][0],y:p.allVertices[ctr][1]}];
-
-				var result = findBestIntersection(lineSegment);
-				var cropPt = result && result.intersection && result.intersection.points[0];
-				var cropEdge = result && result.edge;
-
-				var nextPt = p.allVertices[ctr];
-				var prevPt;
-				if (curInRegion) {
-					prevPt = _.last(curSubpattern.internalVertices) || curSubpattern.start.coords;
-				} else {
-					prevPt = p.allVertices[ctr-1];
-				}
-
-				var isLastPt = ctr === p.allVertices.length - 1;
-
-				if (curInRegion) {
-					if (inRegion(nextPt)) {
-						if (isLastPt) {
-							curSubpattern.end = p.end;
-						} else {
-							curSubpattern.internalVertices.push(p.allVertices[ctr]);
-						}
-					} else {
-						console.assert(typeof result === "object", "If pattern is leaving region, some intersection with a cropped edge must be found.");
-						// end the pattern at the border
-						if (approxEqPoints(cropPt.coords, prevPt)) {
-							console.log("APPROX ERROR 2");
-							// approximation error, the last point seen was effectively equal to this one
-							if (curSubpattern.internalVertices.length == 0) {
-								// this pattern technically doesn't exist, delete it
-								patterns.splice(patterns.length - 1);
-							} else {
-								// this pattern's last seen vertex is equivalent to this one
-								// delete last seen vertex from internal vertices, set end
-								curSubpattern.internalVertices.splice(curSubpattern.internalVertices.length - 1);
-								curSubpattern.end = {
-									proportion: cropPt.relative2,
-									coords: cropPt.coords,
-									edge: cropEdge,
-									index: cropEdge.index
-								};
-							}
-						} else if (approxEqPoints(cropPt.coords, nextPt)) {
-							console.log("APPROX ERROR 4");
-							if (isLastPt) {
-								// prefer to end on p.end instead of cropped edge
-								curSubpattern.end = p.end;
-							} else {
-								curSubpattern.end = {
-									proportion: cropPt.relative2,
-									coords: cropPt.coords,
-									edge: cropEdge,
-									index: cropEdge.index
-								};
-							}
-						} else {
-							curSubpattern.end = {
-								proportion: cropPt.relative2,
-								coords: cropPt.coords,
-								edge: cropEdge,
-								index: cropEdge.index
-							};
-						}
-
-						curInRegion = false;
-					}
-				} else {
-					if (inRegion(nextPt)) {
-						console.assert(typeof result === "object", "If pattern is entering region, some intersection with a cropped edge must be found.");
-						// start a new pattern at the border
-						if (approxEqPoints(cropPt.coords, nextPt)) {
-							console.log("APPROX ERROR1");
-
-							// approximation error, the last point seen was effectively equal to this one
-							if (isLastPt) {
-								// this pattern technically doesn't exist, no need to add it to patterns
-							} else {
-								// since p.allVertices[ctr] is effectively the same as results[0]
-								var start = {
-									proportion: cropPt.relative2,
-									coords: cropPt.coords,
-									edge: cropEdge,
-									index: cropEdge.index
-								};
-
-								patterns.push({
-									start: start,
-									end: null,
-									internalVertices: []
-								});
-								// this pattern's last seen vertex is equivalent to this one
-								// don't push this vertex onto internalVertices
-							}
-
-						} else if (approxEqPoints(cropPt.coords, prevPt)) {
-							console.log("APPROX ERROR3");
-							if (ctr === 0) {
-								patterns.push({
-									start: p.start,
-									end: null,
-									internalVertices: null
-								});
-							} else {
-								var start = {
-									proportion: cropPt.relative2,
-									coords: cropPt.coords,
-									edge: cropEdge,
-									index: cropEdge.index
-								};
-
-								if (isLastPt) {
-									patterns.push({
-										start: start,
-										end: p.end,
-										internalVertices: []
-									});
-								} else {
-									patterns.push({
-										start: start,
-										end: null,
-										internalVertices: [nextPt]
-									});
-								}
-							}
-
-						} else {
-
-							var start = {
-								proportion: cropPt.relative2,
-								coords: cropPt.coords,
-								edge: cropEdge,
-								index: cropEdge.index
-							};
-
-							if (isLastPt) {
-								patterns.push({
-									start: start,
-									end: p.end,
-									internalVertices: []
-								});
-							} else {
-								patterns.push({
-									start: start,
-									end: null,
-									internalVertices: [nextPt]
-								});
-							}
-						}
-
-						curInRegion = true;
-					}
-				}
-			}
-
-			_.each(patterns, function(p) {
-				computePatternDataFromInternalVertices(p);
-			});
-
-			console.log(patterns);
-
-			return patterns;
-		}));
-
-		_.each(tile.patterns, function(p, idx) {
-			p.index = idx;
-		});
-
-		tile.edges.extend(dummyEdges);
-		polygonAddPatternMetadata(tile);
-		// rebuild pattern metadata
-
-		console.log(tile.edges);
-	}
-
+	assemblePalette.classed("hidden", true);
+	setupOverlay();
 };
 
 var stripViewClick = function() {
+
 	traceCanvas.selectAll("path").remove();
 	var clone = _.cloneDeep(polylist, deepCustomizer(false));
 	_.each(clone, function(group) {
-		_.each(group.tiles, circularize);
-		for (var i = 0; i<group.tiles.length; i++) {
-			cropPattern(group.tiles[i], group);
-		}
+		_.each(group.tiles, function(tile) {
+			circularize(tile);
+			generatePatternInterface(tile);
+			if ($("#cropMode").prop("checked") && cropData.hull.length >= 3) {
+				cropPattern(tile, group);
+			}
+		});
 	});
 	resetAndDraw(traceCanvas, clone, tracePatternOptions);
 	traceCanvas
@@ -883,110 +643,12 @@ var stripViewClick = function() {
 	d3.select("#stripTable").selectAll("div").remove();
 
 	tileView.classed("active", false);
+	cropView.classed("active", false);
+
 	d3.select("#assembleTab").classed("active", false).classed("hidden", true);
 	d3.select("#traceTab").classed("active", true).classed("hidden", false);
 
 	redrawCanvas();
-
-};
-
-var isNode = function(o){
-  return (
-    typeof Node === "object" ? o instanceof Node :
-    o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName==="string"
-  );
-};
-
-var reduceCircularity = function(tile) {
-
-	var tileCopy = _.cloneDeep(tile);
-	_.each(tileCopy.patterns, function(p, index) {
-		p.end.edge = p.end.edge.index; // replace reference with id
-		p.start.edge = p.start.edge.index;
-	});
-
-	_.each(tileCopy.edges, function(e) {
-		_.each(e.patterns, function(p) {
-			p.pattern = p.pattern.index;
-		});
-	});
-
-	return tileCopy;
-};
-
-var circularize = function(tile) {
-
-	_.each(tile.patterns, function(p, index) {
-		p.end.edge = tile.edges[p.end.edge]; // dereference index
-		p.start.edge = tile.edges[p.start.edge];
-	});
-
-	_.each(tile.edges, function(e) {
-		_.each(e.patterns, function(p) {
-			p.pattern = tile.patterns[p.pattern];
-		});
-	});
-
-	return tile;
-};
-
-
-var loadFromString = function(str) {
-	loaded = JSON.parse(str);
-	if (loaded.version >= minSupportedVersion) {
-		shapeDropdown.node().value = parseInt(loaded.shapeDropdown, 10);
-		$("#shapeDropdown").trigger("change");
-
-		var canvasTransform = loaded.canvasTransform;
-
-		assembleCanvas.each(function(d) {
-			d.transform = canvasTransform;
-		})
-		.attr("transform", num.getTransform);
-		commonZoomHandler.scale(num.getScale(canvasTransform));
-		commonZoomHandler.translate(num.getTranslation(canvasTransform));
-
-		polylist = loaded.polylist;
-		var palette = loaded.palette;
-
-		_.each(polylist, function(group) {
-			_.each(group.tiles, circularize);
-		});
-
-		_.each(palette, circularize);
-
-		// draw anything in local storage
-		resetAndDraw(assembleCanvas, polylist, assembleCanvasOptions);
-		assembleSVGDrawer.set(palette);
-		assembleSVGDrawer.draw();
-
-		if (loaded.stripViewParams) {
-			var p = loaded.stripViewParams;
-
-			p.thickness ? thicknessSlider.setValue(p.thickness) : null;
-			p.extension ? extensionSlider.setValue(p.extension) : null;
-			p.stripHeight ? stripHeight.setValue(p.stripHeight) : null;
-			p.widthFactor ? widthFactor.setValue(p.widthFactor) : null;
-			p.interSpacing ? interSpacing.setValue(p.interSpacing) : null;
-			p.printHeight ? printHeight.setValue(p.printHeight) : null;
-			p.printWidth ? printWidth.setValue(p.printWidth) : null;
-			if (typeof p.outline !== "undefined") {
-				outlineToggle.classed("active", p.outline);
-				outlineToggle.on("click")();
-				outlineToggle.on("click")();
-			}
-		}
-
-		updateInferButton();
-	} else {
-		if (typeof loaded.version === "undefined") {
-			loaded.version = "?";
-		}
-		throw {
-			message: "File was from Wallpaper v" + loaded.version +
-				" but only >=v" + minSupportedVersion + " is supported."
-		};
-	}
 };
 
 var loadFromFile = function() {
@@ -1007,44 +669,6 @@ var loadFromFile = function() {
 
 		reader.readAsText(files[0]);
 	}
-};
-
-var saveToFileWithTitle = function(title) {
-
-	var nonCircularPolylist = _.cloneDeep(polylist, deepCustomizer(true, true));
-
-	var nonCircularPalette = _.map(assembleSVGDrawer.get(), function(tile) {
-		return reduceCircularity(tile);
-	});
-
-	var saveFile = {
-		polylist: nonCircularPolylist,
-		palette: nonCircularPalette,
-		canvasTransform: assembleCanvas.node().__data__.transform,
-		shapeDropdown: shapeDropdown.node().value,
-		version: wallpaperVersion,
-		stripViewParams: {
-			thickness: thicknessSlider.getValue(),
-			extension: extensionSlider.getValue(),
-			outline: outlineToggle.classed("active"),
-			stripHeight: stripHeight.getValue(),
-			widthFactor: widthFactor.getValue(),
-			interSpacing: interSpacing.getValue(),
-			printHeight: printHeight.getValue(),
-			printWidth: printWidth.getValue()
-		}
-	};
-
-	var saveFileText = JSON.stringify(saveFile, function(k,v) {
-		return (isNode(v)) ? "tag" : v;
-	});
-
-	var bb = new Blob([saveFileText], {type: "application/json"});
-	var pom = d3.select("#downloadLink").node();
-	pom.download = title;
-	pom.href = window.URL.createObjectURL(bb);
-	pom.dataset.downloadurl = ["application/json", pom.download, pom.href].join(':');
-	pom.click();
 };
 
 var saveToFile = function() {

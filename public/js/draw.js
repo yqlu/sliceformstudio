@@ -5,6 +5,7 @@ var line = d3.svg.line()
 	.interpolate("linear");
 
 var drawGroups = function(canvas, inputlist, options) {
+
 	var groups = canvas.selectAll("g.group")
 	.data(inputlist)
 	.enter().append("g")
@@ -314,17 +315,17 @@ var draw = function(container, inputlist, options) {
 		if (tiles.length > 0) {
 			var boundingBox = container.node().getBBox();
 
-			if (boundingBox.width * 1.3 < config.sidebarWidth) {
+			if (boundingBox.width * 1.3 < config.maxSidebarWidth) {
 				newWidth = 1.3 * boundingBox.width;
 
-			} else if (boundingBox.width > config.sidebarWidth) {
-				newWidth = config.sidebarWidth;
-				scaleFactor = 0.75 * config.sidebarWidth / boundingBox.width;
+			} else if (boundingBox.width > config.maxSidebarWidth) {
+				newWidth = config.maxSidebarWidth;
+				scaleFactor = 0.75 * config.maxSidebarWidth / boundingBox.width;
 			} else {
-				newWidth = config.sidebarWidth;
+				newWidth = config.maxSidebarWidth;
 			}
 		} else {
-			newWidth = config.sidebarWidth;
+			newWidth = config.maxSidebarWidth;
 		}
 
 		container.each(function(d, i) {
@@ -340,6 +341,7 @@ var draw = function(container, inputlist, options) {
 		.select("rect")
 		.attr("width", newWidth)
 		.attr("x", - newWidth / 2);
+
 	}
 
 	return groups;

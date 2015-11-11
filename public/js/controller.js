@@ -520,8 +520,20 @@ var thicknessSliderChange = function() {
 };
 
 var extensionSliderChange = function() {
+	// should find way to optimize
 	traceCanvas.selectAll("path").remove();
-	resetAndDraw(traceCanvas, _.cloneDeep(polylist), tracePatternOptions);
+	var clone = _.cloneDeep(polylist, deepCustomizer(false));
+	_.each(clone, function(group) {
+		_.each(group.tiles, function(tile) {
+			circularize(tile);
+			generatePatternInterface(tile);
+			if ($("#cropMode").prop("checked") && cropData.hull.length >= 3) {
+				cropPattern(tile, group);
+			}
+		});
+	});
+	resetAndDraw(traceCanvas, clone, tracePatternOptions);
+
 	colorMap = _.map(stripColors, function(c) {
 		return {
 			color: c,
@@ -530,6 +542,7 @@ var extensionSliderChange = function() {
 	});
 	d3.select("#noneSoFar").style("display", "block");
 	d3.select("#stripTable").selectAll("div").remove();
+
 	redrawCanvas();
 };
 

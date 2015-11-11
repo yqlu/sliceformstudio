@@ -155,6 +155,23 @@ var loadFromString = function(str) {
 		}
 
 		updateInferButton();
+
+		if (loaded.cropData) {
+			setupOverlay();
+			$("#cropMode").bootstrapSwitch('state', loaded.cropData.cropMode);
+
+			cropData.vertices = _.map(d3.selectAll(".crop-vertex").filter(function(d) {
+				return d.correspondsTo && _.any(loaded.cropData.vertices, function(v) {
+					return v.x === d.x && v.y === d.y;
+				});
+			})[0], function(d) {
+				return d.__data__;
+			});
+			recomputeHull();
+
+			teardownOverlay();
+		}
+
 	} else {
 		if (typeof loaded.version === "undefined") {
 			loaded.version = "?";
@@ -174,9 +191,15 @@ var saveToFileWithTitle = function(title) {
 		return reduceCircularity(tile);
 	});
 
+	var cropVertices = _.map(cropData.vertices, function(v) { return _.pick(v, _.isNumber); });
+
 	var saveFile = {
 		polylist: nonCircularPolylist,
 		palette: nonCircularPalette,
+		cropData: {
+			vertices: cropVertices,
+			cropMode: $("#cropMode").prop("checked")
+		},
 		canvasTransform: assembleCanvas.node().__data__.transform,
 		shapeDropdown: shapeDropdown.node().value,
 		version: wallpaperVersion,

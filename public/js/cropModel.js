@@ -194,6 +194,10 @@ var cropPattern = function(tile, parentGroup) {
 		generateDummyEdge(dummyEdges, bboxCorners, bboxEdges, transformedLine);
 	});
 
+	_.each(dummyEdges, function(e, i) {
+		e.index = tile.edges.length + i;
+	});
+
 	var inRegion = generateInRegionPredicate(invTransform);
 
 	if (dummyEdges.length > 0) {
@@ -349,6 +353,11 @@ var cropPattern = function(tile, parentGroup) {
 		});
 
 		tile.edges.extend(dummyEdges);
+
+		if (dummyEdges.length > 0) {
+			console.log(tile.edges);
+		}
+
 		polygonAddPatternMetadata(tile);
 		// rebuild pattern metadata
 

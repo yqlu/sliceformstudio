@@ -300,6 +300,9 @@ li.done a {
   #patternModal > .modal-lg{
     width:1100px
   }
+  #customShapeModal > .modal-lg{
+    width:1100px
+  }
 }
 
 .padded-btn-group {

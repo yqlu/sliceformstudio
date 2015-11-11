@@ -283,8 +283,12 @@ var enterCanvas = function(groupNode) {
 	// update polylist
 	polylist.push(groupNode.__data__);
 
-	// redraw sidebar
+	// redraw sidebar while preserving previous scroll point
+	var scrollPoint = assemblePaletteContainer[0][0].__data__.transform;
 	assembleSVGDrawer.draw();
+	assemblePaletteContainer
+	.each(function(d) { d.transform = scrollPoint; })
+	.attr("transform", num.getTransform);
 
 	// activate infer button if new tile has inferred pattern
 	updateInferButton();

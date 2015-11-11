@@ -47,11 +47,6 @@ var selection = (function() {
 					editPatternButton.attr("disabled", null);
 					$(editPatternButton[0]).tooltip('disable');
 				}
-
-				var sel = shapeDropdown.node();
-				if (sel.selectedIndex === sel.options.length - 1) {
-					$("#customShape").collapse("hide");
-				}
 			}
 		},
 		clear: function(type) {
@@ -84,9 +79,6 @@ var selection = (function() {
 			$("#patternModal").modal('hide');
 
 			var sel = shapeDropdown.node();
-			if (sel.selectedIndex === sel.options.length - 1) {
-				$("#customShape").collapse("show");
-			}
 
 			if (current && (typeof type === "undefined" || current.type === type)) {
 				current = null;

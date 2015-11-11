@@ -40,46 +40,6 @@
 					a#unselectAll.btn.btn-primary Unselect All
 		#assembleSvgContainer
 			#assembleSvg
-		#customShape.collapse(style='margin-top: 15px')
-			.panel.panel-default
-				.panel-heading
-					h3.panel-title Custom Shape Editor
-				.panel-body
-					.row
-						.col-md-6
-							form.form-horizontal
-								.form-group
-									label.control-label.col-md-4 Number of sides:
-									.col-md-8
-										input#sideNumber(type='text')
-								.form-group
-									label.control-label.col-md-4 Side length:
-									.col-md-8
-										input#sideLength(type='text')
-								.form-group
-									.col-md-offset-4.col-md-8
-										a#addToLineup.btn.btn-primary Add to lineup
-										a#shapeEditToggle.btn.btn-default.active(data-toggle='button') Toggle display
-								p
-									| You can customize the polygon on the right by dragging on the vertices before clicking "Add to lineup".
-						.col-md-6
-							#shapeEditSvg
-			.panel.panel-default
-				.panel-body
-					p
-						| Alternatively, you can also generate a polygon by specifying arrays of side lengths and interior angles.
-					form.form-horizontal
-						.form-group
-							label.control-label.col-md-2 Side lengths:
-							.col-md-10
-								input#sidelengths.form-control(type='text', placeholder='[1,1,1,1]')
-						.form-group
-							label.control-label.col-md-2 Interior angles:
-							.col-md-10
-								input#interiorAngles.form-control(type='text', placeholder='[60,120,60,120]')
-						.form-group
-							.col-md-offset-2.col-md-10
-								a#addToLineupManual.btn.btn-primary Add to lineup
 	#traceTab.hidden
 		.toolbar
 			span
@@ -152,6 +112,52 @@
 						label.control-label.col-md-2 Inter-strip spacing
 						.col-md-3
 							input#interSpacing(type='text')
+			.modal-footer
+				button.btn.btn-default(type='button', data-dismiss='modal') Close
+
+
+#customShapeModal.modal.fade(tabindex='-1', role='dialog')
+	.modal-dialog.modal-lg
+		.modal-content
+			.modal-header
+				button.close(type='button', data-dismiss='modal', aria-label='Close')
+					span(aria-hidden='true') ×
+				h4.modal-title Custom Shape Editor
+			.modal-body
+				.container-fluid
+					.row
+						.col-md-6
+							form.form-horizontal
+								.form-group
+									label.control-label.col-md-4 Number of sides:
+									.col-md-8
+										input#sideNumber(type='text')
+								.form-group
+									label.control-label.col-md-4 Side length:
+									.col-md-8
+										input#sideLength(type='text')
+								.form-group
+									.col-md-offset-4.col-md-8
+										a#addToLineup.btn.btn-primary Add to lineup
+										a#shapeEditToggle.btn.btn-default.active(data-toggle='button') Toggle display
+								p
+									| You can customize the polygon on the right by dragging on the vertices before clicking "Add to lineup".
+						.col-md-6
+							#shapeEditSvg
+					p
+						| Alternatively, you can also generate a polygon by specifying arrays of side lengths and interior angles.
+					form.form-horizontal
+						.form-group
+							label.control-label.col-md-2 Side lengths:
+							.col-md-10
+								input#sidelengths.form-control(type='text', placeholder='[1,1,1,1]')
+						.form-group
+							label.control-label.col-md-2 Interior angles:
+							.col-md-10
+								input#interiorAngles.form-control(type='text', placeholder='[60,120,60,120]')
+						.form-group
+							.col-md-offset-2.col-md-10
+								a#addToLineupManual.btn.btn-primary Add to lineup
 			.modal-footer
 				button.btn.btn-default(type='button', data-dismiss='modal') Close
 #patternModal.modal.fade(tabindex='-1', role='dialog')

@@ -250,19 +250,24 @@ var patternClick = function(thisNode) {
 	updateStripTable();
 };
 
-var shapeDropdownChange = function(a, b, c, d, e) {
+var mostRecentShapeDropdownIndex = -1;
+
+var shapeDropdownChange = function() {
+	if (mostRecentShapeDropdownIndex > -1) {
+		var previousOption = shapeOptions[mostRecentShapeDropdownIndex];
+		var currentPalette = assembleSVGDrawer.get();
+		previousOption.polygons = function() {
+			return currentPalette;
+		};
+	}
+
 	var index = shapeDropdown.node().value;
 	var currentOption = shapeOptions[index];
 	assembleSVGDrawer.set(currentOption.polygons());
 	assembleSVGDrawer.draw();
 
-	if (currentOption.name === "Custom") {
-		$("#customShape").collapse("show");
-	} else {
-		$("#customShape").collapse("hide");
-	}
-
 	selection.clear();
+	mostRecentShapeDropdownIndex = index;
 };
 
 var shapeEditCustomDraw = function() {
@@ -364,10 +369,12 @@ var patternUpdate = function() {
 
 var addToLineupClick = function() {
 	pushPolygonToLineup(_.cloneDeep(shapeEditSVGDrawer.getTile()));
+	$("#customShapeModal").modal('hide');
 };
 
 var addToLineupManualClick = function() {
 	pushManualPolygonToLineup($("#sidelengths").val(), $("#interiorAngles").val());
+	$("#customShapeModal").modal('hide');
 };
 
 var updateShapeClick = function() {

@@ -354,10 +354,6 @@ var cropPattern = function(tile, parentGroup) {
 
 		tile.edges.extend(dummyEdges);
 
-		if (dummyEdges.length > 0) {
-			console.log(tile.edges);
-		}
-
 		polygonAddPatternMetadata(tile);
 		// rebuild pattern metadata
 

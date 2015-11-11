@@ -136,6 +136,12 @@ var clearButton = d3.select("#clear")
 	});
 $(clearButton[0]).tooltip({container: 'body'});
 
+var addButton = d3.select("#addShape")
+	.on("click", function() {
+		$("#customShapeModal").modal();
+	});
+$(addButton[0]).tooltip({container: 'body'});
+
 var deleteButton = d3.select("#delete")
 	.on("click", deleteHandler);
 $(deleteButton[0]).tooltip({container: 'body'});
@@ -151,6 +157,9 @@ var editPatternButton = d3.select("#editPattern")
 			var newTiles = selection.get().groupNode.__data__.tiles;
 			patternEditSVGDrawer.set(_.cloneDeep(newTiles));
 			patternEditSVGDrawer.draw();
+			d3.select(patternEditSVGDrawer.container[0][0].parentNode).each(function(d) {
+				d.transform = _.cloneDeep(d.origTransform);
+			}).attr("transform", num.getTransform);
 			if (newTiles[0].patternParams) {
 				var params = newTiles[0].patternParams;
 				patternDropdown.node().value = params.index;
@@ -543,7 +552,7 @@ $(document).ready(function() {
 	$("#shapeDropdown").select2({
 		minimumResultsForSearch: Infinity
 	})
-	.on("change", shapeDropdownChange).trigger("change");
+	.on("select2:select", shapeDropdownChange).trigger("select2:select");
 
 	$("#patternDropdown").select2({
 		minimumResultsForSearch: Infinity

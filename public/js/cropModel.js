@@ -89,7 +89,7 @@ var recomputeHull = function() {
 
 	assembleCropCanvasPathOverlay
 	.datum(cropData.hull)
-	.attr("d", function(d) { return line(d) + "Z"; });
+	.attr("d", function(d) { return d.length > 0 ? line(d) + "Z" : ""; });
 };
 
 var insideBbox = function(bboxCorners, line) {

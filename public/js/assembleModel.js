@@ -5,10 +5,30 @@ var breakEdges = function(thisEdgeNode) {
 	var thisTileNode = thisEdgeNode.parentNode;
 	var otherTileNode = otherEdgeNode.parentNode;
 
-	var BFSResults = tileBFS(otherTileNode, thisTileNode, [thisEdgeNode, otherEdgeNode]);
+	var bfsResults1 = tileBFS(otherTileNode, thisTileNode, []);
+	var bfsResults2 = tileBFS(thisTileNode, otherTileNode, []);
+
+	var bfsResults, tileNodeToKeep;
+
+	var thisTileSurrounded = (bfsResults1.edgesToBreak.length / 2 === thisTileNode.__data__.vertices.length);
+	var otherTileSurrounded = (bfsResults2.edgesToBreak.length / 2 === otherTileNode.__data__.vertices.length);
+
+	if (otherTileSurrounded && !thisTileSurrounded) {
+		bfsResults = bfsResults1;
+		tileNodeToKeep = thisTileNode;
+	} else if (thisTileSurrounded && !otherTileSurrounded) {
+		bfsResults = bfsResults2;
+		tileNodeToKeep = otherTileNode;
+	} else if (bfsResults1.edgesToBreak.length < bfsResults2.edgesToBreak.length) {
+		bfsResults = bfsResults1;
+		tileNodeToKeep = thisTileNode;
+	} else {
+		bfsResults = bfsResults2;
+		tileNodeToKeep = otherTileNode;
+	}
 
 	// break enough edges to form 2 connected components
-	d3.selectAll(BFSResults.edgesToBreak)
+	d3.selectAll(bfsResults.edgesToBreak)
 	.classed("joined", false)
 	.each(function(d,i) {
 		d.joinedTo = null;
@@ -17,7 +37,7 @@ var breakEdges = function(thisEdgeNode) {
 	// move seen elements into new g
 	var newG = document.createElementNS(assembleSvg.node().namespaceURI, "g");
 	assembleCanvas.node().appendChild(newG);
-	_.each(BFSResults.seen, function(tile) {
+	_.each(bfsResults.seen, function(tile) {
 		newG.appendChild(tile);
 	});
 
@@ -26,7 +46,7 @@ var breakEdges = function(thisEdgeNode) {
 	.datum(function() {
 		// update origData and newData correctly
 		// to keep polylist in sync
-		var origData = thisTileNode.parentNode.__data__;
+		var origData = tileNodeToKeep.parentNode.__data__;
 		var newData = {
 			tiles: _.filter(origData.tiles, function(tile) {
 				return tile.this.parentNode === newG;
@@ -35,7 +55,7 @@ var breakEdges = function(thisEdgeNode) {
 			transform: _.cloneDeep(origData.transform)
 		};
 		origData.tiles = _.filter(origData.tiles, function(tile) {
-			return tile.this.parentNode === thisTileNode.parentNode;
+			return tile.this.parentNode === tileNodeToKeep.parentNode;
 		});
 		polylist.push(newData);
 
@@ -52,9 +72,9 @@ var breakEdges = function(thisEdgeNode) {
 	var normal = num.vecProd(num.normalVector(transformEdge(thisEdgeNode)),
 		config.breakEdgeDist);
 
-	d3.selectAll([newG, thisTileNode.parentNode])
+	d3.selectAll([newG, tileNodeToKeep.parentNode])
 	.each(function(d,i) {
-		var dir = i ? 1 : -1;
+		var dir = ((tileNodeToKeep === thisTileNode) ? i : !i) ? 1 : -1;
 		d.transform = num.translateBy(d.transform, dir * normal[0], dir * normal[1]);
 	})
 	.transition()

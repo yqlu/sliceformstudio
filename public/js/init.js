@@ -552,7 +552,7 @@ $(document).ready(function() {
 
 	$("#autoSnap").bootstrapSwitch();
 
-	$("#cropMode").bootstrapSwitch();
+	$("#cropMode").bootstrapSwitch().on('switchChange.bootstrapSwitch', cropModeToggle);
 
 	stylesheet.insertRule("path.strip.hover { stroke: " + $("#colorpicker").val() + " !important }", 0);
 });

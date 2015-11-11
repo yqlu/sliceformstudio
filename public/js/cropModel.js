@@ -53,22 +53,18 @@ var setupOverlay = function() {
 	})
 	.on("click", cropCircleClick);
 
+	// since vertices may overlap, make sure selected vertices appear on top
+	_.each(vertices.filter(".selected")[0], function(selected) {
+		$(selected.parentNode).append(selected);
+	});
+
 	cropData.vertices = _.filter(coords, function(v1) {
 		return _.find(cropData.vertices, function(v2) {
 			return v1.correspondsTo === v2.correspondsTo;
 		});
 	});
 
-	cropData.hull = convexHull(cropData.vertices);
-	cropData.hullEdges = _.map(cropData.hull, function(x, idx) {
-		return (idx === 0) ?
-			[_.last(cropData.hull), cropData.hull[0]] :
-			[cropData.hull[idx - 1], cropData.hull[idx]];
-	});
-
-	assembleCropCanvasPathOverlay
-	.datum(cropData.hull)
-	.attr("d", line);
+	recomputeHull();
 
 	vertices.exit().remove();
 };
@@ -93,7 +89,7 @@ var recomputeHull = function() {
 
 	assembleCropCanvasPathOverlay
 	.datum(cropData.hull)
-	.attr("d", line);
+	.attr("d", function(d) { return line(d) + "Z"; });
 };
 
 var insideBbox = function(bboxCorners, line) {
@@ -117,8 +113,8 @@ var generateInRegionPredicate = function(transform) {
 			var xi = vs[i][0], yi = vs[i][1];
 			var xj = vs[j][0], yj = vs[j][1];
 
-			var intersect = ((yi > y) != (yj > y))
-			    && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+			var intersect = ((yi > y) != (yj > y)) &&
+				(x < (xj - xi) * (y - yi) / (yj - yi) + xi);
 			if (intersect) inside = !inside;
 		}
 

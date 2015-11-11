@@ -252,9 +252,7 @@ var enterCanvas = function(groupNode) {
 
 	d3.select(groupNode)
 	.each(function(d, i) {
-		console.log(d.transform);
 		d.transform = translateWithoutScale(d);
-		console.log(d.transform);
 	})
 	.attr("transform", num.getTransform);
 

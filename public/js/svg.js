@@ -83,8 +83,8 @@ var buildOverlay = function(container, zoomHandler) {
 	.attr("height", "100%")
 	.attr("x", 0)
 	.attr("y", 0)
-	.attr("fill", "white")
-	.attr("opacity", 0.8)
+	.attr("fill", "grey")
+	.attr("opacity", 0)
 	.style("visibility", "hidden")
 	.style("cursor", "move")
 	.call(zoomHandler);

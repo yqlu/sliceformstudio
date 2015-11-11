@@ -539,6 +539,18 @@ var shapeEditToggle = function() {
 	.attr("visibility", shapeEditToggleButton.classed("active") ? "hidden" : "visible");
 };
 
+var cropModeToggle = function(e, state) {
+	if (state) {
+		assembleCropOverlay.attr("opacity", 0);
+		assembleCropCanvasPathOverlay.style("display", "inline");
+		assembleCropCanvas.selectAll(".crop-vertex").style("display", "inline");
+	} else {
+		assembleCropOverlay.attr("opacity", 0.5);
+		assembleCropCanvasPathOverlay.style("display", "none");
+		assembleCropCanvas.selectAll(".crop-vertex").style("display", "none");
+	}
+};
+
 var cropSelectAll = function() {
 	d3.selectAll(".crop-vertex").classed("selected", true);
 	cropData.vertices = _.pluck(d3.selectAll(".crop-vertex")[0], "__data__");
@@ -573,6 +585,8 @@ var tileViewClick = function() {
 		.attr("transform", num.getTransform);
 	}
 
+	assembleCanvas.classed("bg", false);
+
 	d3.select("#tileViewMenu").classed("hidden", false);
 	d3.select("#cropViewMenu").classed("hidden", true);
 
@@ -594,6 +608,8 @@ var cropViewClick = function() {
 		})
 		.attr("transform", num.getTransform);
 	}
+
+	assembleCanvas.classed("bg", true);
 
 	assembleCropCanvas
 	.each(function(d, i) {

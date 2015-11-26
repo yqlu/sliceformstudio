@@ -284,8 +284,11 @@ var cropPattern = function(tile, parentGroup) {
 								index: cropEdge.index
 							};
 
+							// if this is the last point, set pattern.end and have no internal vertices
+							// if cropPt = nextPt, exclude nextPt from internal vertices
+
 							var end = isLastPt ? p.end : null;
-							var internalVertices = isLastPt ? [] : [nextPt];
+							var internalVertices = isLastPt || approxEqPoints(cropPt.coords, nextPt) ? [] : [nextPt];
 
 							patterns.push({
 								start: start,

@@ -656,6 +656,8 @@ var cropViewClick = function() {
 
 var stripViewClick = function() {
 
+	setupOverlay();
+
 	traceCanvas.selectAll("path").remove();
 	var clone = _.cloneDeep(polylist, deepCustomizer(false));
 	_.each(clone, function(group) {

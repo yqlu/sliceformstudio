@@ -27,6 +27,7 @@
     "seiyria-bootstrap-slider": "https://github.com/seiyria/bootstrap-slider.git#~4.4.0",
     "less": "~2.2.0",
     "bootbox.js": "bootbox#~4.4.0",
-    "bootstrap-switch": "~3.3.2"
+    "bootstrap-switch": "~3.3.2",
+    "keyboardjs": "~2.2.0"
   }
 }

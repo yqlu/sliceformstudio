@@ -125,15 +125,7 @@ var inferButton = d3.select("#infer")
 	.classed("hidden", true);
 
 var clearButton = d3.select("#clear")
-	.on("click", function() {
-		bootbox.confirm("Starting a new design will erase any unsaved progress you have. Are you sure?", function(result) {
-			if (result) {
-				polylist = [];
-				assembleCanvas.selectAll("g").remove();
-				inferButton.classed("hidden", true);
-			}
-		});
-	});
+	.on("click", clearHandler);
 $(clearButton[0]).tooltip({container: 'body'});
 
 var addButton = d3.select("#addShape")
@@ -151,27 +143,7 @@ var copyButton = d3.select("#copy")
 $(copyButton[0]).tooltip({container: 'body'});
 
 var editPatternButton = d3.select("#editPattern")
-	.on("click", function() {
-		if (editPatternButton.attr("disabled") === null) {
-			$("#patternModal").modal();
-			var newTiles = selection.get().groupNode.__data__.tiles;
-			patternEditSVGDrawer.set(_.cloneDeep(newTiles));
-			patternEditSVGDrawer.draw();
-			d3.select(patternEditSVGDrawer.container[0][0].parentNode).each(function(d) {
-				d.transform = _.cloneDeep(d.origTransform);
-			}).attr("transform", num.getTransform);
-			if (newTiles[0].patternParams) {
-				var params = newTiles[0].patternParams;
-				patternDropdown.node().value = params.index;
-				$("#patternDropdown").trigger("change");
-				patternSlider1.setValue(params.param1);
-				patternSlider2.setValue(params.param2);
-			} else {
-				patternDropdown.node().value = 0;
-				$("#patternDropdown").trigger("change");
-			}
-		}
-	})
+	.on("click", editPatternClick)
 	.attr("disabled", "disabled");
 $(editPatternButton[0]).tooltip({container: 'body'});
 
@@ -308,6 +280,18 @@ var sideLengthSlider = new Slider('#sideLength', {
 }).on("change", shapeEditCustomDraw);
 
 shapeEditCustomDraw();
+
+keyboardJS.setContext("tileView");
+keyboardJS.bind(['d'], copyHandler);
+keyboardJS.bind(['del'], deleteHandler);
+keyboardJS.bind(['n'], clearHandler);
+keyboardJS.bind(['s'], saveToFile);
+keyboardJS.bind(['+'], function() {
+	$("#customShapeModal").modal();
+});
+keyboardJS.bind(['e'], editPatternClick);
+
+// no keyboard shortcut for loading file
 
 // set listeners on edit pattern UI elements
 
@@ -507,6 +491,16 @@ var printWidth = new Slider("#printWidth", {
 		return value + " px = " + mm + " mm";
 	}
 });
+
+var displayHeight = new Slider("#displayHeight", {
+	min: 300,
+	max: 1200,
+	step: 10,
+	value: 500,
+	formatter: function(value) {
+		return value + " px";
+	}
+}).on("change", displayHeightChange);
 
 var thicknessSlider = new Slider("#thickness", {
 	min: 0,

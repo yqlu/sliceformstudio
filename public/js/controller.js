@@ -455,23 +455,59 @@ var deleteCustomPatternClick = function() {
 	$("#customPatternSelect").val([]);
 	patternUpdate();
 	patternMultiSelectUpdate(tile.customTemplate);
-}
+};
 
 var copyHandler = function(d, i) {
-	if (selection.get().groupNode.parentNode === assembleCanvas.node()) {
-		selection.copy();
-	} else if (selection.get().groupNode.parentNode === assemblePaletteContainer.node()) {
-		selection.copy(assembleSVGDrawer);
+	if (selection.get()) {
+		if (selection.get().groupNode.parentNode === assembleCanvas.node()) {
+			selection.copy();
+		} else if (selection.get().groupNode.parentNode === assemblePaletteContainer.node()) {
+			selection.copy(assembleSVGDrawer);
+		}
 	}
 };
 
 var deleteHandler = function(d, i) {
-	if (selection.get().groupNode.parentNode === assembleCanvas.node()) {
-		// if there are no more inferTiles in the canvas, hide the infer button
-		selection.delete();
-		updateInferButton();
-	} else if (selection.get().groupNode.parentNode === assemblePaletteContainer.node()) {
-		selection.delete(assembleSVGDrawer);
+	if (selection.get()) {
+		if (selection.get().groupNode.parentNode === assembleCanvas.node()) {
+			// if there are no more inferTiles in the canvas, hide the infer button
+			selection.delete();
+			updateInferButton();
+		} else if (selection.get().groupNode.parentNode === assemblePaletteContainer.node()) {
+			selection.delete(assembleSVGDrawer);
+		}
+	}
+};
+
+var clearHandler = function(d, i) {
+	bootbox.confirm("Starting a new design will erase any unsaved progress you have. Are you sure?", function(result) {
+		if (result) {
+			polylist = [];
+			assembleCanvas.selectAll("g").remove();
+			inferButton.classed("hidden", true);
+		}
+	});
+};
+
+var editPatternClick = function() {
+	if (editPatternButton.attr("disabled") === null) {
+		$("#patternModal").modal();
+		var newTiles = selection.get().groupNode.__data__.tiles;
+		patternEditSVGDrawer.set(_.cloneDeep(newTiles));
+		patternEditSVGDrawer.draw();
+		d3.select(patternEditSVGDrawer.container[0][0].parentNode).each(function(d) {
+			d.transform = _.cloneDeep(d.origTransform);
+		}).attr("transform", num.getTransform);
+		if (newTiles[0].patternParams) {
+			var params = newTiles[0].patternParams;
+			patternDropdown.node().value = params.index;
+			$("#patternDropdown").trigger("change");
+			patternSlider1.setValue(params.param1);
+			patternSlider2.setValue(params.param2);
+		} else {
+			patternDropdown.node().value = 0;
+			$("#patternDropdown").trigger("change");
+		}
 	}
 };
 
@@ -557,6 +593,12 @@ var extensionSliderChange = function() {
 	redrawCanvas();
 };
 
+var displayHeightChange = function() {
+	d3.select("#traceSvg svg").attr("height", displayHeight.getValue());
+	d3.select("#assembleSvg svg").attr("height", displayHeight.getValue());
+};
+
+
 // toggle visibility of edges and vertices
 var shapeEditToggle = function() {
 	var s =	d3.select(shapeEditSVGDrawer.getTile().this).selectAll(".label")
@@ -601,6 +643,8 @@ var cropCircleClick = function(d) {
 };
 
 var tileViewClick = function() {
+	keyboardJS.setContext("tileView");
+
 	if (stripView.classed("active")) {
 		assembleCanvas
 		.each(function(d, i) {
@@ -625,6 +669,8 @@ var tileViewClick = function() {
 };
 
 var cropViewClick = function() {
+	keyboardJS.setContext("cropView");
+
 	if (stripView.classed("active")) {
 		assembleCanvas
 		.each(function(d, i) {
@@ -655,6 +701,7 @@ var cropViewClick = function() {
 };
 
 var stripViewClick = function() {
+	keyboardJS.setContext("stripView");
 
 	setupOverlay();
 

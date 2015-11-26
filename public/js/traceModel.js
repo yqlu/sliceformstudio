@@ -176,7 +176,7 @@ var buildStrip = function(traced) {
 		var secondPatternObject = _.find(secondEdge.patterns, function(p) { return p.pattern.this === patternList[i+1].pattern.this; });
 		console.assert(firstPatternObject.intersect === secondPatternObject.intersect,
 			"Error: joined edges have conflicting intersection data.\n", firstPatternObject, secondPatternObject);
-		console.assert(firstPatternObject.proportion === (1 - secondPatternObject.proportion),
+		console.assert(approxEq(firstPatternObject.proportion, (1 - secondPatternObject.proportion), config.proportionTolerance),
 			"Error: joined edges have conflicting position data.\n", firstPatternObject, secondPatternObject);
 
 		var nextSegment = _.cloneDeep(segs[i+1]);

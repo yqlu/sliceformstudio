@@ -127,16 +127,20 @@ var updateUIForCustomTemplate = function(template, forceFlag) {
 			($("#customPatternSelect").val() && $("#customPatternSelect").val().length === 1 &&
 			$("#customPatternSelect").val()[0] !== ""+thisIndex)) {
 
+			var templateClone = _.cloneDeep(template);
+
 			$("#customPatternSelect").val(thisIndex);
-			$(":radio[value=" + template.edgesSpec + "]").prop("checked", true);
-			$(":radio[value=" + template.symmetrySpec + "]").prop("checked", true);
-			$("#patternInterval").val(template.patternInterval);
-			$("#patternStart").val(template.startEdge);
-			$("#patternDepth").val(template.patternDepth);
-			$("#manualEdges").val(JSON.stringify(template.applicableEdges));
-			startOffset.setValue(template.startProportion - 0.5);
-			endOffset.setValue(template.endProportion - 0.5);
-			degreesOfFreedom.setValue(template.points.length);
+			$(":radio[value=" + templateClone.edgesSpec + "]").prop("checked", true);
+			$(":radio[value=" + templateClone.symmetrySpec + "]").prop("checked", true);
+			$("#patternInterval").val(templateClone.patternInterval);
+			$("#patternStart").val(templateClone.startEdge);
+			$("#patternDepth").val(templateClone.patternDepth);
+			$("#manualEdges").val(JSON.stringify(templateClone.applicableEdges));
+			startOffset.setValue(templateClone.startProportion - 0.5);
+			endOffset.setValue(templateClone.endProportion - 0.5);
+			degreesOfFreedom.setValue(templateClone.points.length);
+
+			tile.customTemplate[thisIndex] = templateClone;
 		}
 		d3.select(template.this.parentNode).selectAll("g.patternHelper").classed("active", false);
 		d3.select(template.this).classed("active", true);

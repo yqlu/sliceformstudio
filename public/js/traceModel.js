@@ -196,7 +196,24 @@ var buildStrip = function(traced) {
 	});
 
 	if (traced.hasCycle) {
-		builtSegments.push(_.cloneDeep(builtSegments[0]));
+		var firstPattern = patternList[0];
+		var lastPattern = patternList[patternList.length - 1];
+
+		var firstEdge = firstPattern.reverse ? firstPattern.pattern.end.edge : firstPattern.pattern.start.edge;
+		var lastEdge = lastPattern.reverse ? lastPattern.pattern.start.edge : lastPattern.pattern.end.edge;
+
+		var firstPatternObject = _.find(firstEdge.patterns, function(p) { return p.pattern.this === firstPattern.pattern.this; });
+		var lastPatternObject = _.find(lastEdge.patterns, function(p) { return p.pattern.this === lastPattern.pattern.this; });
+		console.assert(firstPatternObject.intersect === lastPatternObject.intersect,
+			"Error: joined edges have conflicting intersection data.\n", firstPatternObject, lastPatternObject);
+		console.assert(approxEq(firstPatternObject.proportion, (1 - lastPatternObject.proportion), config.proportionTolerance),
+			"Error: joined edges have conflicting position data.\n", firstPatternObject, lastPatternObject);
+
+		if (firstPatternObject.intersect) {
+			_.last(builtSegments).extend(_.cloneDeep(builtSegments[0]));
+		} else {
+			builtSegments.push(_.cloneDeep(builtSegments[0]));
+		}
 	}
 
 	return builtSegments;

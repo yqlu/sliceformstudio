@@ -711,6 +711,14 @@ var loadFromFile = function() {
 
 		reader.readAsText(files[0]);
 	}
+
+	resetFormElement($("#loadFileInput"));
+};
+
+
+var resetFormElement = function(e) {
+  e.wrap('<form>').closest('form').get(0).reset();
+  e.unwrap();
 };
 
 var saveToFile = function() {

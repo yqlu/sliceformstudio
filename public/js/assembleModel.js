@@ -137,6 +137,7 @@ var joinEdges = function(thisEdgeNode, selected) {
 			alert("Error: cannot join edges from same group!");
 		} else {
 			joinNodes(thisEdgeNode, selected.edgeNode);
+			updateJoinedEdges(thisGroupNode.__data__);
 		}
 	} else if (!approxEq(thisEdgeNode.__data__.length, selected.edgeNode.__data__.length)) {
 		alert("Error: cannot join edges with different lengths!");

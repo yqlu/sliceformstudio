@@ -8,24 +8,24 @@
 		"source": "index"
 	},
 	{
-		"label": "App",
-		"url": "app.html",
-		"source": "app"
-	},
-	{
 		"label": "Gallery",
 		"url": "gallery.html",
 		"source": "gallery"
 	},
 	{
-		"label": "Docs",
-		"url": "docs.html",
-		"source": "docs"
+		"label": "App",
+		"url": "app.html",
+		"source": "app"
 	},
 	{
 		"label": "Tutorial",
 		"url": "tutorial.html",
 		"source": "tutorial"
+	},
+	{
+		"label": "Docs",
+		"url": "docs.html",
+		"source": "docs"
 	}],
 	"gallery": {
 		"items": [{
@@ -33,31 +33,31 @@
 			"title": "Brimstone",
 			"year": 2015,
 			"description": "12-gons and triangles",
-			"wlpr": "brimstone.wlpr"
+			"wlpr": "brimstone"
 		}, {
 			"filename": "constellation.jpg",
 			"title": "Constellation I",
 			"year": 2013,
 			"description": "12-gons and 9-gons",
-			"wlpr": "constellation_i.wlpr"
+			"wlpr": "constellation_i"
 		}, {
 			"filename": "constellation2.jpg",
 			"title": "Constellation II",
 			"year": 2014,
 			"description": "12-gons, hexagons and squares",
-			"wlpr": "constellation_ii.wlpr"
+			"wlpr": "constellation_ii"
 		}, {
 			"filename": "Dendrite.png",
 			"title": "Dendrite",
 			"year": 2015,
 			"description": "Girih tiles",
-			"wlpr": "dendrite.wlpr"
+			"wlpr": "dendrite"
 		}, {
 			"filename": "festival.png",
 			"title": "Festival",
 			"year": 2010,
 			"description": "12-gons and octagons",
-			"wlpr": "festival.wlpr"
+			"wlpr": "festival"
 		}, {
 			"filename": "foliage.png",
 			"title": "Foliage",
@@ -68,7 +68,7 @@
 			"title": "Garden",
 			"year": 2010,
 			"description": "12-gons and 9-gons",
-			"wlpr": "garden.wlpr"
+			"wlpr": "garden"
 		}, {
 			"filename": "girih.jpg",
 			"title": "Girih I",
@@ -79,7 +79,7 @@
 			"title": "Girih II",
 			"year": 2015,
 			"description": "Girih tiles",
-			"wlpr": "girih2.wlpr"
+			"wlpr": "girih2"
 		}, {
 			"filename": "iridescence.jpg",
 			"title": "Iridescence",
@@ -90,7 +90,7 @@
 			"title": "Pentille",
 			"year": 2015,
 			"description": "Hexagons and triangles",
-			"wlpr": "pentille.wlpr"
+			"wlpr": "pentille"
 		}, {
 			"filename": "pleiades.png",
 			"title": "Pleiades",
@@ -111,7 +111,7 @@
 			"title": "Rampart",
 			"year": 2015,
 			"description": "12-gons and triangles",
-			"wlpr": "rampart.wlpr"
+			"wlpr": "rampart"
 		}, {
 			"filename": "sunflowerx.png",
 			"title": "Sunflower",
@@ -127,13 +127,13 @@
 			"title": "Undergrowth",
 			"year": 2015,
 			"description": "12-gons, hexagons and squares",
-			"wlpr": "undergrowth.wlpr"
+			"wlpr": "undergrowth"
 		}, {
 			"filename": "vineyard.png",
 			"title": "Vineyard",
 			"year": 2015,
 			"description": "12-gons and 9-gons",
-			"wlpr": "vineyard.wlpr"
+			"wlpr": "vineyard"
 		}]
 	}
 }

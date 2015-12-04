@@ -584,4 +584,17 @@ $(document).ready(function() {
 	$("#cropMode").bootstrapSwitch().on('switchChange.bootstrapSwitch', cropModeToggle);
 
 	stylesheet.insertRule("path.strip.hover { stroke: " + $("#colorpicker").val() + " !important }", 0);
+
+	var params = getUrlVars();
+	if (params.template) {
+		if (params.template.search(/^\w+$/) >= 0) {
+			$.getJSON("/images/gallery/wlpr_files/" + params.template + ".wlpr")
+			.done(loadFromJson)
+			.error(function() {
+				bootbox.alert("Error: " + params.template + " is not a valid template.");
+			});
+		} else {
+			bootbox.alert("Error: " + params.template + " is not a valid template.");
+		}
+	}
 });

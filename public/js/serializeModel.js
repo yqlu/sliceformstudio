@@ -108,8 +108,7 @@ var circularize = function(tile) {
 };
 
 
-var loadFromString = function(str) {
-	loaded = JSON.parse(str);
+var loadFromJson = function(loaded) {
 	if (loaded.version >= minSupportedVersion) {
 		shapeDropdown.node().value = parseInt(loaded.shapeDropdown, 10);
 		$("#shapeDropdown").trigger("change");
@@ -225,4 +224,16 @@ var saveToFileWithTitle = function(title) {
 	pom.href = window.URL.createObjectURL(bb);
 	pom.dataset.downloadurl = ["application/json", pom.download, pom.href].join(':');
 	pom.click();
+};
+
+var getUrlVars = function() {
+    var vars = [], hash;
+    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+    for(var i = 0; i < hashes.length; i++)
+    {
+        hash = hashes[i].split('=');
+        vars.push(hash[0]);
+        vars[hash[0]] = hash[1];
+    }
+    return vars;
 };

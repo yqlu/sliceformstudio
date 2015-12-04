@@ -671,6 +671,8 @@ var tileViewClick = function() {
 
 	assemblePalette.classed("hidden", false);
 	teardownOverlay();
+
+	d3.select("#assembleSvgContainer").select(".shadedOverlay").style("visibility", "hidden");
 };
 
 var cropViewClick = function() {
@@ -703,6 +705,9 @@ var cropViewClick = function() {
 
 	assemblePalette.classed("hidden", true);
 	setupOverlay();
+
+	d3.select("#assembleSvgContainer").select(".shadedOverlay").style("visibility",
+		(polylist.length === 0) ? "visible" : "hidden");
 };
 
 var stripViewClick = function() {
@@ -743,6 +748,9 @@ var stripViewClick = function() {
 	d3.select("#traceTab").classed("active", true).classed("hidden", false);
 
 	redrawCanvas();
+
+	d3.select("#traceSvg").select(".shadedOverlay").style("visibility",
+		(d3.select("#traceSvg").selectAll(".strip")[0].length === 0) ? "visible" : "hidden");
 };
 
 var loadFromFile = function() {
@@ -755,7 +763,8 @@ var loadFromFile = function() {
 
 		reader.onload = function() {
 			try {
-				loadFromString(reader.result);
+				var loaded = JSON.parse(reader.result);
+				loadFromJson(loaded);
 			} catch (err) {
 				bootbox.alert(err.message);
 			}

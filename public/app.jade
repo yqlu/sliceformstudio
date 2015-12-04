@@ -40,6 +40,10 @@
 					a#unselectAll.btn.btn-primary Unselect All
 		#assembleSvgContainer
 			#assembleSvg
+				.shadedOverlay(style="visibility: hidden;")
+					.innerOverlay
+						h2 #[i.fa.fa-exclamation-triangle] There are no tiles to crop.
+						p(style="font-size: 20px; text-transform: none; color: black; margin: 20px;") You need to first drag tiles onto the canvas in Tile View.
 	#traceTab.hidden
 		.toolbar
 			span
@@ -48,6 +52,10 @@
 			a.btn.btn-primary.pull-right#exportSvg #[i.fa.fa-download] SVG
 			a.btn.btn-primary.pull-right#exportPng #[i.fa.fa-download] PNG
 		#traceSvg
+			.shadedOverlay(style="visibility: hidden;")
+				.innerOverlay
+					h2 #[i.fa.fa-exclamation-triangle] There are no strips on the canvas.
+					p(style="font-size: 20px; text-transform: none; color: black; margin: 20px;") You need to first place tiles onto the canvas in Tile View and add patterns to them via the "Edit Pattern" button.
 		.alert.alert-warning(role='alert')
 			| Warning: your colors will be reset if you navigate away from this panel.
 		.panel.panel-default

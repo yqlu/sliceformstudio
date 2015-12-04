@@ -39,7 +39,7 @@ var fullOptions = {
 
 var buildSvg = function(selector, width, height) {
 
-	return d3.select(selector).append("svg")
+	return d3.select(selector).insert("svg", ":first-child")
 	.attr("width", width)
 	.attr("height", height);
 };

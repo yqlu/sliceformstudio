@@ -16,7 +16,29 @@ margin-top: -72px;
   padding: 5px;
 }
 #assembleSvg{
-      position: relative;
+  position: relative;
+}
+#traceSvg {
+  position: relative;
+}
+.shadedOverlay {
+  position: absolute;
+  width: 100%;
+  height: 50%;
+  right: 0px;
+  left: 0px;
+  bottom: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0,0,0,0.2);
+  text-align: center;
+}
+.innerOverlay {
+  top: 50%;
+  position: absolute;
+  transform: translateY(-50%);
+  margin: 0 auto;
+  width: 100%;
 }
 .input-small {
   display: inline-block;

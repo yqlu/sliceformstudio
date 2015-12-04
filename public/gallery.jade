@@ -1,20 +1,17 @@
 .wrap
 	span #[h1 Paper sliceforms] #[h4(st) designed and assembled by Yongquan Lu]
-	p Some of these pieces have corresponding .wlpr files, which you can download and load within the app to get a hands-on experience with these designs.
 	ul.g
 		for image in items
 			li
 				figure.centered
 					.thumb
-						a(href="/images/gallery/#{image.filename}", data-lightbox="#{image.filename}", data-title="#{image.title} (#{image.year})")
+						a(href="/images/gallery/#{image.filename}", data-lightbox="moo", data-title="#{image.title} (#{image.year})")
 							img(src="/images/gallery/thumbs/#{image.filename}")
 							.overlay
 					figcaption
 						label #{image.title} (#{image.year})
 						.subcaption #{image.description}
-						if image.wlpr
-							.subcaption
-								a(href="/images/gallery/wlpr/#{image.wlpr}") .wlpr file available
-						else
-							.subcaption(style="height: 19px;")
+						.subcaption(style="height: 19px;")
+							if image.wlpr
+								a(href="/app.html?template=#{image.wlpr}") Try this in Wallpaper
 script(src='bower/lightbox2/dist/js/lightbox.js')

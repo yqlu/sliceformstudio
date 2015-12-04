@@ -90,7 +90,7 @@ var selection = (function() {
 					svgDrawer.pop(d3.select(current.groupNode).selectAll("g.tile").datum().index);
 					svgDrawer.draw();
 				} else {
-					alert("You need to select a group of tiles first.");
+					bootbox.alert("You need to select a group of tiles first.");
 				}
 				selection.clear();
 			} else {
@@ -101,7 +101,7 @@ var selection = (function() {
 					d3.select(current.groupNode).remove();
 					checkRep();
 				} else {
-					alert("You need to select a group of tiles first.");
+					bootbox.alert("You need to select a group of tiles first.");
 				}
 				selection.clear();
 			}
@@ -116,7 +116,7 @@ var selection = (function() {
 					svgDrawer.push(newTile);
 					svgDrawer.draw();
 				} else {
-					alert("You need to select a group of tiles first.");
+					bootbox.alert("You need to select a group of tiles first.");
 				}
 			} else {
 				if (current && current.type === "group") {
@@ -142,7 +142,7 @@ var selection = (function() {
 					.attr("transform", num.getTransform);
 					checkRep();
 				} else {
-					alert("You need to select a group of tiles first.");
+					bootbox.alert("You need to select a group of tiles first.");
 				}
 			}
 		}

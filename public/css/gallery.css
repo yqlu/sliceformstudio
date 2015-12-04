@@ -1,0 +1,119 @@
+main {
+    padding-top: 10px;
+}
+
+.wrap {
+    padding-right: 50px;
+    padding-left: 50px;
+}
+
+.centered {
+    text-align: center;
+}
+
+.g {
+    padding: 0.25em;
+    overflow: hidden;
+    list-style-type: none;
+}
+.g li {
+    margin: 0 auto;
+    width: 250px;
+    padding: 0.25em;
+}
+.g img {
+    display: block;
+}
+
+@media screen and (min-width: 40em) {
+    .g li {
+        float: left;
+        width: 50%;
+    }
+    .g li:nth-child(odd) {
+        clear: left;
+}
+
+@media screen and (min-width: 54em) {
+    .g li {
+        width: 33.3333333333333333%;
+    }
+    .g li:nth-child(3n+1) {
+        clear: left;
+    }
+    .g li:nth-child(odd) {
+        clear: none;
+    }
+}
+@media screen and (min-width: 72em) {
+    .g li {
+        width: 25%;
+    }
+    .g li:nth-child(4n+1) {
+        clear: left;
+    }
+    .g li:nth-child(3n+1) {
+        clear: none;
+    }
+}
+@media screen and (min-width: 90em) {
+    .g li {
+        width: 20%;
+    }
+    .g li:nth-child(5n+1) {
+        clear: left;
+    }
+    .g li:nth-child(4n+1) {
+        clear: none;
+    }
+}
+@media screen and (min-width: 108em) {
+    .g li {
+        width: 16.666666666%;
+    }
+    .g li:nth-child(6n+1) {
+        clear: left;
+    }
+    .g li:nth-child(5n+1) {
+        clear: none;
+    }
+}
+
+.thumb {
+    display: inline-block;
+    position: relative;
+    width: 250px;
+    height: 250px;
+    margin-top: 20px;
+}
+
+.thumb .overlay {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    background: black;
+    opacity: 0;
+    -moz-transition: opacity 0.3s linear;
+    -webkit-transition: opacity 0.3s linear;
+    -o-transition: opacity 0.3s linear;
+    transition: opacity 0.3s linear;
+}
+
+.thumb .overlay:hover {
+    opacity: 0.5;
+}
+
+.thumb img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: 100%;
+  width: auto;
+  -webkit-transform: translate(-50%,-50%);
+      -ms-transform: translate(-50%,-50%);
+          transform: translate(-50%,-50%);
+}
+
+.subcaption {
+    font-size: 85%;
+}

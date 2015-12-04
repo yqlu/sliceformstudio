@@ -197,20 +197,22 @@ var shapeOptionsBuilder = (function() {
 				polygons: function() { return [regularPolygon(7), polygonFromAnglesAndLengths([9/14*Math.PI, 4/7 * Math.PI, 4/7 * Math.PI, 4/7 * Math.PI, 9/14*Math.PI], [0.696,1,1,1,1], Math.PI)]; },
 			}, {
 				name: "Altair tiling",
-				polygons: function() { return [regularPolygon(8), regularPolygon(6), polygonFromAngles([Math.PI * 7/12, 2.01825, 1.723, 2.01825, Math.PI * 7/12], Math.PI),
-					polygonFromAnglesAndLengths([3/4*Math.PI, 2.2786, 2.1697, Math.PI * 2/3, 2.1697, 2.2786, 3/4 * Math.PI], [0.779, 0.779, 1, 1, 1, 1, 0.779], Math.PI),
-					polygonFromAnglesAndLengths([Math.PI/2, Math.PI/2, Math.PI/2, Math.PI/2], [0.779, 0.779,0.779,0.779])]; },
+				polygons: function() { return [regularPolygon(8), regularPolygon(6),
+					polygonFromAnglesAndLengths([Math.PI * 7/12, 1.858841670477, 2.04190319062728, 1.858841670477, Math.PI * 7/12], [1,1,0.89,0.89, 1], Math.PI),
+					polygonFromAnglesAndLengths([Math.PI/2, Math.PI/2, Math.PI/2, Math.PI/2], [0.896533685752634, 0.896533685752634, 0.896533685752634, 0.896533685752634]),
+					polygonFromAnglesAndLengths([3/4*Math.PI, 2.12064105827615, 2.32994853430939, Math.PI * 2/3, 2.32994853430939, 2.12064105827615, 3/4 * Math.PI], [0.896533685752634, 0.896533685752634, 0.89, 1, 1, 0.89, 0.896533685752634], Math.PI)
+					]; }
 			}]
 		}, {
 			category: "Quasiperiodic tilings",
 			options: [{
-				name: "Pentagons and rhombuses",
+				name: "Pentagons and rhombi",
 				polygons: function() { return [regularPolygon(5), polygonFromAngles([1/5*Math.PI, 4/5 * Math.PI, 1/5 * Math.PI, 4/5 * Math.PI], Math.PI / 10)]; },
 			}, {
-				name: "Heptagonal rhombuses",
+				name: "Heptagonal rhombi",
 				polygons: function() { return [polygonFromAnglesAndLengths([2/7*Math.PI, 5/7 * Math.PI, 2/7 * Math.PI, 5/7 * Math.PI], [2,2,2,2],0), polygonFromAnglesAndLengths([3/7*Math.PI, 4/7 * Math.PI, 3/7 * Math.PI, 4/7 * Math.PI], [2,2,2,2],0), polygonFromAnglesAndLengths([1/7*Math.PI, 6/7 * Math.PI, 1/7 * Math.PI, 6/7 * Math.PI], [2,2,2,2],0)]; },
 			}, {
-				name: "Penrose rhombuses",
+				name: "Penrose rhombi",
 				polygons: function() { return [polygonFromAngles([theta, 4*theta, theta, 4*theta], theta / 2), polygonFromAngles([2*theta, 3*theta, 2*theta, 3*theta], theta)]; },
 			}, {
 				name: "Penrose kites and darts",
@@ -282,14 +284,21 @@ var sideLengthSlider = new Slider('#sideLength', {
 shapeEditCustomDraw();
 
 keyboardJS.setContext("tileView");
-keyboardJS.bind(['d'], copyHandler);
-keyboardJS.bind(['del'], deleteHandler);
-keyboardJS.bind(['n'], clearHandler);
-keyboardJS.bind(['s'], saveToFile);
-keyboardJS.bind(['+'], function() {
-	$("#customShapeModal").modal();
-});
-keyboardJS.bind(['e'], editPatternClick);
+
+var kbdWrapper = function(f) {
+	return function() {
+		if ($(document.activeElement)[0].tagName !== "INPUT") {
+			f();
+		}
+	};
+};
+
+keyboardJS.bind(['d'], kbdWrapper(copyHandler));
+keyboardJS.bind(['del'], kbdWrapper(deleteHandler));
+keyboardJS.bind(['n'], kbdWrapper(clearHandler));
+keyboardJS.bind(['s'], kbdWrapper(saveToFile));
+keyboardJS.bind(['+'], kbdWrapper($("#customShapeModal").modal));
+keyboardJS.bind(['e'], kbdWrapper(editPatternClick));
 
 // no keyboard shortcut for loading file
 
@@ -340,7 +349,7 @@ $('form input[name=edgeRadios][type=radio]:checked')
 var degreesOfFreedom = new Slider('#degreesOfFreedom', {
 	value: 1,
 	min: 0,
-	max: 4,
+	max: 6,
 	step: 1,
 	formatter: function(value) {
 		return 'Current value: ' + value;
@@ -391,6 +400,23 @@ d3.select("#colorpicker").selectAll("option")
 .append("option")
 .attr("value", function(d) { return d.hex; })
 .html(function(d) { return d.name; });
+
+var exportSvg = d3.select("#exportSvg")
+.on("click", function() {
+	var svg = d3.select("#traceSvg").select("svg").node();
+	svgAsDataUri(svg, {}, function(uri) {
+		var pom = d3.select("#downloadLink").node();
+		pom.download = "design.svg";
+		pom.href = uri;
+		pom.click();
+	});
+});
+
+var exportPng = d3.select("#exportPng")
+.on("click", function() {
+	var svg = d3.select("#traceSvg").select("svg").node();
+	saveSvgAsPng(svg, "design.png");
+});
 
 // generate dyanmic stylesheet for coloring
 var newStylesheet = function() {

@@ -1,7 +1,13 @@
-.container
-	.header
-		h1 Wallpaper
-		h4 Create and design sliceform paper artwork.
-		div
-			each term in public._data.contents
-				a.nav(href="#{term.url}")= term.label
+nav.navbar.navbar-custom.navbar-fixed-top.top-nav-collapse(role='navigation')
+  .container
+    .navbar-header
+      button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-main-collapse')
+        i.fa.fa-bars
+      a.navbar-brand(href="/")
+        span.light Wallpaper
+    // Collect the nav links, forms, and other content for toggling
+    .collapse.navbar-collapse.navbar-right.navbar-main-collapse
+      ul.nav.navbar-nav
+        each term in public._data.contents
+          li
+            a.nav(href="#{term.url}")(class = "#{ current.source == term.source ? 'active' : ''}")= term.label

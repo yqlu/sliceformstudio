@@ -5,11 +5,11 @@ html
 
     body
 
-        header
-            != partial("_partials/header")
+        != partial("_partials/header")
 
         main
             != yield
 
-        footer
-            != partial("_partials/footer")
+        if (current.source !== "docs")
+            footer
+                != partial("_partials/footer")

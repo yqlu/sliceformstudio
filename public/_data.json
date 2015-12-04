@@ -1,19 +1,140 @@
 {
+	"index": {
+		"layout": "_index_layout"
+	},
     "contents": [{
 		"label": "Home",
-		"url": "/"
-	},
-	{
-		"label": "About",
-		"url": "/about.html"
+		"url": "/",
+		"source": "index"
 	},
 	{
 		"label": "App",
-		"url": "app.html"
+		"url": "app.html",
+		"source": "app"
 	},
 	{
-		"label": "Documentation",
-		"url": "documentation.html"
-	}]
+		"label": "Gallery",
+		"url": "gallery.html",
+		"source": "gallery"
+	},
+	{
+		"label": "Docs",
+		"url": "docs.html",
+		"source": "docs"
+	},
+	{
+		"label": "Tutorial",
+		"url": "tutorial.html",
+		"source": "tutorial"
+	}],
+	"gallery": {
+		"items": [{
+			"filename": "brimstone.jpg",
+			"title": "Brimstone",
+			"year": 2015,
+			"description": "12-gons and triangles",
+			"wlpr": "brimstone.wlpr"
+		}, {
+			"filename": "constellation.jpg",
+			"title": "Constellation I",
+			"year": 2013,
+			"description": "12-gons and 9-gons",
+			"wlpr": "constellation_i.wlpr"
+		}, {
+			"filename": "constellation2.jpg",
+			"title": "Constellation II",
+			"year": 2014,
+			"description": "12-gons, hexagons and squares",
+			"wlpr": "constellation_ii.wlpr"
+		}, {
+			"filename": "Dendrite.png",
+			"title": "Dendrite",
+			"year": 2015,
+			"description": "Girih tiles",
+			"wlpr": "dendrite.wlpr"
+		}, {
+			"filename": "festival.png",
+			"title": "Festival",
+			"year": 2010,
+			"description": "12-gons and octagons",
+			"wlpr": "festival.wlpr"
+		}, {
+			"filename": "foliage.png",
+			"title": "Foliage",
+			"year": 2015,
+			"description": "Hexagons"
+		}, {
+			"filename": "garden.jpg",
+			"title": "Garden",
+			"year": 2010,
+			"description": "12-gons and 9-gons",
+			"wlpr": "garden.wlpr"
+		}, {
+			"filename": "girih.jpg",
+			"title": "Girih I",
+			"year": 2010,
+			"description": "Girih tiles"
+		}, {
+			"filename": "girih2.jpg",
+			"title": "Girih II",
+			"year": 2015,
+			"description": "Girih tiles",
+			"wlpr": "girih2.wlpr"
+		}, {
+			"filename": "iridescence.jpg",
+			"title": "Iridescence",
+			"year": 2011,
+			"description": "10-gons"
+		}, {
+			"filename": "pentille.jpg",
+			"title": "Pentille",
+			"year": 2015,
+			"description": "Hexagons and triangles",
+			"wlpr": "pentille.wlpr"
+		}, {
+			"filename": "pleiades.png",
+			"title": "Pleiades",
+			"year": 2015,
+			"description": "7-fold rhombi"
+		}, {
+			"filename": "planetarium.JPG",
+			"title": "Planetarium",
+			"year": 2014,
+			"description": "12-gons and 10-gons"
+		}, {
+			"filename": "psychedelica.jpg",
+			"title": "Psychedelica",
+			"year": 2012,
+			"description": "Octagons"
+		}, {
+			"filename": "rampart.png",
+			"title": "Rampart",
+			"year": 2015,
+			"description": "12-gons and triangles",
+			"wlpr": "rampart.wlpr"
+		}, {
+			"filename": "sunflowerx.png",
+			"title": "Sunflower",
+			"year": 2014,
+			"description": "Logarithmic spirals"
+		}, {
+			"filename": "torus.jpg",
+			"title": "Torus",
+			"year": 2015,
+			"description": "Heptagons, hexagons and pentagons"
+		}, {
+			"filename": "undergrowth.png",
+			"title": "Undergrowth",
+			"year": 2015,
+			"description": "12-gons, hexagons and squares",
+			"wlpr": "undergrowth.wlpr"
+		}, {
+			"filename": "vineyard.png",
+			"title": "Vineyard",
+			"year": 2015,
+			"description": "12-gons and 9-gons",
+			"wlpr": "vineyard.wlpr"
+		}]
+	}
 }
 

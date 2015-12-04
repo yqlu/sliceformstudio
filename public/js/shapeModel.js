@@ -149,37 +149,56 @@ var pushPolygonToLineup = function(tile) {
 
 // add new manual polygon to palette
 var pushManualPolygonToLineup = function(inputSidelengths, inputAngles) {
+	var validateArray = function(check) {
+		return function(inputStr) {
+			var arr = JSON.parse(inputStr);
+			if (!(arr instanceof Array)) {
+				throw new Error("Submission must be array.");
+			} else if (arr.length < 3) {
+				throw new Error("Array length must be greater than or equal to 3.");
+			}
+			arr = _.map(arr, check);
+			return arr;
+		};
+	};
+
+	var validateAngles = validateArray(function(i) {
+		if (typeof(i) !== "number" || !isFinite(i)) throw new Error("Angle must be numeric.");
+		if ((i <= 0) || (i >= 360)) throw new Error("Angle must be between 0 and 360 deg.");
+		return i / 180 * Math.PI;
+	});
+
+	var validateLengths = validateArray(function(i) {
+		if (typeof(i) !== "number" || !isFinite(i)) throw new Error("Sidelength must be numeric.");
+		if (i <= 0) throw new Error("Length must be strictly positive.");
+		return i;
+	});
+
 	try {
-		var sidelengths = JSON.parse(inputSidelengths);
-		var angles = JSON.parse(inputAngles);
-		if (!(sidelengths instanceof Array) || !(angles instanceof Array)) {
-			throw new Error("Submission must be an array.");
+		var sidelengths, angles;
+		if (inputSidelengths === "" && inputAngles === "") {
+			throw new Error("Input cannot be blank.");
+		} else if (inputSidelengths === "" ) {
+			angles = validateAngles(inputAngles);
+			sidelengths = _.map(angles, function() { return 1; });
+		} else if (inputAngles === "" ) {
+			sidelengths = validateLengths(inputSidelengths);
+			angles = _.map(sidelengths, function() { return Math.PI * (sidelengths.length - 2) / sidelengths.length; });
+		} else {
+			angles = validateAngles(inputAngles);
+			sidelengths = validateLengths(inputSidelengths);
+			if (sidelengths.length !== angles.length) {
+				throw new Error("Array lengths must be the same.");
+			}
 		}
-		if (sidelengths.length !== angles.length) {
-			throw new Error("Array lengths must be the same.");
-		}
-		if (sidelengths.length < 3) {
-			throw new Error("Array length must be greater than or equal to 3.");
-		}
-		angles = _.map(angles, function(i) {
-			if (typeof(i) !== "number" || !isFinite(i)) throw new Error("Angle must be numeric.");
-			if ((i <= 0) || (i >= 360)) throw new Error("Angle must be between 0 and 360 deg.");
-			return i / 180 * Math.PI;
-		});
-		sidelengths = _.map(sidelengths, function(i) {
-			if (typeof(i) !== "number" || !isFinite(i)) throw new Error("Angle must be numeric.");
-			if (i <= 0) throw new Error("Length must be strictly positive.");
-			return i;
-		});
 		var n = angles.length;
 		if (!approxEq(angles.sum(), (n - 2) * Math.PI, config.anglesTolerance)) {
 			throw new Error("Angles must sum to (n-2) * 180 deg.");
 		}
 		assembleSVGDrawer.push(polygonFromAnglesAndLengths(angles, sidelengths, 0));
 		assembleSVGDrawer.draw();
-
 	} catch (e) {
-		alert("Error: " + e.message);
+		bootbox.alert("Error: " + e.message);
 	}
 };
 
@@ -197,8 +216,6 @@ var regularPolygon = function(n, sidelength) {
 	});
 
 	var transform = num.id;
-
-	// var motif = parammotif ? parammotif : "rosette"; // "star"
 
 	return polygon(vertexData, transform);
 };

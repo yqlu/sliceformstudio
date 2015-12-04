@@ -17,7 +17,6 @@ function removeNode(n){
 }
 
 $(document).ready(function() {
-
 	var $grid = $('.grid').masonry({
 		percentPosition: true
 	});
@@ -25,8 +24,12 @@ $(document).ready(function() {
 	$grid.imagesLoaded().progress( function() {
 		$grid.masonry('layout');
 	});
-
-
-
 });
 
+$(window).scroll(function() {
+    if ($(".navbar").offset().top > 50) {
+        $(".navbar-fixed-top").addClass("top-nav-collapse");
+    } else {
+        $(".navbar-fixed-top").removeClass("top-nav-collapse");
+    }
+});

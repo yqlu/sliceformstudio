@@ -1,0 +1,162 @@
+@bgcolor: white;
+@fontcolor: #424c4c;
+@linkcolor: #000059;
+@linkfocusedcolor: green;
+@activebtn: rgb(238, 238, 238);
+
+p {
+    margin: 0 0 25px;
+    font-size: 18px;
+    line-height: 1.5;
+}
+
+@media(min-width:768px) {
+    p {
+        margin: 0 0 35px;
+        font-size: 20px;
+        line-height: 1.6;
+    }
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0 0 35px;
+}
+
+.intro {
+    display: table;
+    width: 100%;
+    height: auto;
+    padding: 200px 0;
+    text-align: center;
+    background: url(../images/index/bg.png) no-repeat center bottom scroll;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+    background-attachment: fixed;
+}
+
+.intro .intro-body {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.intro .intro-body .brand-heading {
+    font-size: 40px;
+}
+
+.intro .intro-body .intro-text {
+    font-size: 18px;
+}
+
+@media(min-width:768px) {
+    .intro {
+        height: 100%;
+        padding: 0;
+    }
+
+    .intro .intro-body .brand-heading {
+        font-size: 100px;
+    }
+
+    .intro .intro-body .intro-text {
+        font-size: 26px;
+    }
+}
+
+.content-section {
+    margin-top: 50px;
+    margin-bottom: 50px;
+    padding-top: 100px;
+    padding-bottom: 100px;
+}
+
+.defn-section {
+    width: 100%;
+    padding: 50px 0;
+    color: @fontcolor;
+    background: url(../images/index/ramp.png) no-repeat center center scroll;
+    background-color: @bgcolor;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+}
+
+.try-section {
+    width: 100%;
+    padding: 50px 0;
+    color: @fontcolor;
+    background: url(../images/index/planetarium.png) no-repeat left center scroll;
+    background-color: @bgcolor;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+    background-attachment: fixed;
+}
+
+.side-graphic {
+    width: 100%;
+    color: @fontcolor;
+    background-color: @bgcolor;
+    -webkit-background-size: contain;
+    -moz-background-size: contain;
+    background-size: contain;
+    -o-background-size: contain;
+
+}
+
+.tiles {
+    background: url(../images/index/tiles.png) no-repeat left center scroll;
+}
+
+.patterns {
+    background: url(../images/index/patterns.png) no-repeat right center scroll;
+}
+
+.strip {
+    background: url(../images/index/strip.png) no-repeat left center scroll;
+
+}
+
+.strips {
+    background: url(../images/index/strips.png) no-repeat right center scroll;
+
+}
+
+
+.translucent {
+    padding-top: 30px;
+    padding-bottom: 30px;
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+@media(min-width:767px) {
+    .content-section {
+        margin-top: 50px;
+        margin-bottom: 50px;
+        padding-top: 100px;
+        padding-bottom: 100px;
+    }
+}
+
+
+[class*="bg__"] {
+  height: 50vh;
+
+  text-indent: -9999px;
+
+  /* fix background */
+  background-attachment: fixed;
+
+  /* center it */
+  background-position: center center;
+
+  /* Scale it nicely to the element */
+  background-size: cover;
+}
+
+.bg__1 {
+  background-image: url(../images/gallery/iridescence.jpg);
+}

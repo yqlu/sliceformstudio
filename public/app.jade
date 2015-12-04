@@ -1,6 +1,6 @@
 .container
 	.header
-		.btn-group.nav
+		.btn-group.app-nav
 			button#tileView.btn.btn-default.active(type='button', data-toggle='button') Tile view
 			button#cropView.btn.btn-default(type='button', data-toggle='button') Crop view
 			button#stripView.btn.btn-default(type='button', data-toggle='button') Strip view
@@ -8,7 +8,7 @@
 		div(style='margin-bottom: 15px;')
 			form#tileViewMenu.form-inline
 				.form-group
-					label Polygons:
+					label Tiles:
 					span.select2-wrapper
 						select#shapeDropdown.form-control(style='display: inline-block')
 				.btn-group.padded-btn-group
@@ -45,6 +45,8 @@
 			span
 				| Pick a color to assign to strips:#{' '}
 			select#colorpicker
+			a.btn.btn-primary.pull-right#exportSvg #[i.fa.fa-download] SVG
+			a.btn.btn-primary.pull-right#exportPng #[i.fa.fa-download] PNG
 		#traceSvg
 		.alert.alert-warning(role='alert')
 			| Warning: your colors will be reset if you navigate away from this panel.
@@ -92,7 +94,7 @@
 				h4.modal-title Advanced options
 			.modal-body
 				p
-					| Specify parameters for the generated SVG files here. The defaults work well for generic laser cutters, but you can tweak them to your own preferences.
+					| Specify parameters for the display and generated SVG files here. The defaults work well for generic laser cutters, but you can tweak them to your own preferences.
 				form.form-horizontal
 					.form-group
 						label.control-label.col-md-2 Strip height
@@ -125,18 +127,18 @@
 			.modal-header
 				button.close(type='button', data-dismiss='modal', aria-label='Close')
 					span(aria-hidden='true') ×
-				h4.modal-title Custom Shape Editor
+				h4.modal-title Custom Tile Editor
 			.modal-body
 				.container-fluid
 					.row
-						.col-md-6
+						.col-md-7
 							form.form-horizontal
 								.form-group
-									label.control-label.col-md-4 Number of sides:
+									label.control-label.col-md-4 No. of sides
 									.col-md-8
 										input#sideNumber(type='text')
 								.form-group
-									label.control-label.col-md-4 Side length:
+									label.control-label.col-md-4 Side length
 									.col-md-8
 										input#sideLength(type='text')
 								.form-group
@@ -145,17 +147,18 @@
 										a#shapeEditToggle.btn.btn-default.active(data-toggle='button') Toggle display
 								p
 									| You can customize the polygon on the right by dragging on the vertices before clicking "Add to lineup".
-						.col-md-6
+						.col-md-5
 							#shapeEditSvg
+					hr
 					p
 						| Alternatively, you can also generate a polygon by specifying arrays of side lengths and interior angles.
 					form.form-horizontal
 						.form-group
-							label.control-label.col-md-2 Side lengths:
+							label.control-label.col-md-2 Side lengths
 							.col-md-10
 								input#sidelengths.form-control(type='text', placeholder='[1,1,1,1]')
 						.form-group
-							label.control-label.col-md-2 Interior angles:
+							label.control-label.col-md-2 Interior angles
 							.col-md-10
 								input#interiorAngles.form-control(type='text', placeholder='[60,120,60,120]')
 						.form-group
@@ -173,10 +176,10 @@
 			.modal-body
 				.container-fluid
 					.row
-						.col-md-6
+						.col-md-7
 							form.form-horizontal
 								.form-group
-									label.control-label.col-md-3 Motif:
+									label.control-label.col-md-3 Motif
 									.col-md-9
 										select#patternDropdown.form-control(style="width: 100%")
 								#presets
@@ -198,25 +201,25 @@
 											a#newCustomPattern.btn.btn-primary Add new pattern
 											a#deleteCustomPattern.btn.btn-primary Delete pattern
 									.form-group
-										label.control-label.col-md-3 Patterns:
+										label.control-label.col-md-3 Patterns
 										.col-md-9
 											select#customPatternSelect.form-control(multiple='', size='3')
 									.form-group
-										label.control-label.col-md-3 Degrees of freedom:
+										label.control-label.col-md-3 Degrees of freedom
 										.col-md-9
 											input#degreesOfFreedom(type='text')
 									.form-group
-										label.control-label.col-md-3 Edges:
+										label.control-label.col-md-3 Edges
 										.col-md-9
 											.radio
 												label
 													input(type='radio', name='edgeRadios', value='auto', checked='')
 													| Extends from every
-													input#patternInterval.input-small-padded.input-small(value='2', type='text')
+													input#patternInterval.form-control.input-small-padded.input-small(value='2', type='text')
 													| edge(s) starting from edge
-													input#patternStart.input-small-padded.input-small(value='0', type='text')
+													input#patternStart.form-control.input-small-padded.input-small(value='0', type='text')
 													| and spans
-													input#patternDepth.input-small-padded.input-small(value='2', type='text')
+													input#patternDepth.form-control.input-small-padded.input-small(value='2', type='text')
 													| edges counting clockwise.
 											.radio
 												label
@@ -224,15 +227,15 @@
 													| Manual array specification:
 													input#manualEdges.form-control(type='text', placeholder='[[1,5],[2,3]]')
 									.form-group
-										label.control-label.col-md-3 Start offset:
+										label.control-label.col-md-3 Start offset
 										.col-md-9
 											input#startOffset(type='text')
 									.form-group
-										label.control-label.col-md-3 End offset:
+										label.control-label.col-md-3 End offset
 										.col-md-9
 											input#endOffset(type='text')
 									.form-group
-										label.control-label.col-md-3 Symmetry:
+										label.control-label.col-md-3 Symmetry
 										.col-md-9
 											.radio
 												label
@@ -246,7 +249,7 @@
 												label
 													input(type='radio', name='symmetryRadios', value='noMirror')
 													|  No mirror symmetry
-						.col-md-6
+						.col-md-5
 							#patternEditSvg
 			.modal-footer
 				a#confirmPattern.btn.btn-primary Confirm

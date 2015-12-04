@@ -495,6 +495,11 @@ var editPatternClick = function() {
 		var newTiles = selection.get().groupNode.__data__.tiles;
 		patternEditSVGDrawer.set(_.cloneDeep(newTiles));
 		patternEditSVGDrawer.draw();
+		d3.select(patternEditSVGDrawer.container[0][0].parentNode.parentNode).select("rect").each(
+			function(d) {
+				d.zoomHandler.translate([0,0]);
+				d.zoomHandler.scale(1);
+		});
 		d3.select(patternEditSVGDrawer.container[0][0].parentNode).each(function(d) {
 			d.transform = _.cloneDeep(d.origTransform);
 		}).attr("transform", num.getTransform);
@@ -521,7 +526,7 @@ var updateInferButton = function() {
 var inferHandler = function(d, i) {
 	var inferTiles = assembleCanvas.selectAll("g.tile").filter(function(d, i) { return d.infer; });
 	if (_.flatten(inferTiles).length === 0) {
-		alert("No tiles are on the inferred setting.");
+		bootbox.alert("No tiles are on the inferred setting.");
 	}
 	inferTiles.each(function(d, i) {
 		d3.select(this).selectAll("path.pattern").remove();

@@ -131,16 +131,16 @@ var joinEdges = function(thisEdgeNode, selected) {
 	var thisGroupNode = thisTileNode.parentNode;
 
 	if (selected === null) {
-		alert("Error: cannot join unselected edges!");
+		bootbox.alert("Error: cannot join unselected edges!");
 	} else if (thisEdgeNode.parentNode.parentNode === selected.groupNode) {
 		if (autoSnapMode) {
-			alert("Error: cannot join edges from same group!");
+			bootbox.alert("Error: cannot join edges from same group!");
 		} else {
 			joinNodes(thisEdgeNode, selected.edgeNode);
 			updateJoinedEdges(thisGroupNode.__data__);
 		}
 	} else if (!approxEq(thisEdgeNode.__data__.length, selected.edgeNode.__data__.length)) {
-		alert("Error: cannot join edges with different lengths!");
+		bootbox.alert("Error: cannot join edges with different lengths!");
 	} else {
 
 		centerCoords(thisTileNode);

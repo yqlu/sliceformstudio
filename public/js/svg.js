@@ -5,12 +5,12 @@ var config = {
 	initSidebarWidth: 143,
 	sidebarSpacing: 40,
 	labelOffset: 5,
-	editWidth: 400,
-	editHeight: 400,
+	editWidth: 300,
+	editHeight: 300,
 	breakEdgeDist: 0.2,
 	slidingFactor: 0.2,
 	clickThreshold: 300,
-	pixelTolerance : 1,
+	pixelTolerance : 2,
 	anglesTolerance: 0.01,
 	polygonTolerance: 0.05,
 	matrixDetTolerance: 0.01,
@@ -56,6 +56,7 @@ var buildBg = function(svg, enableZooming, clickToClear, zoomHandler) {
 
 	if (enableZooming) {
 		bg.style("cursor", "move").call(zoomHandler);
+		bg[0][0].__data__ = {zoomHandler: zoomHandler};
 	}
 
 	if (clickToClear) {

@@ -293,14 +293,4 @@ var enterCanvas = function(groupNode) {
 
 	// activate infer button if new tile has inferred pattern
 	updateInferButton();
-
-	if (((new Date()).getTime() - groupNode.__data__.startTime) < config.clickThreshold) {
-		// slide outwards
-		d3.select(groupNode)
-		.each(function(d) {
-			d.transform = num.translateBy(d.transform, config.slidingFactor * assembleSvg.node().getBBox().width, 0);
-		})
-		.transition()
-		.attr("transform", num.getTransform);
-	}
 };

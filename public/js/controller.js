@@ -215,7 +215,12 @@ var edgeClick = function(thisNode) {
 		if (thisNode === selection.get().edgeNode) {
 			selection.clear();
 		} else {
-			joinEdges(thisNode, selection.get());
+			if (thisNode.parentNode.parentNode.parentNode !== assemblePaletteContainer.node()) {
+				if (selection.get().groupNode.parentNode === assemblePaletteContainer.node()) {
+					enterCanvas(selection.get().groupNode);
+				}
+				joinEdges(thisNode, selection.get());
+			}
 			selection.clear();
 		}
 	} else if (d3.select(thisNode).classed("joined")) {

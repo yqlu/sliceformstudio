@@ -1,9 +1,9 @@
 .container
 	.header
 		.btn-group.app-nav
-			button#tileView.btn.btn-default.active(type='button', data-toggle='button') Tile view
-			button#cropView.btn.btn-default(type='button', data-toggle='button') Crop view
-			button#stripView.btn.btn-default(type='button', data-toggle='button') Strip view
+			button#tileView.btn.btn-default.active(type='button', data-toggle='button') Edit tiles and patterns
+			button#cropView.btn.btn-default(type='button', data-toggle='button') Crop design
+			button#stripView.btn.btn-default(type='button', data-toggle='button') Trace and export strips
 	#assembleTab.active
 		div(style='margin-bottom: 15px;')
 			form#tileViewMenu.form-inline
@@ -12,8 +12,6 @@
 					span.select2-wrapper
 						select#shapeDropdown.form-control(style='display: inline-block')
 				.btn-group.padded-btn-group
-					a#editPattern.btn.btn-primary(title="Select a shape in the palette first.") Edit Pattern
-				.btn-group.padded-btn-group
 					a#clear.btn.btn-primary(title="New design")
 						i.fa.fa-file-o
 					label#loadFile.btn.btn-primary(title="Load design")
@@ -21,6 +19,8 @@
 						i.fa.fa-folder-open
 					a#saveFile.btn.btn-primary(title="Save design")
 						i.fa.fa-floppy-o
+				.btn-group.padded-btn-group
+					a#editPattern.btn.btn-primary(title="Select a shape in the palette first.") Edit Pattern
 				.btn-group.padded-btn-group
 					a#addShape.btn.btn-primary(title="Add shape")
 						i.fa.fa-plus

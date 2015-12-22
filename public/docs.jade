@@ -4,7 +4,7 @@
 		ul.sidebar-nav
 	#page-content-wrapper
 		.alert.alert-info(role='alert')
-			| #[h6.inline Note:] Wallpaper works best on Google Chrome; some unexpected behavior might arise on other browsers. If you are using Wallpaper on Google Chrome and have discovered a bug, please report it at bugs@(this-domain).
+			| #[h6.inline Note:] Sliceform Studio works best on Google Chrome; some unexpected behavior might arise on other browsers. If you are using Sliceform Studio on Google Chrome and have discovered a bug, please report it at bugs@(this-domain).
 		h2#tileSelect Tile selection
 
 		p The first step to making a geometric design is picking the right set of tiles (your "palette") via the "Tiles" dropdown in the upper left corner. Different sets of tiles fit together differently and have different symmetries.
@@ -100,7 +100,7 @@
 
 		p With the former option, you can pick a new shape by dragging the sliders for number of sides and side lengths. The display always defaults to a regular polygon, but you can further specify the dimensions of the polygon by dragging around individual vertices in the display with your mouse. The side lengths and angles update continuously to tell you what the new dimensions are. Add it to the palette by clicking "Add to Lineup".
 
-		p With the latter option, you can pick a new shape by specifying the side-lengths and interior angles in degrees. Sidelengths default to all 1s if left unspecified; interior angles default to a regular polygon if left unspecified. Note that the first interior angle you specify is between the first and the second edge you specify. Wallpaper alerts you with an error if it is unable to parse your input or get a closed polygon from your input.
+		p With the latter option, you can pick a new shape by specifying the side-lengths and interior angles in degrees. Sidelengths default to all 1s if left unspecified; interior angles default to a regular polygon if left unspecified. Note that the first interior angle you specify is between the first and the second edge you specify. Sliceform Studio alerts you with an error if it is unable to parse your input or get a closed polygon from your input.
 
 		.row
 			.col-sm-4.img-with-label
@@ -168,7 +168,7 @@
 				.img-container
 					img(style="height: auto", data-gifffer="/images/docs/edgejoins.gif")
 
-		p When the tiles are joined in a cluster along multiple edges, sometimes it is necessary to detach multiple edges such that the two tiles are separated. Wallpaper will infer the minimum number of of edges required to separate tiles along that edge.
+		p When the tiles are joined in a cluster along multiple edges, sometimes it is necessary to detach multiple edges such that the two tiles are separated. Sliceform Studio will infer the minimum number of of edges required to separate tiles along that edge.
 
 		.row
 			.col-sm-6.img-with-label
@@ -187,7 +187,7 @@
 
 		h6 Snapping edges
 
-		p Under normal circumstances, Wallpaper will forbid you from joining two edges belonging to the same tile or to tiles in the same group. You can disable this check by turning off "Snap Edges" in the toolbar. Now when you click on two edges in succession, no snapping of the tiles will occur, but the edges will still turn green to indicate that they are now joined.
+		p Under normal circumstances, Sliceform Studio will forbid you from joining two edges belonging to the same tile or to tiles in the same group. You can disable this check by turning off "Snap Edges" in the toolbar. Now when you click on two edges in succession, no snapping of the tiles will occur, but the edges will still turn green to indicate that they are now joined.
 
 		p This is useful for creating non-planar configurations like cylinders, polyhedra and other configurations where edges are identified in topologically interesting ways. Refer to #[a(href="/gallery.html") Rampart or Planetarium in the gallery] as examples of this.
 
@@ -210,7 +210,7 @@
 
 		h4#basicMotifs Basic motifs
 
-		p These are common motifs in Islamic geometry which have been parametrized by sliders. "Angle" controls the contact angle between the motif and its incident edge while "Depth" controls the depth of the pattern. Wallpaper's implementation of these motifs is heavily based on #[a(href="http://www.cgl.uwaterloo.ca/~csk/washington/tile/papers/kaplan_bridges2000.pdf/") Craig Kaplan’s implementation of the same in the Java applet Taprats].
+		p These are common motifs in Islamic geometry which have been parametrized by sliders. "Angle" controls the contact angle between the motif and its incident edge while "Depth" controls the depth of the pattern. Sliceform Studio's implementation of these motifs is heavily based on #[a(href="http://www.cgl.uwaterloo.ca/~csk/washington/tile/papers/kaplan_bridges2000.pdf/") Craig Kaplan’s implementation of the same in the Java applet Taprats].
 
 		.row
 			.col-sm-4.img-with-label
@@ -235,9 +235,9 @@
 
 		p The Hankin option is a convenient choice to inscribe a pattern within an irregular filler polygon that is consistent with the other tiles in the set.
 
-		p When you specify two parameters - contact angle and edge offset - Wallpaper applies the Hankin inference algorithm to generate a minimal consistent pattern satisfying these two constraints.
+		p When you specify two parameters - contact angle and edge offset - Sliceform Studio applies the Hankin inference algorithm to generate a minimal consistent pattern satisfying these two constraints.
 
-		p For an n-sided polygon, Wallpaper constructs #[i 2n] rays: two for each edge at the specified angles and offsets. It then matches pairs of the rays up greedily to minimize total internal pattern length. For a more involved discussion of this algorithm, refer to #[a(href="http://www.cgl.uwaterloo.ca/~csk/papers/gi2005.html") Craig Kaplan’s paper on this technique].
+		p For an n-sided polygon, Sliceform Studio constructs #[i 2n] rays: two for each edge at the specified angles and offsets. It then matches pairs of the rays up greedily to minimize total internal pattern length. For a more involved discussion of this algorithm, refer to #[a(href="http://www.cgl.uwaterloo.ca/~csk/papers/gi2005.html") Craig Kaplan’s paper on this technique].
 
 		.alert.alert-warning Note that for some polygons and some inputs a matching of all 2n rays is not possible.
 
@@ -271,7 +271,7 @@
 				.label-container
 					label Example of patterns inferred from smoothly varying boundary conditions.
 
-		p As with Hankin, some experimentation is needed. Wallpaper may not be able to construct proper patterns for certain polygons under certain boundary conditions.
+		p As with Hankin, some experimentation is needed. Sliceform Studio may not be able to construct proper patterns for certain polygons under certain boundary conditions.
 
 		h4#customPat Custom
 
@@ -302,7 +302,7 @@
 
 		p When you drag around the red pattern handles, you determine a pattern template which is copied multiple times and pasted onto different edges within the same polygon. This is very useful to impose certain symmetries onto the patterns within the tile. The exact way that the template is copied and pasted is defined by an #[i edge mapping].
 
-		p An edge mapping looks like a list of pairs of integers: #[code [[1,2], [4,5], [7,8]]]. In this example, the template specified by the red pattern handles enters the tile via edge 1 and leaves via edge 2. Wallpaper then copies and pastes two more copies of the pattern that enter from edges 4 and 7 and leave from edges 5 and 8 respectively.
+		p An edge mapping looks like a list of pairs of integers: #[code [[1,2], [4,5], [7,8]]]. In this example, the template specified by the red pattern handles enters the tile via edge 1 and leaves via edge 2. Sliceform Studio then copies and pastes two more copies of the pattern that enter from edges 4 and 7 and leave from edges 5 and 8 respectively.
 
 		.alert.alert-info Each polygon has an implicit numbering of edges from 0 to n-1 counting clockwise. To figure out this implicit labelling, set a pattern's edge mapping to #[code [[0,1]]]. You can then deduce the 0th edge, and count the edges clockwise.
 
@@ -335,7 +335,7 @@
 						br
 						code [6,8],[7,9],[8,10],[9,11],[10,0],[11,1]]
 
-		p You can also manually type in the array. If Wallpaper can't parse the text input into a list of pairs of integers, it will alert you of the error.
+		p You can also manually type in the array. If Sliceform Studio can't parse the text input into a list of pairs of integers, it will alert you of the error.
 
 		p Sometimes you might want to impose mirror symmetry instead of rotational symmetry on the system. The pairs of integers in the edge mapping takes a 3rd implicit boolean argument, true/false, that indicate whether flip the pattern when copying it to that pair of edges. If omitted, the default is false.
 
@@ -367,7 +367,7 @@
 		ul
 			li The default is "Mirror symmetry with cropping", where the template is built on both the start and end edge and joined in the middle by extending the two terminal rays till they complete. A template with #[i n] handles creates a pattern with #[i 2n] line segments.
 
-			li Under "Mirror symmetry without cropping", the template is also built on both the start and end edge. Instead of extending the two terminal rays, Wallpaper builds an intermediate line segment to join the two terminal rays. A template with #[i n] handles creates a pattern with #[i 2n+1] line segments.
+			li Under "Mirror symmetry without cropping", the template is also built on both the start and end edge. Instead of extending the two terminal rays, Sliceform Studio builds an intermediate line segment to join the two terminal rays. A template with #[i n] handles creates a pattern with #[i 2n+1] line segments.
 
 			li Under "No mirror symmetry", the template is only built on the start edge. A final line segment is built to join the final point on the template and the point on the end edge at the appropriate offset. A template with #[i n] handles creates a pattern with #[i n+1] line segments.
 
@@ -429,28 +429,28 @@
 
 		h2#stripTrace Strip tracing
 
-		p Select "Strip view" at the top of the screen. Wallpaper automatically figures out how to trace patterns across the joined edges at the boundary of tiles and match them up. Your tiles has been converted into interlaced strips weaving through the design!
+		p Select "Strip view" at the top of the screen. Sliceform Studio automatically figures out how to trace patterns across the joined edges at the boundary of tiles and match them up. Your tiles has been converted into interlaced strips weaving through the design!
 
 		h4#traceRules Tracing rules
 
-		.alert.alert-info This section explains how Wallpaper traces the patterns to form strips under the hood. You can skip this if you're not interested in the theory.
+		.alert.alert-info This section explains how Sliceform Studio traces the patterns to form strips under the hood. You can skip this if you're not interested in the theory.
 
-		p When you specify a pattern, Wallpaper stores a record at each edge of the list of patterns incident at that edge. It calculates the offset of the pattern on the edge (with 0 representing the midpoint and -0.5 and +0.5 representing the two extremes) as well as the incident angle of the pattern on the edge.
+		p When you specify a pattern, Sliceform Studio stores a record at each edge of the list of patterns incident at that edge. It calculates the offset of the pattern on the edge (with 0 representing the midpoint and -0.5 and +0.5 representing the two extremes) as well as the incident angle of the pattern on the edge.
 
-		p When tracing is initiated, Wallpaper tries to match the pattern interfaces at a tile boundary, where two edges are joined together.
+		p When tracing is initiated, Sliceform Studio tries to match the pattern interfaces at a tile boundary, where two edges are joined together.
 
 		p For each pattern #[i p] incident on an edge, the algorithm filters out the patterns from the other corresponding edge to those with edge offset compatible with #[i p]. If the filter is empty, the pattern is not matched*. If the filter returns a unique pattern, they are matched.
 
 		p If there are multiple patterns originating from the same position, the algorithm picks the one with incident angle closest to that of #[i p]. It also checks that this is mutual, i.e. that #[i p] has incident angle closest to the other edge as well. If this is true, the two patterns are matched; otherwise, #[i p] is unmatched.
 
-		p If no corresponding pattern is found on the other edge but there is a second pattern in the same tile as #[i p] incident on the edge at the same offset, Wallpaper matches both of them up such that the pattern "bounces" off the edge like a reflection.
+		p If no corresponding pattern is found on the other edge but there is a second pattern in the same tile as #[i p] incident on the edge at the same offset, Sliceform Studio matches both of them up such that the pattern "bounces" off the edge like a reflection.
 
 		.row
 			.img-with-label.col-sm-12
 				.img-container
 					img(style="height: 100%", src="/images/docs/matching.png")
 				.label-container
-					label A summary of the matching procedure. Here two edges with incompatible pattern interfaces are being joined. Wallpaper matches up (a,b), (b,x), (c,w), (e,y) and (f,g). Patterns d and z are unmatched and their strips terminate at this edge.
+					label A summary of the matching procedure. Here two edges with incompatible pattern interfaces are being joined. Sliceform Studio matches up (a,b), (b,x), (c,w), (e,y) and (f,g). Patterns d and z are unmatched and their strips terminate at this edge.
 
 		h4#color Color assignment
 
@@ -458,17 +458,17 @@
 
 		p Colors serve two purposes. They can be entirely aesthetic and a way to create a visually appealing image for exporting. On the other hand, if you would like to create paper strips, colors serve as categories for strips that should be generated in the same SVG files. This allows you to group strips together to be printed or laser-cut or die-cut at one go.
 
-		.alert.alert-warning Note that your color assignment will be lost if you navigate to Tile view or Crop view. This is because Wallpaper recomputes the traced strips every time you enter Strip view (since the strip configuration could have changed in the meantime).
+		.alert.alert-warning Note that your color assignment will be lost if you navigate to Tile view or Crop view. This is because Sliceform Studio recomputes the traced strips every time you enter Strip view (since the strip configuration could have changed in the meantime).
 
 		h4#displayParam Display parameters
 
 		p The panel below the canvas allows you to specify various parameters about the display of your design.
 
-		p The strip width slider controls the width of each strip. Note that strips may appear to pass through each other in tightly interlaced situations if the strip width is very high. This is a rendering artifact of the way Wallpaper displays interlaced strips.
+		p The strip width slider controls the width of each strip. Note that strips may appear to pass through each other in tightly interlaced situations if the strip width is very high. This is a rendering artifact of the way Sliceform Studio displays interlaced strips.
 
 		p The extension length slider controls the width of the line segment that is appended to the ends of strips. Note that this is only applicable to strips that terminate in an intersection; a non-zero extension length is required to generate paper strips so that they can properly slot into each other. If you are only generating the final image digitally for aesthetic reasons, you can freely set extension length to 0.
 
-		.alert.alert-warning Note that changing extension length can be very slow on large designs because Wallpaper recomputes the traced strips every time. This also means that your color assignment will be lost upon changing extension length. This is currently a focus for future optimization.
+		.alert.alert-warning Note that changing extension length can be very slow on large designs because Sliceform Studio recomputes the traced strips every time. This also means that your color assignment will be lost upon changing extension length. This is currently a focus for future optimization.
 
 		p The outline toggle is purely aesthetic and does exactly as it says.
 
@@ -488,7 +488,7 @@
 
 		h4#manualStrip Manual strip generation
 
-		p Some users have requested the use of Wallpaper's strip generation capabilities independent of the pattern generation or tracing features. If you have a particular sliceform in mind which you have already calculated the dimensions of each strip for, you can type in a JSON input under "Manual strip generation" to generate the corresponding strip.
+		p Some users have requested the use of Sliceform Studio's strip generation capabilities independent of the pattern generation or tracing features. If you have a particular sliceform in mind which you have already calculated the dimensions of each strip for, you can type in a JSON input under "Manual strip generation" to generate the corresponding strip.
 
 		p The input format is an array of strips, where:
 		ul
@@ -507,7 +507,7 @@
 
 		h4#loadSave Load and save
 
-		p You can save your in-progress Wallpaper design as a .wlpr file by clicking the #[i.fa.fa-floppy-o.fa-border] button in the toolbar or pressing the hotkey #[kbd s].
+		p You can save your in-progress Sliceform Studio design as a .wlpr file by clicking the #[i.fa.fa-floppy-o.fa-border] button in the toolbar or pressing the hotkey #[kbd s].
 
 		p Existing .wlpr files can be loaded by clicking the #[i.fa.fa-folder-open.fa-border] button in the toolbar.
 

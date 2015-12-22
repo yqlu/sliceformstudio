@@ -1,3 +1,10 @@
+svg .btn {
+  font-family: FontAwesome;
+  font-size: 1.33333333em;
+  line-height: 0.75em;
+  vertical-align: -15%;
+}
+
 #widthFactorDiv .tooltip-inner {
 white-space: pre;
 max-width: 300px;
@@ -54,7 +61,7 @@ svg {
   border-radius: 5px;
 }
 .palette-background {
-  fill: #ffd699;
+  fill:  #d7e6f4;
 }
 g.translucent path.interior,
 g.translucent line.edge {

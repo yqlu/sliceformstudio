@@ -328,8 +328,46 @@ var draw = function(container, inputlist, options) {
 			newWidth = config.maxSidebarWidth;
 		}
 
+		newWidth += 50;
+
+		assemblePaletteButtons.selectAll("g").remove();
+
+		tiles.each(function(d, i) {
+			var verticalOffset = this.parentNode.__data__.transform;
+			var fo = assemblePaletteButtons.append("g")
+				.each(function(d) {
+					d.transform = _.cloneDeep(verticalOffset);
+					d.transform[1][2] = d.transform[1][2] * scaleFactor;
+				})
+				.attr("transform", num.getTransform)
+				.append("foreignObject")
+				.attr("height", 50)
+				.attr("width", 50);
+
+			var innerBtn = fo
+				.append("xhtml:body")
+				.attr("xmlns", "http://www.w3.org/1999/xhtml")
+				.append("a")
+				.classed("btn btn-primary", true)
+				.html("&#xf013;");
+
+			innerBtn.on("click", editSpecificPattern(this.parentNode.__data__.tiles));
+
+			var bBox = innerBtn[0][0].getBoundingClientRect();
+
+			fo.attr("height", bBox.height).attr("width", bBox.width)
+				.attr("y", - bBox.height / 2)
+				.attr("x", - bBox.width / 2);
+		});
+
 		container.each(function(d, i) {
-			d.scaledTransform = num.scaleBy(d.origTransform, scaleFactor);
+			d.scaledTransform = num.translateBy(
+				num.scaleBy(d.origTransform, scaleFactor), 25, 0);
+			d.transform = d.scaledTransform;
+		}).attr("transform", num.getTransform);
+
+		assemblePaletteButtons.each(function(d, i) {
+			d.scaledTransform = num.translate(- (newWidth - 50) / 2 + 10, 0);
 			d.transform = d.scaledTransform;
 		}).attr("transform", num.getTransform);
 
@@ -341,7 +379,6 @@ var draw = function(container, inputlist, options) {
 		.select("rect")
 		.attr("width", newWidth)
 		.attr("x", - newWidth / 2);
-
 	}
 
 	return groups;

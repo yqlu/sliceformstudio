@@ -92,6 +92,9 @@ var assemblePaletteContainer = assemblePalette.append("g")
 		};
 	});
 
+var assemblePaletteButtons = assemblePalette.append("g")
+	.classed("btn-container", true);
+
 var assembleSVGDrawer = svgDrawer(assemblePaletteContainer, assemblePaletteOptions);
 
 var traceSvg = buildSvg("#traceSvg", config.standardWidth, config.standardHeight);
@@ -141,11 +144,6 @@ $(deleteButton[0]).tooltip({container: 'body'});
 var copyButton = d3.select("#copy")
 	.on("click", copyHandler);
 $(copyButton[0]).tooltip({container: 'body'});
-
-var editPatternButton = d3.select("#editPattern")
-	.on("click", editPatternClick)
-	.attr("disabled", "disabled");
-$(editPatternButton[0]).tooltip({container: 'body'});
 
 d3.select("#selectAll").on("click", cropSelectAll);
 d3.select("#unselectAll").on("click", cropUnselectAll);
@@ -298,7 +296,6 @@ keyboardJS.bind(['del'], kbdWrapper(deleteHandler));
 keyboardJS.bind(['n'], kbdWrapper(clearHandler));
 keyboardJS.bind(['s'], kbdWrapper(saveToFile));
 keyboardJS.bind(['+'], kbdWrapper($("#customShapeModal").modal));
-keyboardJS.bind(['e'], kbdWrapper(editPatternClick));
 
 // no keyboard shortcut for loading file
 

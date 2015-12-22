@@ -42,11 +42,6 @@ var selection = (function() {
 				$(copyButton[0]).tooltip("destroy").tooltip({container: 'body'});
 				deleteButton.attr("disabled", null).attr("title", "Delete selection");
 				$(deleteButton[0]).tooltip("destroy").tooltip({container: 'body'});
-
-				if (options.updatePatternDisplay && thisNode.parentNode === assemblePaletteContainer.node()) {
-					editPatternButton.attr("disabled", null);
-					$(editPatternButton[0]).tooltip('disable');
-				}
 			}
 		},
 		clear: function(type) {
@@ -74,8 +69,6 @@ var selection = (function() {
 			$(copyButton[0]).tooltip("destroy").tooltip({container: 'body'});
 			deleteButton.attr("disabled", "disabled").attr("title", "Select tiles first.");
 			$(deleteButton[0]).tooltip("destroy").tooltip({container: 'body'});
-			editPatternButton.attr("disabled", "disabled");
-			$(editPatternButton[0]).tooltip("enable");
 			$("#patternModal").modal('hide');
 
 			var sel = shapeDropdown.node();

@@ -286,9 +286,15 @@ var enterCanvas = function(groupNode) {
 
 	// redraw sidebar while preserving previous scroll point
 	var scrollPoint = assemblePaletteContainer[0][0].__data__.transform;
+	var btnScrollPoint = assemblePaletteButtons[0][0].__data__.transform;
+
 	assembleSVGDrawer.draw();
+
 	assemblePaletteContainer
-	.each(function(d) { d.transform = scrollPoint; })
+	.each(function(d) { d.transform = scrollPoint; console.log(JSON.stringify(d.transform)); })
+	.attr("transform", num.getTransform);
+	assemblePaletteButtons
+	.each(function(d) { d.transform = btnScrollPoint; })
 	.attr("transform", num.getTransform);
 
 	// activate infer button if new tile has inferred pattern

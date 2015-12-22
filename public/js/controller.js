@@ -206,6 +206,13 @@ var zoomPalette = d3.behavior.zoom()
 		d.transform = num.translateBy(d.scaledTransform, 0, zoomPalette.translate()[1]);
 	})
 	.attr("transform", num.getTransform);
+
+	assemblePaletteButtons.each(function(d) {
+		d.transform = num.translateBy(d.scaledTransform, 0, zoomPalette.translate()[1]);
+	})
+	.attr("transform", num.getTransform);
+
+
 });
 
 // click handler for joining edges, attached to edge element
@@ -494,11 +501,10 @@ var clearHandler = function(d, i) {
 	});
 };
 
-var editPatternClick = function() {
-	if (editPatternButton.attr("disabled") === null) {
+var editSpecificPattern = function(tiles) {
+	return function() {
 		$("#patternModal").modal();
-		var newTiles = selection.get().groupNode.__data__.tiles;
-		patternEditSVGDrawer.set(_.cloneDeep(newTiles));
+		patternEditSVGDrawer.set(_.cloneDeep(tiles));
 		patternEditSVGDrawer.draw();
 		d3.select(patternEditSVGDrawer.container[0][0].parentNode.parentNode).select("rect").each(
 			function(d) {
@@ -508,8 +514,8 @@ var editPatternClick = function() {
 		d3.select(patternEditSVGDrawer.container[0][0].parentNode).each(function(d) {
 			d.transform = _.cloneDeep(d.origTransform);
 		}).attr("transform", num.getTransform);
-		if (newTiles[0].patternParams) {
-			var params = newTiles[0].patternParams;
+		if (tiles[0].patternParams) {
+			var params = tiles[0].patternParams;
 			patternDropdown.node().value = params.index;
 			$("#patternDropdown").trigger("change");
 			patternSlider1.setValue(params.param1);
@@ -518,7 +524,7 @@ var editPatternClick = function() {
 			patternDropdown.node().value = 0;
 			$("#patternDropdown").trigger("change");
 		}
-	}
+	};
 };
 
 var updateInferButton = function() {

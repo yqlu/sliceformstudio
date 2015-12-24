@@ -291,7 +291,7 @@ var enterCanvas = function(groupNode) {
 	assembleSVGDrawer.draw();
 
 	assemblePaletteContainer
-	.each(function(d) { d.transform = scrollPoint; console.log(JSON.stringify(d.transform)); })
+	.each(function(d) { d.transform = scrollPoint; })
 	.attr("transform", num.getTransform);
 	assemblePaletteButtons
 	.each(function(d) { d.transform = btnScrollPoint; })

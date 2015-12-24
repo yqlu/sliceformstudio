@@ -118,7 +118,7 @@ var saveButton = d3.select("#saveFile")
 $(saveButton[0]).tooltip({container: 'body'});
 
 var loadButton = d3.select("#loadFile");
-$(loadButton[0]).tooltip({container: 'body'});
+// $(loadButton[0]).tooltip({container: 'body'});
 
 $("#loadFileInput")
 .on("change", loadFromFile);

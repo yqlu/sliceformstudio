@@ -366,6 +366,8 @@ var draw = function(container, inputlist, options) {
 			d.transform = d.scaledTransform;
 		}).attr("transform", num.getTransform);
 
+		assemblePaletteButtons[0][0].__data__ = {};
+
 		assemblePaletteButtons.each(function(d, i) {
 			d.scaledTransform = num.translate(- (newWidth - 50) / 2 + 10, 0);
 			d.transform = d.scaledTransform;

@@ -31,6 +31,7 @@
     "keyboardjs": "~2.2.0",
     "saveSvgAsPng": "https://github.com/exupero/saveSvgAsPng.git#~1.0.1",
     "gifffer": "*",
-    "lightbox2": "~2.8.1"
+    "lightbox2": "~2.8.1",
+    "font-awesome": "fontawesome#~4.5.0"
   }
 }

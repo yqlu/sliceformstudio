@@ -115,10 +115,10 @@ var cropView = d3.select("#cropView")
 
 var saveButton = d3.select("#saveFile")
 .on("click", saveToFile);
-$(saveButton[0]).tooltip({container: 'body'});
+$(saveButton[0]).tooltip({container: 'body#body'});
 
 var loadButton = d3.select("#loadFile");
-// $(loadButton[0]).tooltip({container: 'body'});
+$(loadButton[0]).tooltip({container: 'body#body'});
 
 $("#loadFileInput")
 .on("change", loadFromFile);
@@ -129,21 +129,21 @@ var inferButton = d3.select("#infer")
 
 var clearButton = d3.select("#clear")
 	.on("click", clearHandler);
-$(clearButton[0]).tooltip({container: 'body'});
+$(clearButton[0]).tooltip({container: 'body#body'});
 
 var addButton = d3.select("#addShape")
 	.on("click", function() {
 		$("#customShapeModal").modal();
 	});
-$(addButton[0]).tooltip({container: 'body'});
+$(addButton[0]).tooltip({container: 'body#body'});
 
 var deleteButton = d3.select("#delete")
 	.on("click", deleteHandler);
-$(deleteButton[0]).tooltip({container: 'body'});
+$(deleteButton[0]).tooltip({container: 'body#body'});
 
 var copyButton = d3.select("#copy")
 	.on("click", copyHandler);
-$(copyButton[0]).tooltip({container: 'body'});
+$(copyButton[0]).tooltip({container: 'body#body'});
 
 d3.select("#selectAll").on("click", cropSelectAll);
 d3.select("#unselectAll").on("click", cropUnselectAll);

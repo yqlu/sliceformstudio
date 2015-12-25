@@ -13,7 +13,11 @@ var genSVG = function(strips, options) {
 	d3.select("#stripSvg").selectAll("svg").remove();
 	var stripSvg = d3.select("#stripSvg").append("svg")
 		.attr("width", size[0])
-		.attr("height", size[1]);
+		.attr("height", size[1])
+		.attr("version", 1.1);
+
+	stripSvg.node().setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.w3.org/2000/svg");
+	stripSvg.node().setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink");
 
 	_.each(strips, function(strip) {
 		var width = 0;

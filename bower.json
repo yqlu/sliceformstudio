@@ -32,6 +32,8 @@
     "saveSvgAsPng": "https://github.com/exupero/saveSvgAsPng.git#~1.0.1",
     "gifffer": "*",
     "lightbox2": "~2.8.1",
-    "font-awesome": "fontawesome#~4.5.0"
+    "font-awesome": "fontawesome#~4.5.0",
+    "convexhull-js": "https://github.com/indy256/convexhull-js.git",
+    "select2": "~4.0.1"
   }
 }

@@ -522,6 +522,7 @@ var updateStripTable = function() {
 	.classed("btn btn-default btn-sm", true)
 	.style("margin-left", "15px")
 	.on("click", function(d) {
+		var xmlPrefix = "<?xml version='1.0' encoding='utf-8'?>";
 		genSVG(_.pluck(d.strips, "lengths"), {
 			stripHeight: stripHeight.getValue(),
 			widthFactor: widthFactor.getValue(),
@@ -532,7 +533,7 @@ var updateStripTable = function() {
 		var svg = d3.select("#stripSvg").select("svg").node();
 		var serializer = new XMLSerializer();
 		var pom = d3.select("#downloadLink").node();
-		var bb = new Blob([serializer.serializeToString(svg)], {type: "image/svg+xml"});
+		var bb = new Blob([xmlPrefix + serializer.serializeToString(svg)], {type: "image/svg+xml"});
 		pom.download = d.color.name+".svg";
 		pom.href = window.URL.createObjectURL(bb);
 		pom.dataset.downloadurl = ["image/svg+xml", pom.download, pom.href].join(':');

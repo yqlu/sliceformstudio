@@ -266,6 +266,7 @@ var edgeClick = function(thisNode) {
 // select the group
 var groupClick = function(d, i) {
 	selection.clear();
+	console.log(this);
 	selection.set(this, {type: "group"});
 };
 
@@ -528,6 +529,7 @@ var clearHandler = function(d, i) {
 
 var editSpecificPattern = function(tiles) {
 	return function() {
+		selection.set(tiles[0].this.parentNode, {type: 'group'});
 		$("#patternModal").modal();
 		patternEditSVGDrawer.set(_.cloneDeep(tiles));
 		patternEditSVGDrawer.draw();

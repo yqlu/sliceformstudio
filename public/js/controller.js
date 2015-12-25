@@ -796,7 +796,6 @@ var stripViewClick = function() {
 
 		d3.select("#traceSvg").select(".shadedOverlay").style("visibility",
 			(d3.select("#traceSvg").selectAll(".strip")[0].length === 0) ? "visible" : "hidden");
-
 	}
 };
 

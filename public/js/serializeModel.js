@@ -177,11 +177,11 @@ var loadFromJson = function(loaded) {
 		if (typeof loaded.version === "undefined") {
 			loaded.version = "?";
 		}
+		d3.select(".loading-overlay").classed("in", false);
 		throw {
 			message: "File was from Wallpaper v" + loaded.version +
 				" but only >=v" + minSupportedVersion + " is supported."
 		};
-		d3.select(".loading-overlay").classed("in", false);
 	}
 };
 

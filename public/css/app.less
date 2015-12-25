@@ -4,12 +4,10 @@ svg .btn {
   line-height: 0.75em;
   vertical-align: -15%;
 }
-
 #widthFactorDiv .tooltip-inner {
 white-space: pre;
 max-width: 300px;
 }
-
 #widthFactorDiv .tooltip.top {
 margin-top: -72px;
 }
@@ -81,19 +79,19 @@ path.interior {
   -webkit-transition: all 0.5s ease;
   fill: white;
 }
-path.interior.interior.infer {
+.display:not(.bg) path.interior.interior.infer {
   fill: #fffbd4;
 }
 path.interior.interior.infer.hover {
   fill: #ffeb3b;
 }
-path.interior.interior.infer.selected {
+.display:not(.bg) path.interior.interior.infer.selected {
   fill: #fffbd4;
 }
 path.interior.hover {
   fill: #c5ecfe;
 }
-path.interior.selected {
+.display:not(.bg) path.interior.selected {
   fill: #c5ecfe;
 }
 path.pattern {
@@ -149,13 +147,13 @@ line.edge {
 line.edge.hover {
   stroke: #03a9f4;
 }
-line.edge.selected {
+.display:not(.bg) line.edge.selected {
   stroke: #2196f3;
 }
-line.edge.joined {
+.display:not(.bg) line.edge.joined {
   stroke: #4caf50;
 }
-line.edge.joined.hover {
+.display:not(.bg) line.edge.joined.hover {
   stroke: #f44336;
 }
 .bg line.edge.joined {
@@ -212,8 +210,8 @@ g.active.patternHelper circle.patternHandle {
 g.active.patternHelper path.patternHelperLine {
   stroke: red;
 }
-line.edge.selectedGroup,
-path.pattern.selectedGroup {
+.display:not(.bg) line.edge.selectedGroup,
+.display:not(.bg) path.pattern.selectedGroup {
   stroke: #2ebcfc;
 }
 circle.vertex.selectedGroup {

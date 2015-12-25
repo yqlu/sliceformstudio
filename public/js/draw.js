@@ -429,6 +429,30 @@ var createGroups = function(polygons) {
 	});
 };
 
+var drawSvgDraggableEdge = function(svg) {
+	var edge = svg.append("line")
+		.attr("stroke-width", 40)
+		.attr("opacity", 0)
+		.attr("stroke", "black")
+		.style("cursor", "row-resize")
+		.attr("x1", 0)
+		.attr("x2", config.standardWidth)
+		.attr("y1", config.standardHeight)
+		.attr("y2", config.standardHeight);
+
+	dragSvgHandler.call(edge);
+
+	return edge;
+};
+
+var drawSvgDimensionLabel = function(svg) {
+	return svg.append("text")
+	.attr("x", assembleSvg.node().offsetWidth - 20)
+	.attr("y", config.standardHeight - 20)
+	.attr("text-anchor", "end")
+	.text("");
+};
+
 var svgDrawer = function(container, options) {
 	return {
 		container: container,

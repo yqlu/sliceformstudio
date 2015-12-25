@@ -113,6 +113,31 @@ var dragEdit = d3.behavior.drag()
 	updateDimensions(this.parentNode.__data__);
 });
 
+var dragSvgHandler = d3.behavior.drag()
+.on('dragstart', function(d, i) {
+	document.body.style.cursor = 'row-resize';
+})
+.on("drag", function(d,i) {
+	// update x y coordinates
+	var newHeight = Math.min(Math.max(d3.event.y, 300),1200);
+	d3.select("#traceSvg svg").attr("height", newHeight);
+	d3.select("#assembleSvg svg").attr("height", newHeight);
+	d3.select(this)
+	.attr("y1", newHeight)
+	.attr("y2", newHeight);
+	assembleSvgDimensions
+	.attr("y", newHeight - 20)
+	.text(assembleSvg.node().offsetWidth + "px x " + newHeight + "px");
+	traceSvgDimensions
+	.attr("y", newHeight - 20)
+	.text(traceSvg.node().offsetWidth + "px x " + newHeight + "px");
+})
+.on('dragend', function(d, i) {
+	document.body.style.cursor = 'auto';
+	assembleSvgDimensions.text("");
+	traceSvgDimensions.text("");
+});
+
 var updateUIForCustomTemplate = function(template, forceFlag) {
 	if (template === null || typeof template === "undefined") {
 		resetCustomPatternUIValues();
@@ -609,12 +634,6 @@ var extensionSliderChange = function() {
 	redrawCanvas();
 };
 
-var displayHeightChange = function() {
-	d3.select("#traceSvg svg").attr("height", displayHeight.getValue());
-	d3.select("#assembleSvg svg").attr("height", displayHeight.getValue());
-};
-
-
 // toggle visibility of edges and vertices
 var shapeEditToggle = function() {
 	var s =	d3.select(shapeEditSVGDrawer.getTile().this).selectAll(".label")
@@ -658,44 +677,8 @@ var cropCircleClick = function(d) {
 	recomputeHull();
 };
 
-var tileViewClick = function() {
-	keyboardJS.setContext("tileView");
-
-	if (stripView.classed("active")) {
-		assembleCanvas
-		.each(function(d, i) {
-			d.transform = traceCanvas.datum().transform;
-		})
-		.attr("transform", num.getTransform);
-	}
-
-	assembleCanvas.classed("bg", false);
-
-	d3.select("#tileViewMenu").classed("hidden", false);
-	d3.select("#cropViewMenu").classed("hidden", true);
-
-	stripView.classed("active", false);
-	cropView.classed("active", false);
-
-	d3.select("#assembleTab").classed("active", true).classed("hidden", false);
-	d3.select("#traceTab").classed("active", false).classed("hidden", true);
-
-	assemblePalette.classed("hidden", false);
-	teardownOverlay();
-
-	d3.select("#assembleSvgContainer").select(".shadedOverlay").style("visibility", "hidden");
-};
-
-var cropViewClick = function() {
+var cropDesignClick = function() {
 	keyboardJS.setContext("cropView");
-
-	if (stripView.classed("active")) {
-		assembleCanvas
-		.each(function(d, i) {
-			d.transform = traceCanvas.datum().transform;
-		})
-		.attr("transform", num.getTransform);
-	}
 
 	assembleCanvas.classed("bg", true);
 
@@ -708,60 +691,111 @@ var cropViewClick = function() {
 	d3.select("#tileViewMenu").classed("hidden", true);
 	d3.select("#cropViewMenu").classed("hidden", false);
 
-	tileView.classed("active", false);
-	stripView.classed("active", false);
+	assemblePalette.each(function(d) {
+		var width = d3.select(this).select(".palette-background").attr("width");
+		d.transform = num.translate(- width / 2, 0);
+	})
+	.transition()
+	.duration(1000)
+	.attr("transform", num.getTransform);
 
-	d3.select("#assembleTab").classed("active", true).classed("hidden", false);
-	d3.select("#traceTab").classed("active", false).classed("hidden", true);
-
-	assemblePalette.classed("hidden", true);
+	// assemblePalette.classed("hidden", true);
 	setupOverlay();
 
 	d3.select("#assembleSvgContainer").select(".shadedOverlay").style("visibility",
 		(polylist.length === 0) ? "visible" : "hidden");
 };
 
+var exitCropView = function() {
+	keyboardJS.setContext("tileView");
+	d3.select("#tileViewMenu").classed("hidden", false);
+	d3.select("#cropViewMenu").classed("hidden", true);
+
+	assembleCanvas.classed("bg", false);
+	assemblePalette.each(function(d) {
+		var width = d3.select(this).select(".palette-background").attr("width");
+		d.transform = num.translate(width / 2, 0);
+	})
+	.transition()
+	.duration(1000)
+	.attr("transform", num.getTransform);
+
+	d3.select("#assembleSvgContainer").select(".shadedOverlay").style("visibility", "hidden");
+
+	teardownOverlay();
+};
+
+var tileViewClick = function() {
+	keyboardJS.setContext("tileView");
+
+	if (!tileView.classed("active")) {
+		assembleCanvas
+		.each(function(d, i) {
+			d.transform = traceCanvas.datum().transform;
+		})
+		.attr("transform", num.getTransform);
+		d3.select("#tileViewMenu").classed("hidden", false);
+		d3.select("#cropViewMenu").classed("hidden", true);
+
+		assembleCanvas.classed("bg", false);
+
+		tileView.classed("active", true);
+		stripView.classed("active", false);
+
+		d3.select("#assembleTab").classed("active", true).classed("hidden", false);
+		d3.select("#traceTab").classed("active", false).classed("hidden", true);
+
+		assemblePalette.classed("hidden", false);
+
+		teardownOverlay();
+
+	}
+};
+
 var stripViewClick = function() {
 	keyboardJS.setContext("stripView");
 
-	setupOverlay();
+	if (!stripView.classed("active")) {
+		setupOverlay();
 
-	traceCanvas.selectAll("path").remove();
-	var clone = _.cloneDeep(polylist, deepCustomizer(false));
-	_.each(clone, function(group) {
-		_.each(group.tiles, function(tile) {
-			circularize(tile);
-			generatePatternInterface(tile);
-			if ($("#cropMode").prop("checked") && cropData.hull.length >= 3) {
-				cropPattern(tile, group);
-			}
+		traceCanvas.selectAll("path").remove();
+		var clone = _.cloneDeep(polylist, deepCustomizer(false));
+		_.each(clone, function(group) {
+			_.each(group.tiles, function(tile) {
+				circularize(tile);
+				generatePatternInterface(tile);
+				if ($("#cropMode").prop("checked") && cropData.hull.length >= 3) {
+					cropPattern(tile, group);
+				}
+			});
 		});
-	});
-	resetAndDraw(traceCanvas, clone, tracePatternOptions);
-	traceCanvas
-	.each(function(d, i) {
-		d.transform = assembleCanvas.datum().transform;
-	})
-	.attr("transform", num.getTransform);
-	colorMap = _.map(stripColors, function(c) {
-		return {
-			color: c,
-			strips: []
-		};
-	});
-	d3.select("#noneSoFar").style("display", "block");
-	d3.select("#stripTable").selectAll("div").remove();
+		resetAndDraw(traceCanvas, clone, tracePatternOptions);
+		traceCanvas
+		.each(function(d, i) {
+			d.transform = assembleCanvas.datum().transform;
+		})
+		.attr("transform", num.getTransform);
+		colorMap = _.map(stripColors, function(c) {
+			return {
+				color: c,
+				strips: []
+			};
+		});
+		d3.select("#noneSoFar").style("display", "block");
+		d3.select("#stripTable").selectAll("div").remove();
 
-	tileView.classed("active", false);
-	cropView.classed("active", false);
+		tileView.classed("active", false);
+		stripView.classed("active", true);
 
-	d3.select("#assembleTab").classed("active", false).classed("hidden", true);
-	d3.select("#traceTab").classed("active", true).classed("hidden", false);
+		d3.select("#assembleTab").classed("active", false).classed("hidden", true);
+		d3.select("#traceTab").classed("active", true).classed("hidden", false);
 
-	redrawCanvas();
+		redrawCanvas();
 
-	d3.select("#traceSvg").select(".shadedOverlay").style("visibility",
-		(d3.select("#traceSvg").selectAll(".strip")[0].length === 0) ? "visible" : "hidden");
+		d3.select("#traceSvg").select(".shadedOverlay").style("visibility",
+			(d3.select("#traceSvg").selectAll(".strip")[0].length === 0) ? "visible" : "hidden");
+
+	}
 };
 
 var loadFromFile = function() {

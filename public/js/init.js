@@ -60,6 +60,7 @@ var patternEditSVGDrawer = buildPane("#patternEditSvg", patternEditPaletteOption
 var commonZoomHandler = d3.behavior.zoom().on("zoom", zoomBehavior);
 
 var assembleSvg = buildSvg("#assembleSvg", config.standardWidth, config.standardHeight);
+
 var assembleBg = buildBg(assembleSvg, true, true, commonZoomHandler);
 var assembleCanvas = buildDisplay(assembleSvg, num.id, true);
 var assembleCropOverlay = buildOverlay(assembleSvg, commonZoomHandler);
@@ -96,10 +97,14 @@ var assemblePaletteButtons = assemblePalette.append("g")
 	.classed("btn-container", true);
 
 var assembleSVGDrawer = svgDrawer(assemblePaletteContainer, assemblePaletteOptions);
+var assembleDraggableEdge = drawSvgDraggableEdge(assembleSvg);
+var assembleSvgDimensions = drawSvgDimensionLabel(assembleSvg);
 
 var traceSvg = buildSvg("#traceSvg", config.standardWidth, config.standardHeight);
 var traceBg = buildBg(traceSvg, true, true, commonZoomHandler);
 var traceCanvas = buildDisplay(traceSvg, assembleCanvas.datum().transform, true); // ensure they zoom the same amount
+var traceDraggableEdge = drawSvgDraggableEdge(traceSvg);
+var traceSvgDimensions = drawSvgDimensionLabel(traceSvg);
 
 // set listeners on tile / strip view toggles
 var tileView = d3.select("#tileView")
@@ -107,9 +112,6 @@ var tileView = d3.select("#tileView")
 
 var stripView = d3.select("#stripView")
 .on("click", stripViewClick);
-
-var cropView = d3.select("#cropView")
-.on("click", cropViewClick);
 
 // set listeners on tile view UI elements
 
@@ -147,6 +149,11 @@ $(copyButton[0]).tooltip({container: 'body#body'});
 
 d3.select("#selectAll").on("click", cropSelectAll);
 d3.select("#unselectAll").on("click", cropUnselectAll);
+d3.select("#exitCropView").on("click", exitCropView);
+
+var cropDesign = d3.select("#cropDesign")
+	.on("click", cropDesignClick);
+$(cropDesign[0]).tooltip({container: 'body#body'});
 
 // initializing dropdown options
 var shapeOptionsBuilder = (function() {
@@ -517,16 +524,6 @@ var printWidth = new Slider("#printWidth", {
 		return value + " px = " + mm + " mm";
 	}
 });
-
-var displayHeight = new Slider("#displayHeight", {
-	min: 300,
-	max: 1200,
-	step: 10,
-	value: 500,
-	formatter: function(value) {
-		return value + " px";
-	}
-}).on("change", displayHeightChange);
 
 var thicknessSlider = new Slider("#thickness", {
 	min: 0,

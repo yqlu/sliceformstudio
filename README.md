@@ -20,19 +20,19 @@ Make sure you have [Node](nodejs.org) and [Bower](bower.io) installed.
 
 First, install Harp with:
 
-'''
+```
 sudo npm install -g harp
-'''
+```
 
 Next, in the same directory as Wallpaper, fetch all the packages with:
-'''
+```
 bower install
-'''
+```
 
 Then, run:
-'''
+```
 harp server
-'''
+```
 
 The app should now be running on localhost:9000.
 

@@ -284,18 +284,21 @@ shapeEditCustomDraw();
 keyboardJS.setContext("tileView");
 
 var kbdWrapper = function(f) {
-	return function() {
+	return function(e) {
 		if ($(document.activeElement)[0].tagName !== "INPUT") {
 			f();
+			e.preventDefault();
 		}
 	};
 };
 
 keyboardJS.bind(['d'], kbdWrapper(copyHandler));
-keyboardJS.bind(['del'], kbdWrapper(deleteHandler));
+keyboardJS.bind(['backspace'], kbdWrapper(deleteHandler));
 keyboardJS.bind(['n'], kbdWrapper(clearHandler));
 keyboardJS.bind(['s'], kbdWrapper(saveToFile));
-keyboardJS.bind(['+'], kbdWrapper($("#customShapeModal").modal));
+keyboardJS.bind(['+'], kbdWrapper(function() {
+	$("#customShapeModal").modal();
+}));
 
 // no keyboard shortcut for loading file
 
@@ -557,6 +560,10 @@ $(".collapse").collapse({toggle: true});
 
 d3.select("#generateCustomStripBtn")
   .on("click", generateCustomStrip);
+
+bootbox.setDefaults({
+	container: "body#body"
+});
 
 // wrap jQuery plugins in document.ready
 $(document).ready(function() {

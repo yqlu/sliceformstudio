@@ -801,13 +801,10 @@ var stripViewClick = function() {
 };
 
 var loadFromFile = function() {
+	d3.select(".loading-overlay").classed("in", true);
 	var reader = new FileReader();
-
 	var files = $("#loadFileInput")[0].files;
-
-
 	if (files.length === 1) {
-
 		reader.onload = function() {
 			try {
 				var loaded = JSON.parse(reader.result);
@@ -816,11 +813,10 @@ var loadFromFile = function() {
 				bootbox.alert(err.message);
 			}
 		};
-
 		reader.readAsText(files[0]);
 	}
-
 	resetFormElement($("#loadFileInput"));
+	d3.select(".loading-overlay").classed("in", false);
 };
 
 

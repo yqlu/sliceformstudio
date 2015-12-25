@@ -589,10 +589,12 @@ $(document).ready(function() {
 	var params = getUrlVars();
 	if (params.template) {
 		if (params.template.search(/^\w+$/) >= 0) {
+			d3.select(".loading-overlay").classed("in", true);
 			$.getJSON("/images/gallery/wlpr_files/" + params.template + ".wlpr")
 			.done(loadFromJson)
 			.error(function() {
 				bootbox.alert("Error: " + params.template + " is not a valid template.");
+				d3.select(".loading-overlay").classed("in", false);
 			});
 		} else {
 			bootbox.alert("Error: " + params.template + " is not a valid template.");

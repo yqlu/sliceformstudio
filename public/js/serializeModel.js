@@ -110,6 +110,7 @@ var circularize = function(tile) {
 
 var loadFromJson = function(loaded) {
 	if (loaded.version >= minSupportedVersion) {
+		d3.select(".loading-overlay").classed("in", true);
 		shapeDropdown.node().value = parseInt(loaded.shapeDropdown, 10);
 		$("#shapeDropdown").trigger("change");
 
@@ -170,6 +171,7 @@ var loadFromJson = function(loaded) {
 
 			teardownOverlay();
 		}
+		d3.select(".loading-overlay").classed("in", false);
 
 	} else {
 		if (typeof loaded.version === "undefined") {
@@ -179,6 +181,7 @@ var loadFromJson = function(loaded) {
 			message: "File was from Wallpaper v" + loaded.version +
 				" but only >=v" + minSupportedVersion + " is supported."
 		};
+		d3.select(".loading-overlay").classed("in", false);
 	}
 };
 

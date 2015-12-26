@@ -125,6 +125,7 @@ var loadFromJson = function(loaded) {
 
 		polylist = loaded.polylist;
 		var palette = loaded.palette;
+		polygonID = _.max(_.pluck(palette, "polygonID")) + 1;
 
 		_.each(polylist, function(group) {
 			_.each(group.tiles, circularize);

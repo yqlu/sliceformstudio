@@ -284,50 +284,48 @@ var polygonFromAnglesAndLengths = function(angles, lengths, theta) {
 	return polygon(vertexData, transform);
 };
 
+var polygonID = 0;
+
 // create polygon from list of vertices
-var polygon = (function() {
-	var polygonID = 0;
+var polygon = function(vertexData, origTransform, raw) {
+	var factor = raw ? 1 : config.sidelength;
 
-	return function(vertexData, origTransform, raw) {
-		var factor = raw ? 1 : config.sidelength;
-
-		var vertices = _.map(vertexData, function(v) {
-			return {
-				angle: v.angle,
-				x: v.coords[0] * factor,
-				y: v.coords[1] * factor
-			};
-		});
-
-		vertices.get = function(i) {
-			return this[i % this.length];
-		};
-
-		recenterVertices(vertices);
-
-		var transform = num.dot(origTransform, num.id);
-
-		var edges = _.map(vertices, function(value, index, collection) {
-			var ends = [[collection.get(index).x, collection.get(index).y],
-				[collection.get(index+1).x, collection.get(index+1).y]];
-			return {
-				index: index,
-				ends: ends,
-				patterns: [],
-				length: num.edgeLength(ends),
-				joinedTo: null};
-		});
-
+	var vertices = _.map(vertexData, function(v) {
 		return {
-			// ensures polygonID is unique
-			polygonID: polygonID++,
-			infer: false,
-			dimensions: computeDimensions(vertices, transform),
-			vertices: vertices,
-			edges: edges,
-			patterns: [],
-			transform: transform,
-			origTransform: origTransform
+			angle: v.angle,
+			x: v.coords[0] * factor,
+			y: v.coords[1] * factor
 		};
+	});
+
+	vertices.get = function(i) {
+		return this[i % this.length];
 	};
-})();
+
+	recenterVertices(vertices);
+
+	var transform = num.dot(origTransform, num.id);
+
+	var edges = _.map(vertices, function(value, index, collection) {
+		var ends = [[collection.get(index).x, collection.get(index).y],
+			[collection.get(index+1).x, collection.get(index+1).y]];
+		return {
+			index: index,
+			ends: ends,
+			patterns: [],
+			length: num.edgeLength(ends),
+			joinedTo: null};
+	});
+
+	return {
+		// ensures polygonID is unique
+		polygonID: polygonID++,
+		infer: false,
+		dimensions: computeDimensions(vertices, transform),
+		vertices: vertices,
+		edges: edges,
+		patterns: [],
+		transform: transform,
+		origTransform: origTransform
+	};
+};

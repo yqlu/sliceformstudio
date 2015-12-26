@@ -266,7 +266,6 @@ var edgeClick = function(thisNode) {
 // select the group
 var groupClick = function(d, i) {
 	selection.clear();
-	console.log(this);
 	selection.set(this, {type: "group"});
 };
 

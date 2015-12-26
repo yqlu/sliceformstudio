@@ -295,16 +295,16 @@ var mostRecentShapeDropdownIndex = -1;
 
 var shapeDropdownChange = function() {
 	if (mostRecentShapeDropdownIndex > -1) {
-		var previousOption = shapeOptions[mostRecentShapeDropdownIndex];
-		var currentPalette = assembleSVGDrawer.get();
-		previousOption.polygons = function() {
-			return currentPalette;
-		};
+		shapeCachedOptions[mostRecentShapeDropdownIndex] = assembleSVGDrawer.get();
 	}
-
 	var index = shapeDropdown.node().value;
-	var currentOption = shapeOptions[index];
-	assembleSVGDrawer.set(currentOption.polygons());
+	if (shapeCachedOptions[index]) {
+		assembleSVGDrawer.set(shapeCachedOptions[index]);
+	} else {
+		var computedPolygons = shapeOptions[index].polygons();
+		shapeCachedOptions[index] = computedPolygons;
+		assembleSVGDrawer.set(computedPolygons);
+	}
 	assembleSVGDrawer.draw();
 
 	selection.clear();

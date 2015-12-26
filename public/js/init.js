@@ -234,6 +234,8 @@ var shapeOptionsBuilder = (function() {
 
 var shapeOptions = _.flatten(_.pluck(shapeOptionsBuilder, "options")).concat({name: "Custom", polygons: function() { return []; }});
 
+var shapeCachedOptions = {};
+
 var shapeDropdown = d3.select("#shapeDropdown");
 
 shapeDropdown.selectAll("optgroup").data(shapeOptionsBuilder).enter()

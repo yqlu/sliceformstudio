@@ -113,6 +113,7 @@ var loadFromJson = function(loaded) {
 		d3.select(".loading-overlay").classed("in", true);
 		shapeDropdown.node().value = parseInt(loaded.shapeDropdown, 10);
 		$("#shapeDropdown").trigger("change");
+		shapeDropdownChange();
 
 		var canvasTransform = loaded.canvasTransform;
 
@@ -130,6 +131,14 @@ var loadFromJson = function(loaded) {
 		_.each(polylist, function(group) {
 			_.each(group.tiles, circularize);
 		});
+
+		if (loaded.shapeOptions) {
+			shapeCachedOptions = _.mapValues(loaded.shapeOptions, function(p) {
+				_.each(p, circularize);
+				return p;
+			});
+		}
+		shapeCachedOptions[shapeDropdown.node().value] = palette;
 
 		_.each(palette, circularize);
 
@@ -194,11 +203,14 @@ var saveToFileWithTitle = function(title) {
 		return reduceCircularity(tile);
 	});
 
+	var nonCircularShapeOptions = _.mapValues(shapeCachedOptions, function(p) { return _.map(p, reduceCircularity); });
+
 	var cropVertices = _.map(cropData.vertices, function(v) { return _.pick(v, _.isNumber); });
 
 	var saveFile = {
 		polylist: nonCircularPolylist,
 		palette: nonCircularPalette,
+		shapeOptions: nonCircularShapeOptions,
 		cropData: {
 			vertices: cropVertices,
 			cropMode: $("#cropMode").prop("checked")

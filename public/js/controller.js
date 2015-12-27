@@ -119,18 +119,20 @@ var dragSvgHandler = d3.behavior.drag()
 })
 .on("drag", function(d,i) {
 	// update x y coordinates
-	var newHeight = Math.min(Math.max(d3.event.y, 300),1200);
+	var newHeight = Math.ceil(Math.min(Math.max(d3.event.y, 300),1200));
 	d3.select("#traceSvg svg").attr("height", newHeight);
 	d3.select("#assembleSvg svg").attr("height", newHeight);
-	d3.select(this)
-	.attr("y1", newHeight)
+	d3.selectAll("#traceSvg svg > line").attr("y1", newHeight)
 	.attr("y2", newHeight);
+	d3.selectAll("#assembleSvg svg > line").attr("y1", newHeight)
+	.attr("y2", newHeight);
+	var existingWidth = (tileView.classed("active")) ? assembleSvg.node().getBBox().width : traceSvg.node().getBBox().width;
 	assembleSvgDimensions
 	.attr("y", newHeight - 20)
-	.text(assembleSvg.node().offsetWidth + "px x " + newHeight + "px");
+	.text(existingWidth + "px x " + newHeight + "px");
 	traceSvgDimensions
 	.attr("y", newHeight - 20)
-	.text(traceSvg.node().offsetWidth + "px x " + newHeight + "px");
+	.text(existingWidth + "px x " + newHeight + "px");
 })
 .on('dragend', function(d, i) {
 	document.body.style.cursor = 'auto';

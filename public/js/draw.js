@@ -447,7 +447,7 @@ var drawSvgDraggableEdge = function(svg) {
 
 var drawSvgDimensionLabel = function(svg) {
 	return svg.append("text")
-	.attr("x", assembleSvg.node().offsetWidth - 20)
+	.attr("x", assembleSvg.node().getBBox().width - 20)
 	.attr("y", config.standardHeight - 20)
 	.attr("text-anchor", "end")
 	.text("");

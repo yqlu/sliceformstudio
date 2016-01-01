@@ -513,7 +513,14 @@ var deleteHandler = function(d, i) {
 			selection.delete();
 			updateInferButton();
 		} else if (selection.get().groupNode.parentNode === assemblePaletteContainer.node()) {
-			selection.delete(assembleSVGDrawer);
+			var id = d3.select(selection.get().groupNode).select("g.tile").node().__data__.tiles[0].polygonID;
+			if (_.any(assembleCanvas.selectAll("g.tile")[0], function(t) {
+				return t.__data__.polygonID === id;
+			})) {
+				bootbox.alert("You cannot delete a template tile in the palette if there are copies of it on the canvas.");
+			} else {
+				selection.delete(assembleSVGDrawer);
+			}
 		}
 	}
 };

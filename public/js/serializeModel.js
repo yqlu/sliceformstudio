@@ -111,9 +111,6 @@ var circularize = function(tile) {
 var loadFromJson = function(loaded) {
 	if (loaded.version >= minSupportedVersion) {
 		d3.select(".loading-overlay").classed("in", true);
-		shapeDropdown.node().value = parseInt(loaded.shapeDropdown, 10);
-		$("#shapeDropdown").trigger("change");
-		shapeDropdownChange();
 
 		var canvasTransform = loaded.canvasTransform;
 
@@ -124,23 +121,35 @@ var loadFromJson = function(loaded) {
 		commonZoomHandler.scale(num.getScale(canvasTransform));
 		commonZoomHandler.translate(num.getTranslation(canvasTransform));
 
-		polylist = loaded.polylist;
 		var palette = loaded.palette;
+		_.each(palette, circularize);
+		console.log(palette);
 		polygonID = _.max(_.pluck(palette, "polygonID")) + 1;
 
-		_.each(polylist, function(group) {
-			_.each(group.tiles, circularize);
-		});
-
-		if (loaded.shapeOptions) {
-			shapeCachedOptions = _.mapValues(loaded.shapeOptions, function(p) {
-				_.each(p, circularize);
-				return p;
+		if (loaded.version === 0.2) {
+			polylist = loaded.polylist;
+			_.each(polylist, function(group) {
+				_.each(group.tiles, circularize);
+			});
+		} else {
+			polylist = _.map(loaded.polylist, function(group) {
+				group.tiles = _.map(group.tiles, function(tile, tileIndex) {
+					var tileTemplate = _.find(palette, function(t) {
+						return t.polygonID === tile.polygonID;
+					});
+					var tileTemplateCopy = _.clone(tileTemplate);
+					tileTemplateCopy.edges = _.map(tileTemplate.edges, function(edge, edgeIndex) {
+						var edgeCopy = _.clone(edge);
+						edgeCopy.id = [tileIndex, edgeIndex];
+						return edgeCopy;
+					});
+					tileTemplateCopy.patterns = _.map(tileTemplate.patterns, _.clone);
+					tileTemplateCopy.transform = tile.transform;
+					return tileTemplateCopy;
+				});
+				return group;
 			});
 		}
-		shapeCachedOptions[shapeDropdown.node().value] = palette;
-
-		_.each(palette, circularize);
 
 		// draw anything in local storage
 		resetAndDraw(assembleCanvas, polylist, assembleCanvasOptions);
@@ -197,26 +206,31 @@ var loadFromJson = function(loaded) {
 
 var saveToFileWithTitle = function(title) {
 
-	var nonCircularPolylist = _.cloneDeep(polylist, deepCustomizer(true, true));
+	var reducedPolylist = _.map(polylist, function(gp) {
+		var gpClone = _.clone(gp);
+		gpClone.tiles = _.map(gp.tiles, function(tile) {
+			return {
+				polygonID: tile.polygonID,
+				transform: tile.transform
+			};
+		});
+		return gpClone;
+	});
 
 	var nonCircularPalette = _.map(assembleSVGDrawer.get(), function(tile) {
 		return reduceCircularity(tile);
 	});
 
-	var nonCircularShapeOptions = _.mapValues(shapeCachedOptions, function(p) { return _.map(p, reduceCircularity); });
-
 	var cropVertices = _.map(cropData.vertices, function(v) { return _.pick(v, _.isNumber); });
 
 	var saveFile = {
-		polylist: nonCircularPolylist,
+		polylist: reducedPolylist,
 		palette: nonCircularPalette,
-		shapeOptions: nonCircularShapeOptions,
 		cropData: {
 			vertices: cropVertices,
 			cropMode: $("#cropMode").prop("checked")
 		},
 		canvasTransform: assembleCanvas.node().__data__.transform,
-		shapeDropdown: shapeDropdown.node().value,
 		version: wallpaperVersion,
 		stripViewParams: {
 			thickness: thicknessSlider.getValue(),

@@ -7,10 +7,10 @@ var computeDimensions = function(vertices, transform) {
 	var transformedXValues = _.pluck(transformedCoords, "0");
 	var transformedYValues = _.pluck(transformedCoords, "1");
 
-	var top = transformedYValues.min();
-	var bottom = transformedYValues.max();
-	var right = transformedXValues.max();
-	var left = transformedXValues.min();
+	var top = Math.roundToPrecision(transformedYValues.min(), config.globalPrecisionCap);
+	var bottom = Math.roundToPrecision(transformedYValues.max(), config.globalPrecisionCap);
+	var right = Math.roundToPrecision(transformedXValues.max(), config.globalPrecisionCap);
+	var left = Math.roundToPrecision(transformedXValues.min(), config.globalPrecisionCap);
 
 	return {
 		top: top,
@@ -25,7 +25,7 @@ var computeDimensions = function(vertices, transform) {
 // update dimensions for a tile
 // based on the tile's list of vertices
 var updateDimensions = function(tile) {
-	tile.transform = num.dot(tile.origTransform, recenterVertices(tile.vertices));
+	tile.transform = num.dot(tile.origTransform, recenterAndRoundVertices(tile.vertices));
 	tile.dimensions = computeDimensions(tile.vertices, tile.transform);
 };
 
@@ -54,9 +54,9 @@ var updateEdgeLabel = function(edgeLabel) {
 	.text(function(d) {
 		return (d.__data__.length / config.sidelength).toFixed(2);
 	});
-}
+};
 
-var recenterVertices = function(vertices) {
+var recenterAndRoundVertices = function(vertices) {
 	// translate vertices
 	var tileCenter = _.map(_.reduce(vertices, function(center, v) {
 		center[0] += v.x;
@@ -69,6 +69,9 @@ var recenterVertices = function(vertices) {
 	_.map(vertices, function(v) {
 		v.x -= tileCenter[0];
 		v.y -= tileCenter[1];
+		v.angle = Math.roundToPrecision(v.angle, config.globalPrecisionCap);
+		v.x = Math.roundToPrecision(v.x, config.globalPrecisionCap);
+		v.y = Math.roundToPrecision(v.y, config.globalPrecisionCap);
 	});
 };
 
@@ -302,7 +305,7 @@ var polygon = function(vertexData, origTransform, raw) {
 		return this[i % this.length];
 	};
 
-	recenterVertices(vertices);
+	recenterAndRoundVertices(vertices);
 
 	var transform = num.dot(origTransform, num.id);
 
@@ -313,7 +316,7 @@ var polygon = function(vertexData, origTransform, raw) {
 			index: index,
 			ends: ends,
 			patterns: [],
-			length: num.edgeLength(ends),
+			length: Math.roundToPrecision(num.edgeLength(ends),config.globalPrecisionCap),
 			joinedTo: null};
 	});
 

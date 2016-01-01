@@ -28,6 +28,9 @@ var dragMove = d3.behavior.drag()
 	d3.select(this).attr('pointer-events', 'none');
 })
 .on("dragend", function(d, i) {
+	d.transform = num.matrixRound(d.transform);
+	d3.select(this).attr("transform", num.getTransform);
+
 	// restore ui
 	d3.select(this).classed("translucent", false);
 	d3.select(this).attr('pointer-events', '');
@@ -93,8 +96,10 @@ var dragRotate = d3.behavior.drag()
 	centerCoords(this.parentNode);
 })
 .on("dragend", function() {
-	d3.select("body")
-	.style("cursor", "auto");
+	d.transform = num.matrixRound(d.transform);
+	d3.select(this).attr("transform", num.getTransform);
+
+	d3.select("body").style("cursor", "auto");
 });
 
 // drag handler for editing shape, attached to vertex element
@@ -196,7 +201,7 @@ var dragPatternHandleEdit = d3.behavior.drag()
 	// sometimes d3.event.dx and d3.event.dy abruptly return a huge value, which I don't understand
 	// hard cap drag functionality to work only if they have reasonable values
 	if (d3.event.dx < 25 && d3.event.dy < 25) {
-		d.transform = num.translateBy(d.transform, d3.event.dx, d3.event.dy);
+		d.transform = num.matrixRound(num.translateBy(d.transform, d3.event.dx, d3.event.dy));
 		d3.select(d.this).attr("transform", num.getTransform);
 		var tile = d.this.parentNode.parentNode.__data__;
 		patternFn = makePatterns(_.last(patternOptions).generator(tile));
@@ -210,7 +215,7 @@ var dragPatternHandleEdit = d3.behavior.drag()
 // zoom handler for canvas
 var zoomBehavior = function(d, i) {
 	d3.select(this.parentNode).selectAll(".canvas").each(function(d) {
-		d.transform = num.translateBy(num.scaleBy(num.id, d3.event.scale), d3.event.translate[0], d3.event.translate[1]);
+		d.transform = num.matrixRound(num.translateBy(num.scaleBy(num.id, d3.event.scale), d3.event.translate[0], d3.event.translate[1]));
 	})
 	.attr("transform", num.getTransform);
 };
@@ -291,26 +296,6 @@ var handleMouseout = function(edgeNode) {
 var patternClick = function(thisNode) {
 	assignStripColor(thisNode, $("#colorpicker").val());
 	updateStripTable();
-};
-
-var mostRecentShapeDropdownIndex = -1;
-
-var shapeDropdownChange = function() {
-	if (mostRecentShapeDropdownIndex > -1) {
-		shapeCachedOptions[mostRecentShapeDropdownIndex] = assembleSVGDrawer.get();
-	}
-	var index = shapeDropdown.node().value;
-	if (shapeCachedOptions[index]) {
-		assembleSVGDrawer.set(shapeCachedOptions[index]);
-	} else {
-		var computedPolygons = shapeOptions[index].polygons();
-		shapeCachedOptions[index] = computedPolygons;
-		assembleSVGDrawer.set(computedPolygons);
-	}
-	assembleSVGDrawer.draw();
-
-	selection.clear();
-	mostRecentShapeDropdownIndex = index;
 };
 
 var shapeEditCustomDraw = function() {
@@ -519,7 +504,7 @@ var deleteHandler = function(d, i) {
 };
 
 var clearHandler = function(d, i) {
-	bootbox.confirm("Starting a new design will erase any unsaved progress you have. Are you sure?", function(result) {
+	bootbox.confirm("All the tiles on the canvas will be deleted. Are you sure?", function(result) {
 		if (result) {
 			polylist = [];
 			assembleCanvas.selectAll("g").remove();
@@ -811,6 +796,7 @@ var loadFromFile = function() {
 				loadFromJson(loaded);
 			} catch (err) {
 				bootbox.alert(err.message);
+				console.log(err);
 			}
 		};
 		reader.readAsText(files[0]);

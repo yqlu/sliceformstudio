@@ -147,9 +147,16 @@ var buildIntersections = function(polygon) {
 			return i === 0 || !approxEqPoints(vertex.coords, intersectedVerticesWithDups[i-1].coords);
 		});
 
+		// round intersectedVertices
+		_.each(p.intersectedVertices, function(v) {
+			v.coords = _.map(v.coords, function(vi) {
+				return Math.roundToPrecision(vi, config.globalPrecisionCap);
+			});
+		});
+
 		p.intersectedSegments = _.map(p.fullSegments, function(s, j) {
 			return _.map(_.range(collated[i][j].length - 1), function(k) {
-				return (collated[i][j][k+1].relative - collated[i][j][k].relative) * s;
+				return Math.roundToPrecision((collated[i][j][k+1].relative - collated[i][j][k].relative) * s, config.globalPrecisionCap);
 			});
 		});
 	});
@@ -179,6 +186,11 @@ var regularPolygonPattern = function(n, depth, template) {
 var makePatterns = function(patterns) {
 	return function(edges) {
 		return _.map(patterns, function(p) {
+			p.template = _.map(p.template, function(t) {
+				return _.map(t, function(t1) {
+					return Math.roundToPrecision(t1, config.globalPrecisionCap);
+				});
+			});
 
 			p.start.edge = edges[p.start.index % edges.length];
 			p.end.edge = edges[p.end.index % edges.length];
@@ -252,6 +264,11 @@ var makePatterns = function(patterns) {
 				p.internalVertices = fromStart;
 			}
 
+			p.internalVertices = _.map(p.internalVertices, function(iv) {
+				return [Math.roundToPrecision(iv[0], config.globalPrecisionCap),
+					Math.roundToPrecision(iv[1], config.globalPrecisionCap)];
+			});
+
 			computePatternDataFromInternalVertices(p);
 
 			return p;
@@ -264,7 +281,7 @@ var computePatternDataFromInternalVertices = function(p) {
 	p.allVertices = [p.start.coords].concat(p.internalVertices).concat([p.end.coords]);
 
 	p.fullSegments = _.map(_.range(p.allVertices.length-1), function(i) {
-		return num.edgeLength([p.allVertices[i],p.allVertices[i+1]]);
+		return Math.roundToPrecision(num.edgeLength([p.allVertices[i],p.allVertices[i+1]]), config.globalPrecisionCap);
 	});
 
 	// calculate angles with edges
@@ -272,12 +289,12 @@ var computePatternDataFromInternalVertices = function(p) {
 	var secondPoint = p.allVertices[1];
 	var startVector = num.vecSub(secondPoint, p.start.coords);
 	var startEdgeVector = num.vectorFromEnds(p.start.edge.ends);
-	p.start.angle = num.angleBetweenVectors(startVector, startEdgeVector);
+	p.start.angle = Math.roundToPrecision(num.angleBetweenVectors(startVector, startEdgeVector), config.globalPrecisionCap);
 
 	var secondToLastPoint = p.allVertices[p.allVertices.length - 2];
 	var endVector = num.vecSub(secondToLastPoint, p.end.coords);
 	var endEdgeVector = num.vectorFromEnds(p.end.edge.ends);
-	p.end.angle = num.angleBetweenVectors(endVector, endEdgeVector);
+	p.end.angle = Math.roundToPrecision(num.angleBetweenVectors(endVector, endEdgeVector), config.globalPrecisionCap);
 
 	// calculate line generator
 	p.line = "M" + p.start.coords[0] + "," + p.start.coords[1] +

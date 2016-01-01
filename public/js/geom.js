@@ -55,6 +55,15 @@ var num = {
 		newm[1][2] = 0;
 		return newm;
 	},
+	matrixRound: function(m, precision) {
+		var p = precision || config.globalPrecisionCap;
+		var ret = _.map(m, function(row) {
+			return _.map(row, function(n) {
+				return Math.roundToPrecision(n, p);
+			});
+		});
+		return ret;
+	},
 	getAngle: function(x, y) {
 		var getAngleHelper = function(x, y) {
 			if (x === 0 && y === 0) {
@@ -202,11 +211,11 @@ var centerCoords = function(tileNode) {
 
 	d3.select(tileNode.parentNode)
 	.each(function(d) {
-		d.transform = num.dot(d.transform, tileTransform);
+		d.transform = num.matrixRound(num.dot(d.transform, tileTransform));
 	})
 	.attr("transform", num.getTransform)
 	.selectAll("g").each(function(d) {
-		d.transform = num.dot(tileInverse, d.transform);
+		d.transform = num.matrixRound(num.dot(tileInverse, d.transform));
 	})
 	.attr("transform", num.getTransform);
 };

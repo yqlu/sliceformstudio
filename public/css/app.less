@@ -100,7 +100,7 @@ path.pattern {
   -o-transition: all 0.5s ease;
   -webkit-transition: all 0.5s ease;
   fill: none;
-  stroke: darkgrey;
+  stroke: gainsboro;
   stroke-width: 3;
 }
 path.pattern.traced {
@@ -141,7 +141,7 @@ line.edge {
   -moz-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
   -webkit-transition: all 0.5s ease;
-  stroke: silver;
+  stroke: #999999;
   stroke-width: 5;
 }
 line.edge.hover {
@@ -151,7 +151,7 @@ line.edge.hover {
   stroke: #2196f3;
 }
 .display:not(.bg) line.edge.joined {
-  stroke: #4caf50;
+  stroke: #239207;
 }
 .display:not(.bg) line.edge.joined.hover {
   stroke: #f44336;
@@ -169,7 +169,7 @@ circle.vertex {
   -moz-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
   -webkit-transition: all 0.5s ease;
-  fill: silver;
+  fill: #808080;
 }
 circle.vertex.actionable:hover {
   fill: #03a9f4;
@@ -347,6 +347,7 @@ li.done a {
 .btn {
   font-weight: 300;
 }
+
 .loading-overlay {
   pointer-events: none;
   position: absolute;
@@ -361,6 +362,82 @@ li.done a {
 }
 .loading-overlay.in {
   opacity: 0.75;
+}
+
+.image-frame {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  text-align: center;
+}
+
+.image-frame img {
+  height: 250px;
+  position: relative;
+  left: 100%;
+  margin-left: -200%;
+}
+
+.overlap-full {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  padding: inherit;
+}
+
+.row-fluid.clearfix {
+  padding-bottom: 20px;
+}
+
+.scrolled-modal {
+  overflow-y: scroll;
+  height: 80vh;
+}
+
+.padded-col {
+  padding: 8px 0px;
+}
+
+.gradient-overlay {
+  background: rgba(0,0,0,0);
+  height: 250px;
+  position: relative;
+  transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  -webkit-transition: all 0.5s ease;
+}
+
+.image-border {
+  border: black;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 10px;
+
+}
+
+.gradient-overlay:hover {
+  background: linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.2) 80%, rgba(0,0,0, 0.8) 100%);
+}
+
+.gradient-title {
+  position: absolute;
+  color: rgba(0,0,0,0);
+  font-weight: 700;
+  bottom: 10px;
+  left: 10px;
+}
+
+.gradient-overlay:hover .gradient-title {
+  color: white;
+}
+
+.clearfix:after {
+   content: " ";
+   display: block;
+   height: 0;
+   clear: both;
 }
 
 .spinner-wrapper2 {
@@ -565,4 +642,28 @@ li.done a {
   -ms-transform-origin: 50% 50%;
   -webkit-transform-origin: 50% 50%;
   transform-origin: 50% 50%;
+}
+
+.bootstrap-switch {
+  border-radius: 0px;
+}
+
+.bootstrap-switch .bootstrap-switch-container {
+  border-radius: 0px;
+}
+
+.bootstrap-switch .bootstrap-switch-handle-on {
+  border-radius: 0px;
+}
+
+.bootstrap-switch.bootstrap-switch-on .bootstrap-switch-label, .bootstrap-switch.bootstrap-switch-inverse.bootstrap-switch-off .bootstrap-switch-label {
+  border-radius: 0px;
+}
+
+.bootstrap-switch .bootstrap-switch-handle-off {
+  border-radius: 0px;
+}
+
+.bootstrap-switch, .bootstrap-switch-container, .bootstrap-switch-handle-on, .bootstrap-switch-handle-off, .bootstrap-switch-label {
+  height: 38.65px;
 }

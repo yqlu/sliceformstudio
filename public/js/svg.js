@@ -15,6 +15,7 @@ var config = {
 	polygonTolerance: 0.05,
 	matrixDetTolerance: 0.01,
 	proportionTolerance: 0.001,
+	globalPrecisionCap: 6,
 	extensionLength: 30,
 	sidelength: 50,
 	debug: true,

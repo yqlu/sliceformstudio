@@ -71,8 +71,6 @@ var selection = (function() {
 			$(deleteButton[0]).tooltip("destroy").tooltip({container: 'body'});
 			$("#patternModal").modal('hide');
 
-			var sel = shapeDropdown.node();
-
 			if (current && (typeof type === "undefined" || current.type === type)) {
 				current = null;
 			}

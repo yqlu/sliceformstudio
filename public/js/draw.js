@@ -309,7 +309,7 @@ var draw = function(container, inputlist, options) {
 	});
 
 	if (options.autoresizeSidebar) {
-		var newWidth;
+		var newWidth = 0;
 		var scaleFactor = 1;
 
 		if (tiles.length > 0) {
@@ -325,7 +325,7 @@ var draw = function(container, inputlist, options) {
 				newWidth = config.maxSidebarWidth;
 			}
 		} else {
-			newWidth = config.maxSidebarWidth;
+			newWidth = config.initSidebarWidth;
 		}
 
 		newWidth += 50;

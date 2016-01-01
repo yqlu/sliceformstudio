@@ -166,7 +166,7 @@ var joinEdges = function(thisEdgeNode, selected) {
 				});
 			})
 			.each(function(d) {
-				d.transform = num.dot(t, d.transform);
+				d.transform = num.matrixRound(num.dot(t, d.transform));
 			})
 			.transition()
 			.attr("transform", num.getTransform);
@@ -174,7 +174,7 @@ var joinEdges = function(thisEdgeNode, selected) {
 			tiles = d3.select(selected.groupNode)
 			.selectAll("g.tile")
 			.each(function(d) {
-				d.transform = num.dot(orig, d.transform);
+				d.transform = num.matrixRound(num.dot(orig, d.transform));
 			})
 			.attr("transform", num.getTransform);
 		}

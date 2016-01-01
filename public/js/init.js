@@ -1,4 +1,4 @@
-var wallpaperVersion = 0.2;
+var wallpaperVersion = 0.3;
 var minSupportedVersion = 0.2;
 
 // global UI variables
@@ -115,12 +115,15 @@ var stripView = d3.select("#stripView")
 
 // set listeners on tile view UI elements
 
+var newButton = d3.select("#newDesign")
+.on("click", function() {
+	$("#newModal").modal('show');
+})
+
 var saveButton = d3.select("#saveFile")
 .on("click", saveToFile);
-$(saveButton[0]).tooltip({container: 'body#body'});
 
 var loadButton = d3.select("#loadFile");
-$(loadButton[0]).tooltip({container: 'body#body'});
 
 $("#loadFileInput")
 .on("change", loadFromFile);
@@ -131,21 +134,17 @@ var inferButton = d3.select("#infer")
 
 var clearButton = d3.select("#clear")
 	.on("click", clearHandler);
-$(clearButton[0]).tooltip({container: 'body#body'});
 
 var addButton = d3.select("#addShape")
 	.on("click", function() {
 		$("#customShapeModal").modal();
 	});
-$(addButton[0]).tooltip({container: 'body#body'});
 
 var deleteButton = d3.select("#delete")
 	.on("click", deleteHandler);
-$(deleteButton[0]).tooltip({container: 'body#body'});
 
 var copyButton = d3.select("#copy")
 	.on("click", copyHandler);
-$(copyButton[0]).tooltip({container: 'body#body'});
 
 d3.select("#selectAll").on("click", cropSelectAll);
 d3.select("#unselectAll").on("click", cropUnselectAll);
@@ -153,102 +152,104 @@ d3.select("#exitCropView").on("click", exitCropView);
 
 var cropDesign = d3.select("#cropDesign")
 	.on("click", cropDesignClick);
-$(cropDesign[0]).tooltip({container: 'body#body'});
 
-// initializing dropdown options
-var shapeOptionsBuilder = (function() {
-	var theta = Math.PI / 5;
-	var phi = (1 + Math.sqrt(5)) / 2;
-	return [
-		{
-			category: "Regular polygons",
-			options: [{
-				name: "Triangles, squares and hexagons",
-				polygons: function() {
-					return regularPolygonList([3,4,6]);
-				},
-			}, {
-				name: "Squares and octagons",
-				polygons: function() { return regularPolygonList([4, 8]); },
-			}, {
-				name: "Triangles, hexagons, squares and 12-gons",
-				polygons: function() { return regularPolygonList([3, 4, 6, 12]); },
-			}]
-		}, {
-			category: "Regular polygons with fillers",
-			options: [{
-				name: "10-gons with fillers",
-				polygons: function() { return [regularPolygon(10), polygonFromAngles([2/5 * Math.PI, 2/5 * Math.PI, 6/5 * Math.PI, 2/5 * Math.PI, 2/5 * Math.PI, 6/5 * Math.PI], -Math.PI / 10)]; },
-			}, {
-				name: "12-gons with fillers",
-				polygons: function() { return [regularPolygon(12), polygonFromAngles([7/6 * Math.PI, 1/3 * Math.PI, 7/6 * Math.PI, 1/3 * Math.PI, 7/6 * Math.PI, 1/3 * Math.PI, 7/6 * Math.PI, 1/3 * Math.PI], -Math.PI/6)]; },
-			}, {
-				name: "Octagons, 12-gons with fillers",
-				polygons: function() { return [regularPolygon(8), regularPolygon(12), polygonFromAngles([5/12 * Math.PI, 5/12 * Math.PI, 7/6 * Math.PI, 5/12 * Math.PI, 5/12 * Math.PI, 7/6 * Math.PI], -1/12 * Math.PI)]; },
-			}, {
-				name: "Nonagons, 12-gons with fillers",
-				polygons: function() { return [regularPolygon(9), regularPolygon(12), polygonFromAngles([7/18 * Math.PI, 7/18 * Math.PI, 11/9 * Math.PI, 7/18 * Math.PI, 7/18 * Math.PI, 11/9 * Math.PI], -1/9 * Math.PI)]; },
-			}, {
-				name: "Octagons, 16-gons with fillers",
-				polygons: function() { return [regularPolygon(16), regularPolygon(8), polygonFromAngles([9/8 * Math.PI, 9/8 * Math.PI, 3/8 * Math.PI, 3/8 * Math.PI, 9/8 * Math.PI, 9/8 * Math.PI, 3/8 * Math.PI, 3/8 * Math.PI], Math.PI / 8)]; },
-			}, {
-				name: "18-gons with fillers",
-				polygons: function() { return [regularPolygon(18), polygonFromAngles([10/9 * Math.PI, 2/9 * Math.PI, 10/9 * Math.PI, 2/9 * Math.PI, 10/9 * Math.PI, 2/9 * Math.PI], -5/18 * Math.PI)]; },
-			}]
-		}, {
-			category: "Almost-regular polygons",
-			options: [{
-				name: "Heptagons and pentagons",
-				polygons: function() { return [regularPolygon(7), polygonFromAnglesAndLengths([9/14*Math.PI, 4/7 * Math.PI, 4/7 * Math.PI, 4/7 * Math.PI, 9/14*Math.PI], [0.696,1,1,1,1], Math.PI)]; },
-			}, {
-				name: "Altair tiling",
-				polygons: function() { return [regularPolygon(8), regularPolygon(6),
-					polygonFromAnglesAndLengths([Math.PI * 7/12, 1.858841670477, 2.04190319062728, 1.858841670477, Math.PI * 7/12], [1,1,0.89,0.89, 1], Math.PI),
-					polygonFromAnglesAndLengths([Math.PI/2, Math.PI/2, Math.PI/2, Math.PI/2], [0.896533685752634, 0.896533685752634, 0.896533685752634, 0.896533685752634]),
-					polygonFromAnglesAndLengths([3/4*Math.PI, 2.12064105827615, 2.32994853430939, Math.PI * 2/3, 2.32994853430939, 2.12064105827615, 3/4 * Math.PI], [0.896533685752634, 0.896533685752634, 0.89, 1, 1, 0.89, 0.896533685752634], Math.PI)
-					]; }
-			}]
-		}, {
-			category: "Quasiperiodic tilings",
-			options: [{
-				name: "Pentagons and rhombi",
-				polygons: function() { return [regularPolygon(5), polygonFromAngles([1/5*Math.PI, 4/5 * Math.PI, 1/5 * Math.PI, 4/5 * Math.PI], Math.PI / 10)]; },
-			}, {
-				name: "Heptagonal rhombi",
-				polygons: function() { return [polygonFromAnglesAndLengths([2/7*Math.PI, 5/7 * Math.PI, 2/7 * Math.PI, 5/7 * Math.PI], [2,2,2,2],0), polygonFromAnglesAndLengths([3/7*Math.PI, 4/7 * Math.PI, 3/7 * Math.PI, 4/7 * Math.PI], [2,2,2,2],0), polygonFromAnglesAndLengths([1/7*Math.PI, 6/7 * Math.PI, 1/7 * Math.PI, 6/7 * Math.PI], [2,2,2,2],0)]; },
-			}, {
-				name: "Penrose rhombi",
-				polygons: function() { return [polygonFromAngles([theta, 4*theta, theta, 4*theta], theta / 2), polygonFromAngles([2*theta, 3*theta, 2*theta, 3*theta], theta)]; },
-			}, {
-				name: "Penrose kites and darts",
-				polygons: function() { return [polygonFromAnglesAndLengths([2*theta, 4*theta, 2*theta, 2*theta], [phi, 1, 1, phi], -Math.PI/2 - theta), polygonFromAnglesAndLengths([theta, 2*theta, theta, 6*theta], [1, phi, phi, 1], -theta/2)]; },
-			}, {
-				name: "Girih tiles",
-				polygons: function() { return [regularPolygon(10), regularPolygon(5), polygonFromAngles([2*theta, 3*theta, 2*theta, 3*theta]),
-					polygonFromAngles([6*theta, 2*theta, 2*theta, 6*theta, 2*theta, 2*theta]),
-					polygonFromAngles([2*theta, 4*theta, 4*theta, 2*theta, 4*theta, 4*theta])];
-				}
-			}]
-		}];
-})();
+var tileOptions = {
+	basicTiles: [{
+		name: "Hexagons",
+		file: "hexagons"
+	}, {
+		name: "Squares",
+		file: "squares"
+	}, {
+		name: "Hexagons, squares and triangles",
+		file: "6434"
+	}, {
+		name: "Octagons and squares",
+		file: "848"
+	}, {
+		name: "12-gons and triangles",
+		file: "31212"
+	}, {
+		name: "12-gons, hexagons and squares",
+		file: "4612"
+	}],
+	fillerTiles: [{
+		name: "10-gons and fillers",
+		file: "10filler"
+	}, {
+		name: "12-gons and fillers",
+		file: "12filler"
+	}, {
+		name: "Octagons, 12-gons and fillers",
+		file: "812filler"
+	}, {
+		name: "Nonagons, 12-gons and fillers",
+		file: "912filler"
+	}, {
+		name: "Octagons, 16-gons and fillers",
+		file: "816filler"
+	}, {
+		name: "18-gons and fillers",
+		file: "18filler"
+	}],
+	almostRegular: [{
+		name: "Pentagons and heptagons",
+		file: "57"
+	}, {
+		name: "Altair tiling",
+		file: "altair"
+	}],
+	quasiperiodic: [{
+		name: "Pentagons and rhombi",
+		file: "pentagonrhomb"
+	}, {
+		name: "Penrose rhombi",
+		file: "penroserhomb"
+	}, {
+		name: "Penrose kites and darts",
+		file: "kitesdarts"
+	}, {
+		name: "Heptagonal rhombi",
+		file: "heptagonal"
+	}, {
+		name: "Girih tiles",
+		file: "girih"
+	}]
+};
 
-var shapeOptions = _.flatten(_.pluck(shapeOptionsBuilder, "options")).concat({name: "Custom", polygons: function() { return []; }});
+var generateHtml = function(container) {
+	return function(opt) {
+		var col = d3.select(container).append("div")
+			.classed("col-lg-4 padded-col", true);
+		col.append("div").classed("image-frame", true)
+			.append("img")
+			.attr("src", "images/starter/" + opt.file + ".png");
+		col.append("a").classed("image-frame overlap-full", true)
+			.attr("href", "#")
+			.on("click", function() {
+				$("#newModal").modal("hide");
+				$.getJSON("/images/starter/" + opt.file + ".wlpr")
+				.done(loadFromJson)
+				.error(function() {
+					bootbox.alert("Error: " + params.template + " is not a valid template.");
+					d3.select(".loading-overlay").classed("in", false);
+				});
+			})
+			.append("div").classed("gradient-overlay", true)
+			.append("div").classed("gradient-title", true)
+			.text(opt.name);
+	};
+};
 
-var shapeCachedOptions = {};
+$("#customTile").click(function() {
+	$("#newModal").modal("hide");
+	assembleSVGDrawer.set([]);
+	assembleSVGDrawer.draw();
+});
 
-var shapeDropdown = d3.select("#shapeDropdown");
-
-shapeDropdown.selectAll("optgroup").data(shapeOptionsBuilder).enter()
-	.append("optgroup")
-	.attr("label", function(d) { return d.category; })
-	.selectAll("option").data(function(d) { return d.options; }).enter()
-	.append("option")
-	.html(function(d) {return d.name;});
-
-shapeDropdown.append("option").html("Custom");
-
-shapeDropdown.selectAll("option")
-	.attr("value", function(d, i) {return i;});
+_.each(tileOptions, function(opts, name) {
+	_.each(opts, generateHtml("#" + name));
+});
 
 var patternDropdown = d3.select("#patternDropdown");
 
@@ -572,11 +573,6 @@ $(document).ready(function() {
 		stylesheet.insertRule("path.strip.hover { stroke: " + $("#colorpicker").val() + " !important }", 0);
 	});
 
-	$("#shapeDropdown").select2({
-		minimumResultsForSearch: Infinity
-	})
-	.on("select2:select", shapeDropdownChange).trigger("select2:select");
-
 	$("#patternDropdown").select2({
 		minimumResultsForSearch: Infinity
 	})
@@ -589,6 +585,7 @@ $(document).ready(function() {
 	stylesheet.insertRule("path.strip.hover { stroke: " + $("#colorpicker").val() + " !important }", 0);
 
 	var params = getUrlVars();
+
 	if (params.template) {
 		if (params.template.search(/^\w+$/) >= 0) {
 			d3.select(".loading-overlay").classed("in", true);
@@ -601,5 +598,14 @@ $(document).ready(function() {
 		} else {
 			bootbox.alert("Error: " + params.template + " is not a valid template.");
 		}
+	} else {
+		$("#newModal").modal("show")
+		.on("show.bs.modal", function() {
+			$("#newModal .modal-body").scrollTop(0);
+		})
+		.on("shown.bs.modal", function() {
+			$("#newModal .modal-body").scrollTop(0);
+		});
 	}
+
 });

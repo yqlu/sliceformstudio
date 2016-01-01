@@ -5,33 +5,31 @@
 			button#stripView.btn.btn-default Trace and export strips
 	#assembleTab.active
 		div(style='margin-bottom: 15px;')
-			form#tileViewMenu.form-inline
-				.form-group
-					label Tiles:
-					span.select2-wrapper
-						select#shapeDropdown.form-control(style='display: inline-block')
+			form#tileViewMenu.form-inline(style="margin-left: -10px;")
 				.btn-group.padded-btn-group
-					a#clear.btn.btn-primary(title="New design")
-						i.fa.fa-file-o
-					label#loadFile.btn.btn-primary(title="Load design")
+					a#newDesign.btn.btn-primary
+						#[i.fa.fa-file-o] New
+					label#loadFile.btn.btn-primary
 						input#loadFileInput(type="file", style="display:none;", accept=".wlpr")
-						i.fa.fa-folder-open
-					a#saveFile.btn.btn-primary(title="Save design")
-						i.fa.fa-floppy-o
+						#[i.fa.fa-folder-open] Open
+					a#saveFile.btn.btn-primary
+						#[i.fa.fa-floppy-o] Save
 				.btn-group.padded-btn-group
-					a#addShape.btn.btn-primary(title="Add shape")
-						i.fa.fa-plus
-					a#delete.btn.btn-primary(title="Delete selection")
-						i.fa.fa-trash
-					a#copy.btn.btn-primary(title="Copy selection")
-						i.fa.fa-files-o
+					a#addShape.btn.btn-primary
+						#[i.fa.fa-plus] Add Tile
+					a#delete.btn.btn-primary
+						#[i.fa.fa-trash] Delete
+					a#copy.btn.btn-primary
+						#[i.fa.fa-files-o] Copy
+					a#clear.btn.btn-primary
+						#[i.fa.fa-times-circle] Clear All
 				.btn-group.padded-btn-group
-					a#cropDesign.btn.btn-primary(title="Crop design")
-						i.fa.fa-crop
+					a#cropDesign.btn.btn-primary
+						#[i.fa.fa-crop] Crop
 				.btn-group.padded-btn-group
 					input#autoSnap(type="checkbox", checked="true", data-label-text="Snap edges")
 				.btn-group.padded-btn-group
-					a#infer.btn.btn-primary(title="Infer tile patterns") Infer
+					a#infer.btn.btn-primary Infer
 			form#cropViewMenu.form-inline.hidden
 				.btn-group.padded-btn-group
 					span
@@ -264,6 +262,30 @@
 			.modal-footer
 				a#confirmPattern.btn.btn-primary Confirm
 				button.btn.btn-default(type='button', data-dismiss='modal') Close
+#newModal.modal.fade(tabindex='-1', role='dialog')
+	.modal-dialog.modal-lg(role='document')
+		.modal-content
+			.modal-header
+				button.close(type='button', data-dismiss='modal', aria-label='Close')
+					span(aria-hidden='true') ×
+				h4.modal-title Initialize your design
+			.modal-body.scrolled-modal
+				h5 Beginner: regular tiles
+				.row-fluid.clearfix#basicTiles
+				h5 Intermediate: Regular and filler tiles
+				.row-fluid.clearfix#fillerTiles
+				h5 Advanced: Almost-regular tiles
+				.row-fluid.clearfix#almostRegular
+				h5 Advanced: Quasiperiodic tiles
+				.row-fluid.clearfix#quasiperiodic
+				h5 Custom
+				.row-fluid.clearfix
+					.col-lg-4.padded-col
+						.image-frame
+							img(src="images/starter/question.png")
+						a#customTile.image-frame.overlap-full(href="#")
+							.gradient-overlay
+								.gradient-title Custom
 .loading-overlay#loading
 	.spinner-wrapper1
 		.spinner-wrapper2

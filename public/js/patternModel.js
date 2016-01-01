@@ -390,6 +390,7 @@ var rotatedRay = function(angle, offset) {
 var patternOptions = [
 	{
 		name: "Star",
+		regularOnly: true,
 		parameters: [{
 			name: "Angle",
 			options: function(n) {
@@ -428,6 +429,7 @@ var patternOptions = [
 		}
 	},{
 		name: "Rosette",
+		regularOnly: true,
 		parameters: [{
 			name: "Angle",
 			options: function(n) {
@@ -469,6 +471,7 @@ var patternOptions = [
 	},
 	{
 		name: "Extended Rosette",
+		regularOnly: true,
 		parameters: [{
 			name: "Angle",
 			options: function(n) {
@@ -517,6 +520,7 @@ var patternOptions = [
 	},
 	{
 		name: "Hankin",
+		regularOnly: false,
 		parameters: [{
 			name: "Angle",
 			options: function(n) {
@@ -578,6 +582,7 @@ var patternOptions = [
 	},
 	{
 		name: "Infer",
+		regularOnly: false,
 		parameters: [],
 		generator: function(tile) {
 			tile.infer = true;
@@ -587,6 +592,7 @@ var patternOptions = [
 	},
 	{
 		name: "Custom",
+		regularOnly: false,
 		parameters: [],
 		generator: function(tile) {
 			tile.infer = false;

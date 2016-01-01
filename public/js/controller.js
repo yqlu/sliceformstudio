@@ -514,7 +514,16 @@ var clearHandler = function(d, i) {
 };
 
 var editSpecificPattern = function(tiles) {
+	var isRegular = isRegularPolygon(tiles[0].vertices);
 	return function() {
+		patternDropdown.selectAll("option").attr("disabled", function(d) {
+			return isRegular ? null : (d.regularOnly ? true : null);
+		});
+		$("#patternDropdown").select2({
+			minimumResultsForSearch: Infinity
+		})
+		.on("change", patternDropdownChange);
+		var defaultOption = isRegular ? 0 : 3;
 		selection.set(tiles[0].this.parentNode, {type: 'group'});
 		$("#patternModal").modal();
 		patternEditSVGDrawer.set(_.cloneDeep(tiles));
@@ -534,7 +543,7 @@ var editSpecificPattern = function(tiles) {
 			patternSlider1.setValue(params.param1);
 			patternSlider2.setValue(params.param2);
 		} else {
-			patternDropdown.node().value = 0;
+			patternDropdown.node().value = defaultOption;
 			$("#patternDropdown").trigger("change");
 		}
 	};

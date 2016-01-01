@@ -332,3 +332,18 @@ var polygon = function(vertexData, origTransform, raw) {
 		origTransform: origTransform
 	};
 };
+
+var isRegularPolygon = function(vertices) {
+	var n = vertices.length;
+	var edge0 = [vertices[0].x - vertices[n-1].x, vertices[0].y - vertices[n-1].y];
+	return _.all(vertices, function(v, idx) {
+		if (idx === n - 1) {
+			return true;
+		} else {
+			var edgei = [vertices[idx + 1].x - vertices[idx].x, vertices[idx + 1].y - vertices[idx].y];
+			return approxEqPoints(edge0,
+				num.matrixToCoords(num.dot(num.rotate(- 2 * Math.PI * (idx + 1) / n),
+					num.coordsToMatrix([edgei])))[0]);
+		}
+	});
+};

@@ -123,7 +123,6 @@ var loadFromJson = function(loaded) {
 
 		var palette = loaded.palette;
 		_.each(palette, circularize);
-		console.log(palette);
 		polygonID = _.max(_.pluck(palette, "polygonID")) + 1;
 
 		if (loaded.version === 0.2) {

@@ -3,6 +3,7 @@ var config = {
 	standardHeight: 500,
 	maxSidebarWidth: 250,
 	initSidebarWidth: 143,
+	stripTableWidth: 270,
 	sidebarSpacing: 40,
 	labelOffset: 5,
 	editWidth: 300,

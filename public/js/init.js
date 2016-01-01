@@ -80,7 +80,7 @@ var assemblePaletteBg = assemblePalette.append("rect")
 	.attr("x", - config.initSidebarWidth / 2)
 	.attr("y", 0)
 	.style("cursor", "move")
-	.call(zoomPalette);
+	.call(assembleZoomPalette);
 
 var assemblePaletteContainer = assemblePalette.append("g")
 	.classed("palette-container", true)
@@ -106,6 +106,36 @@ var traceCanvas = buildDisplay(traceSvg, assembleCanvas.datum().transform, true)
 var traceDraggableEdge = drawSvgDraggableEdge(traceSvg);
 var traceSvgDimensions = drawSvgDimensionLabel(traceSvg);
 
+var tracePalette = buildDisplay(traceSvg, num.id).classed("palette", true);
+var tracePaletteBg = tracePalette.append("rect")
+	.classed("palette-background", true)
+	.attr("width", config.stripTableWidth)
+	.attr("height", "100%")
+	.attr("x", 0)
+	.attr("y", 0)
+	.style("cursor", "move");
+
+var tracePaletteContainer = tracePalette.append("g")
+	.classed("palette-container", true);
+
+var fo = tracePaletteContainer.append("foreignObject")
+	.attr("height", config.standardHeight)
+	.attr("width", config.stripTableWidth)
+	.append("xhtml:body").classed("strip-table", true)
+	.attr("xmlns", "http://www.w3.org/1999/xhtml")
+	.append("div").classed("stripTablePadded", true);
+
+fo.append("h4")
+	.text("Strip generation");
+
+var sidebarForm = fo
+	.append("form").classed("form-horizontal", true);
+
+var noneSoFar = fo
+	.append("span")
+	.attr("id", "noneSoFar")
+	.text("You haven't assigned colors to any strips yet!");
+
 // set listeners on tile / strip view toggles
 var tileView = d3.select("#tileView")
 .on("click", tileViewClick);
@@ -118,7 +148,7 @@ var stripView = d3.select("#stripView")
 var newButton = d3.select("#newDesign")
 .on("click", function() {
 	$("#newModal").modal('show');
-})
+});
 
 var saveButton = d3.select("#saveFile")
 .on("click", saveToFile);
@@ -135,10 +165,16 @@ var inferButton = d3.select("#infer")
 var clearButton = d3.select("#clear")
 	.on("click", clearHandler);
 
-var addButton = d3.select("#addShape")
+var addShapeGUIButton = d3.select("#addShapeGUI")
 	.on("click", function() {
-		$("#customShapeModal").modal();
+		$("#customShapeGUIModal").modal();
 	});
+
+var addShapeTextButton = d3.select("#addShapeText")
+	.on("click", function() {
+		$("#customShapeTextModal").modal();
+	});
+
 
 var deleteButton = d3.select("#delete")
 	.on("click", deleteHandler);
@@ -246,6 +282,9 @@ $("#customTile").click(function() {
 	assembleSVGDrawer.set([]);
 	assembleSVGDrawer.draw();
 });
+
+assembleSVGDrawer.set([]);
+assembleSVGDrawer.draw();
 
 _.each(tileOptions, function(opts, name) {
 	_.each(opts, generateHtml("#" + name));

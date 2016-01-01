@@ -221,9 +221,9 @@ var zoomBehavior = function(d, i) {
 };
 
 // zoom handler for palette, only enable y panning
-var zoomPalette = d3.behavior.zoom()
+var assembleZoomPalette = d3.behavior.zoom()
 .on("zoom", function(d, i) {
-	var ty = zoomPalette.translate()[1];
+	var ty = assembleZoomPalette.translate()[1];
 
 	ty = Math.min(ty, 0);
 	if (config.standardHeight < assemblePaletteContainer.node().getBBox().height + 2 * config.sidebarSpacing) {
@@ -231,20 +231,35 @@ var zoomPalette = d3.behavior.zoom()
 	} else {
 		ty = Math.max(ty, 0);
 	}
-	// ty = Math.max(ty, )
-	zoomPalette.translate([0, ty]);
+	assembleZoomPalette.translate([0, ty]);
 
 	assemblePaletteContainer.each(function(d) {
-		d.transform = num.translateBy(d.scaledTransform, 0, zoomPalette.translate()[1]);
+		d.transform = num.translateBy(d.scaledTransform, 0, assembleZoomPalette.translate()[1]);
 	})
 	.attr("transform", num.getTransform);
 
 	assemblePaletteButtons.each(function(d) {
-		d.transform = num.translateBy(d.scaledTransform, 0, zoomPalette.translate()[1]);
+		d.transform = num.translateBy(d.scaledTransform, 0, assembleZoomPalette.translate()[1]);
 	})
 	.attr("transform", num.getTransform);
+});
 
+var traceZoomPalette = d3.behavior.zoom()
+.on("zoom", function(d, i) {
+	var ty = traceZoomPalette.translate()[1];
 
+	ty = Math.min(ty, 0);
+	if (config.standardHeight < tracePaletteContainer.node().getBBox().height + 2 * config.sidebarSpacing) {
+		ty = Math.max(ty, config.standardHeight - tracePaletteContainer.node().getBBox().height - 2 * config.sidebarSpacing);
+	} else {
+		ty = Math.max(ty, 0);
+	}
+	traceZoomPalette.translate([0, ty]);
+
+	// tracePaletteContainer.each(function(d) {
+	// 	d.transform = num.translateBy(d.scaledTransform, 0, traceZoomPalette.translate()[1]);
+	// })
+	// .attr("transform", num.getTransform);
 });
 
 // click handler for joining edges, attached to edge element
@@ -397,12 +412,12 @@ var patternUpdate = function() {
 
 var addToLineupClick = function() {
 	pushPolygonToLineup(_.cloneDeep(shapeEditSVGDrawer.getTile()));
-	$("#customShapeModal").modal('hide');
+	$("#customShapeGUIModal").modal('hide');
 };
 
 var addToLineupManualClick = function() {
 	pushManualPolygonToLineup($("#sidelengths").val(), $("#interiorAngles").val());
-	$("#customShapeModal").modal('hide');
+	$("#customShapeTextModal").modal('hide');
 };
 
 var updateShapeClick = function() {
@@ -626,7 +641,7 @@ var extensionSliderChange = function() {
 		};
 	});
 	d3.select("#noneSoFar").style("display", "block");
-	d3.select("#stripTable").selectAll("div").remove();
+	sidebarForm.selectAll("div").remove();
 
 	redrawCanvas();
 };
@@ -744,6 +759,14 @@ var tileViewClick = function() {
 
 		assemblePalette.classed("hidden", false);
 
+		assemblePalette.each(function(d) {
+			var width = d3.select(this).select(".palette-background").attr("width");
+			d.transform = num.translate(width / 2, 0);
+		})
+		.transition()
+		.duration(1000)
+		.attr("transform", num.getTransform);
+
 		teardownOverlay();
 
 	}
@@ -779,7 +802,7 @@ var stripViewClick = function() {
 			};
 		});
 		d3.select("#noneSoFar").style("display", "block");
-		d3.select("#stripTable").selectAll("div").remove();
+		sidebarForm.selectAll("div").remove();
 
 		tileView.classed("active", false);
 		stripView.classed("active", true);
@@ -789,8 +812,11 @@ var stripViewClick = function() {
 
 		redrawCanvas();
 
+		var noStripsOnCanvas = d3.select("#traceSvg").selectAll(".strip")[0].length === 0;
 		d3.select("#traceSvg").select(".shadedOverlay").style("visibility",
-			(d3.select("#traceSvg").selectAll(".strip")[0].length === 0) ? "visible" : "hidden");
+			(noStripsOnCanvas ? "visible" : "hidden"));
+		d3.select("#traceSvg").select(".palette").style("visibility",
+			(noStripsOnCanvas ? "hidden" : "visible"));
 	}
 };
 

@@ -348,7 +348,7 @@ var draw = function(container, inputlist, options) {
 				.append("xhtml:body")
 				.attr("xmlns", "http://www.w3.org/1999/xhtml")
 				.append("a")
-				.classed("btn btn-primary", true)
+				.classed("btn btn-primary icon-btn", true)
 				.html("&#xf013;");
 
 			innerBtn.on("click", editSpecificPattern(this.parentNode.__data__.tiles));

@@ -494,6 +494,45 @@ var groupPattern = function(patternData, strictMode) {
 		updateStripTable();
 	});
 
+	underStrip.__data__ = {};
+	underStrip.__data__.updateExtension = function(newLength) {
+		// update reducedSegments and strip properly
+		if (extendedEnd) {
+			var finalExtension = num.vecSum(finalCoord, num.vecProd(num.normalize(finalVector), newLength * config.sidelength));
+			var lastSegment = _.last(reducedSegments);
+			lastSegment[lastSegment.length - 1] = {
+				intersect: false,
+				x: finalExtension[0],
+				y: finalExtension[1]
+			};
+			_.last(strip)[_.last(strip).length - 1] = newLength * config.sidelength;
+		}
+
+		if (extendedStart) {
+			var initialExtension = num.vecSum(initialCoord, num.vecProd(num.normalize(initialVector), newLength * config.sidelength));
+			var firstSegment = _.first(reducedSegments);
+			firstSegment[0] = {
+				intersect: false,
+				x: initialExtension[0],
+				y: initialExtension[1]
+			};
+			_.first(strip)[0] = newLength * config.sidelength;
+		}
+
+		d3.select(overOutline).attr("d", function() {
+			return altLine(reducedSegments, direction, true);
+		});
+		d3.select(overStrip).attr("d", function() {
+			return altLine(reducedSegments, direction, false);
+		});
+		d3.select(underStrip).attr("d", function() {
+			return _.map(reducedSegments, function(seg) {
+				return line(seg);
+			}).join(" ");
+		});
+		d3.select(underOutline).attr("d", underStrip.getAttribute("d"));
+	};
+
 	var groupedNodes = _.pluck(_.pluck(patternList, "pattern"), "this");
 	d3.selectAll(groupedNodes).remove();
 
@@ -592,6 +631,9 @@ var assignStripColor = function(nodes, strip, color) {
 			c.strips.push({
 				lengths: strip,
 				nodes: nodes,
+			});
+			_.each(nodes, function(n) {
+				n.__data__.colorMapPtr = _.last(c.strips);
 			});
 		}
 	});

@@ -625,30 +625,35 @@ var thicknessSliderChange = function() {
 };
 
 var extensionSliderChange = function() {
-	// should find way to optimize
-	traceCanvas.selectAll("path").remove();
-	var clone = _.cloneDeep(polylist, deepCustomizer(false));
-	_.each(clone, function(group) {
-		_.each(group.tiles, function(tile) {
-			circularize(tile);
-			generatePatternInterface(tile);
-			if ($("#cropMode").prop("checked") && cropData.hull.length >= 3) {
-				cropPattern(tile, group);
-			}
-		});
+	d3.selectAll(".strip.strip-below").each(function(d) {
+		d.updateExtension(extensionSlider.getValue());
 	});
-	resetAndDraw(traceCanvas, clone, tracePatternOptions);
 
-	colorMap = _.map(stripColors, function(c) {
-		return {
-			color: c,
-			strips: []
-		};
-	});
-	d3.select("#noneSoFar").style("display", "block");
-	sidebarForm.selectAll("div").remove();
 
-	redrawCanvas();
+	// // should find way to optimize
+	// traceCanvas.selectAll("path").remove();
+	// var clone = _.cloneDeep(polylist, deepCustomizer(false));
+	// _.each(clone, function(group) {
+	// 	_.each(group.tiles, function(tile) {
+	// 		circularize(tile);
+	// 		generatePatternInterface(tile);
+	// 		if ($("#cropMode").prop("checked") && cropData.hull.length >= 3) {
+	// 			cropPattern(tile, group);
+	// 		}
+	// 	});
+	// });
+	// resetAndDraw(traceCanvas, clone, tracePatternOptions);
+
+	// colorMap = _.map(stripColors, function(c) {
+	// 	return {
+	// 		color: c,
+	// 		strips: []
+	// 	};
+	// });
+	// d3.select("#noneSoFar").style("display", "block");
+	// sidebarForm.selectAll("div").remove();
+
+	// redrawCanvas();
 };
 
 // toggle visibility of edges and vertices

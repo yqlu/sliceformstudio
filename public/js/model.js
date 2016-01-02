@@ -78,7 +78,7 @@ var selection = (function() {
 		delete: function(svgDrawer){
 			if (svgDrawer) {
 				if (current && current.type === "group") {
-					svgDrawer.pop(d3.select(current.groupNode).selectAll("g.tile").datum().index);
+					svgDrawer.pop(d3.select(current.groupNode).datum().tiles[0].index);
 					svgDrawer.draw();
 				} else {
 					bootbox.alert("You need to select a group of tiles first.");

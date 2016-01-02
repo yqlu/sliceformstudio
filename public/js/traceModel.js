@@ -539,34 +539,6 @@ var updateStripTable = function() {
 	.text(function(d) {
 		return " " + d.color.name + " (" + d.strips.length + (d.strips.length > 1 ? " strips)" : " strip)");
 	});
-
-	// update.html(function(d) {
-	// 	return "<label class='control-label col-md-2'> " + d.color.name + " (" + d.strips.length + (d.strips.length > 1 ? " strips)" : " strip)") + "</div>";
-	// })
-	// .append("div")
-	// .classed("col-md-2", true)
-	// .append("a")
-	// .classed("btn btn-default btn-sm", true)
-	// .style("margin-left", "15px")
-	// .on("click", function(d) {
-	// 	var xmlPrefix = "<?xml version='1.0' encoding='utf-8'?>";
-	// 	genSVG(_.pluck(d.strips, "lengths"), {
-	// 		stripHeight: stripHeight.getValue(),
-	// 		widthFactor: widthFactor.getValue(),
-	// 		interSpacing: interSpacing.getValue(),
-	// 		printWidth: printWidth.getValue(),
-	// 		printHeight: printHeight.getValue()
-	// 	});
-	// 	var svg = d3.select("#stripSvg").select("svg").node();
-	// 	var serializer = new XMLSerializer();
-	// 	var pom = d3.select("#downloadLink").node();
-	// 	var bb = new Blob([xmlPrefix + serializer.serializeToString(svg)], {type: "image/svg+xml"});
-	// 	pom.download = d.color.name+".svg";
-	// 	pom.href = window.URL.createObjectURL(bb);
-	// 	pom.dataset.downloadurl = ["image/svg+xml", pom.download, pom.href].join(':');
-	// 	pom.click();
-	// 	d3.select(svg).remove();
-	// }).text("Generate SVG");
 };
 
 var validateStripFormat = function(strips) {

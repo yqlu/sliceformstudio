@@ -95,9 +95,12 @@ var dragRotate = d3.behavior.drag()
 	d3.event.sourceEvent.stopPropagation();
 	centerCoords(this.parentNode);
 })
-.on("dragend", function() {
-	d.transform = num.matrixRound(d.transform);
-	d3.select(this).attr("transform", num.getTransform);
+.on("dragend", function(d) {
+	d3.select(this.parentNode.parentNode)
+	.attr("transform", function(d) {
+		d.transform = num.matrixRound(d.transform);
+		return num.getTransform(d);
+	});
 
 	d3.select("body").style("cursor", "auto");
 });
@@ -153,13 +156,13 @@ var updateUIForCustomTemplate = function(template, forceFlag) {
 		// if forceFlag is false, only update UI if thisTemplate is not selected
 		// (applicable for switching values when dragging a different pattern handle)
 		var tile = template.this.parentNode.__data__;
-		var thisIndex = _.findIndex(tile.customTemplate, function(t) { return t === template; });
+		var thisIndex = _.findIndex(tile.customTemplate, function(t) { return t.this === template.this; });
 
 		if (forceFlag ||
 			($("#customPatternSelect").val() && $("#customPatternSelect").val().length === 1 &&
 			$("#customPatternSelect").val()[0] !== ""+thisIndex)) {
 
-			var templateClone = _.cloneDeep(template);
+			var templateClone = template; // _.cloneDeep(template);
 
 			$("#customPatternSelect").val(thisIndex);
 			$(":radio[value=" + templateClone.edgesSpec + "]").prop("checked", true);
@@ -255,11 +258,6 @@ var traceZoomPalette = d3.behavior.zoom()
 		ty = Math.max(ty, 0);
 	}
 	traceZoomPalette.translate([0, ty]);
-
-	// tracePaletteContainer.each(function(d) {
-	// 	d.transform = num.translateBy(d.scaledTransform, 0, traceZoomPalette.translate()[1]);
-	// })
-	// .attr("transform", num.getTransform);
 });
 
 // click handler for joining edges, attached to edge element

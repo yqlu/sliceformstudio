@@ -32,7 +32,7 @@
 					a#cropDesign.btn.btn-primary
 						#[i.fa.fa-crop] Crop
 				.btn-group.padded-btn-group
-					input#autoSnap(type="checkbox", checked="true", data-label-text="Snap edges")
+					input#autoSnap(type="checkbox", checked="true", data-label-text="Planar tilings only", data-label-width=140)
 				.btn-group.padded-btn-group
 					a#infer.btn.btn-primary Infer
 			form#cropViewMenu.form-inline.hidden
@@ -40,7 +40,7 @@
 					span
 						b Select points to define the area to crop your design to.
 				.btn-group.padded-btn-group
-					input#cropMode(type="checkbox", checked="false", data-label-text="Crop mode")
+					input#cropMode(type="checkbox", checked="false", data-label-text="Crop mode", data-label-width=110)
 				.btn-group.padded-btn-group
 					a#selectAll.btn.btn-primary Select All
 					a#unselectAll.btn.btn-primary Reset
@@ -73,6 +73,7 @@
 						label.control-label.col-md-2 Strip width
 						.col-md-4
 							input#thickness(type='text')
+						input#outlineToggle(type="checkbox", checked="true", data-label-text="Draw outline", data-label-width=110)
 					.form-group
 						label.control-label.col-md-2 Extension length
 						.col-md-4
@@ -145,7 +146,7 @@
 										input#sideLength(type='text')
 								.form-group
 									.col-md-offset-4.col-md-8
-										input#shapeEditToggle(type="checkbox", checked="true", data-label-text="Display labels", data-label-width=110)
+										a#shapeEditToggle.btn.btn-default.active(data-toggle='button') Toggle display
 								p
 									| You can customize the polygon on the right by dragging on the vertices before clicking "Add to lineup".
 						.col-md-5

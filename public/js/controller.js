@@ -730,10 +730,6 @@ var tileViewClick = function() {
 			d.transform = traceCanvas.datum().transform;
 		})
 		.attr("transform", num.getTransform);
-		d3.select("#tileViewMenu").classed("hidden", false);
-		d3.select("#cropViewMenu").classed("hidden", true);
-
-		assembleCanvas.classed("bg", false);
 
 		tileView.classed("active", true);
 		stripView.classed("active", false);
@@ -741,17 +737,18 @@ var tileViewClick = function() {
 		d3.select("#assembleTab").classed("active", true).classed("hidden", false);
 		d3.select("#traceTab").classed("active", false).classed("hidden", true);
 
-		assemblePalette.classed("hidden", false);
+		if (d3.select("#cropViewMenu").classed("hidden")) {
+			teardownOverlay();
+			assemblePalette.classed("hidden", false);
 
-		assemblePalette.each(function(d) {
-			var width = d3.select(this).select(".palette-background").attr("width");
-			d.transform = num.translate(width / 2, 0);
-		})
-		.transition()
-		.duration(1000)
-		.attr("transform", num.getTransform);
-
-		teardownOverlay();
+			assemblePalette.each(function(d) {
+				var width = d3.select(this).select(".palette-background").attr("width");
+				d.transform = num.translate(width / 2, 0);
+			})
+			.transition()
+			.duration(1000)
+			.attr("transform", num.getTransform);
+		}
 
 	}
 };

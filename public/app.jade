@@ -7,32 +7,25 @@
 		div(style='margin-bottom: 15px;')
 			form#tileViewMenu.form-inline(style="margin-left: -10px;")
 				.btn-group.padded-btn-group
-					a#newDesign.btn.btn-primary
-						#[i.fa.fa-file-o] New
+					a#newDesign.btn.btn-primary #[i.fa.fa-file-o] New
 					label#loadFile.btn.btn-primary
 						input#loadFileInput(type="file", style="display:none;", accept=".wlpr")
-						#[i.fa.fa-folder-open] Open
-					a#saveFile.btn.btn-primary
-						#[i.fa.fa-floppy-o] Save
+						| #[i.fa.fa-folder-open] Open
+					a#saveFile.btn.btn-primary #[i.fa.fa-floppy-o] Save
 				.btn-group.padded-btn-group
-					a.btn.btn-primary.dropdown-toggle(data-toggle="dropdown")
-						#[i.fa.fa-caret-down] Add Tile
+					a.btn.btn-primary.dropdown-toggle(data-toggle="dropdown") #[i.fa.fa-caret-down] Add Tile
 					ul.dropdown-menu
 						li
 							a#addShapeGUI(href="#") Graphical editor (basic)
 						li
 							a#addShapeText(href="#") Manual text editor (advanced)
-					a#delete.btn.btn-primary
-						#[i.fa.fa-trash] Delete
-					a#copy.btn.btn-primary
-						#[i.fa.fa-files-o] Copy
-					a#clear.btn.btn-primary
-						#[i.fa.fa-times-circle] Clear All
+					a#delete.btn.btn-primary #[i.fa.fa-trash] Delete
+					a#copy.btn.btn-primary #[i.fa.fa-files-o] Copy
+					a#clear.btn.btn-primary #[i.fa.fa-times-circle] Clear All
 				.btn-group.padded-btn-group
-					a#cropDesign.btn.btn-primary
-						#[i.fa.fa-crop] Crop
+					a#cropDesign.btn.btn-primary #[i.fa.fa-crop] Crop
 				.btn-group.padded-btn-group
-					input#autoSnap(type="checkbox", checked="true", data-label-text="Planar tilings only", data-label-width=140)
+					input#autoSnap(type="checkbox", checked="true", data-label-text="Planar tilings only", data-label-width=160)
 				.btn-group.padded-btn-group
 					a#infer.btn.btn-primary Infer
 			form#cropViewMenu.form-inline.hidden

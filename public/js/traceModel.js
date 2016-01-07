@@ -328,6 +328,11 @@ var redrawCanvas = function() {
 			}
 		}
 	}
+
+	d3.selectAll(".strip-below")
+	.each(function(d, i) {
+		d.id = i;
+	});
 };
 
 var groupPattern = function(patternData, strictMode) {
@@ -460,7 +465,7 @@ var groupPattern = function(patternData, strictMode) {
 					.classed("strip-outline", true)
 					.attr("d", function() {
 						return altLine(reducedSegments, direction, true);
-					}).node();
+					}).node()
 	var overStrip = traceCanvas.append("path")
 					.classed("strip strip-above", true)
 					.attr("d", function() {
@@ -476,6 +481,9 @@ var groupPattern = function(patternData, strictMode) {
 	var underOutline = traceCanvas.insert("path", ":first-child")
 					.classed("strip-outline", true)
 					.attr("d", underStrip.getAttribute("d")).node();
+
+	overStrip.__data__ = {outline: overOutline};
+	underStrip.__data__ = {outline: underOutline};
 
 	d3.selectAll([overOutline, underOutline]).attr("stroke-linejoin", "miter").style("stroke-width", thicknessSlider.getValue()+1);
 
@@ -520,7 +528,7 @@ var groupPattern = function(patternData, strictMode) {
 		};
 	});
 
-	underStrip.__data__ = {};
+	underStrip.__data__ = underStrip.__data__ || {};
 	underStrip.__data__.updateExtension = function(newLength) {
 		// update reducedSegments and strip properly
 		if (extendedEnd) {
@@ -565,8 +573,27 @@ var groupPattern = function(patternData, strictMode) {
 	return false; // successful, quit out of loop
 };
 
+var emphasizeStrips = function(nodes, color) {
+	d3.selectAll(".strip").style("stroke", "gainsboro");
+	d3.selectAll(".strip-outline").style("stroke-width", 0);
+	d3.selectAll(nodes).style("stroke", color);
+	d3.selectAll(_.map(nodes, function(n) { return n.__data__.outline; })).style("stroke-width", thicknessSlider.getValue() + 1);
+};
+
+var colorAllStrips = function() {
+	_.each(colorMap, function(c) {
+		d3.selectAll(_.flatten(_.pluck(c.strips, "nodes"))).style("stroke", c.color.hex);
+	});
+	d3.selectAll(".strip-outline").style("stroke-width", thicknessSlider.getValue() + 1);
+};
+
 // update display for strip table
 var updateStripTable = function() {
+	var expandedColorSlots = _.filter(colorMap, function(c) {
+		return d3.select("#collapse" + c.color.id)[0][0] &&
+		d3.select("#collapse" + c.color.id).style("display") === "block";
+	});
+
 	var update = sidebarForm
 	.selectAll("div.color-slot")
 	.data(colorMap);
@@ -579,7 +606,7 @@ var updateStripTable = function() {
 	.remove();
 
 	update.html("").append("a")
-	.classed("btn btn-primary btn-sm", true)
+	.classed("pull-right btn btn-primary btn-xs", true).style("margin-right", "10px")
 	.on("click", function(d) {
 		var xmlPrefix = "<?xml version='1.0' encoding='utf-8'?>";
 		genSVG(_.pluck(d.strips, "lengths"), {
@@ -598,11 +625,61 @@ var updateStripTable = function() {
 		pom.dataset.downloadurl = ["image/svg+xml", pom.download, pom.href].join(':');
 		pom.click();
 		d3.select(svg).remove();
-	}).append("i").classed("fa fa-download", true);
+	}).append("i").classed("fa fa-download fa-fw", true);
+	update.append("h5").classed("colorLabel", true)
+	.attr("id", function(d) { return "collapser" + d.color.id; })
+	.html(function(d) {
+		var caret = _.contains(expandedColorSlots, d) ? "fa-caret-down" : "fa-caret-right";
+		return "<i class='fa fa-fw fa-caret-right'></i> <span>" + d.color.name + " (" + d.strips.length + ")</span>";
+	})
+	.each(function(d) {
+		$("#collapser" + d.color.id).click(function() {
+			var collapseDiv = d3.select("#collapse" + d.color.id);
+			if (collapseDiv.style("display") === "block") {
+				// collapse
+				collapseDiv.style("display", "none");
+				d3.select(this).select("i").classed("fa-caret-right", true).classed("fa-caret-down", false);
+			} else {
+				// open up
+				collapseDiv.style("display", "block");
+				d3.select(this).select("i").classed("fa-caret-down", true).classed("fa-caret-right", false);
+			}
+		});
+	})
+	.on("mouseover", function(d) {
+		emphasizeStrips(_.flatten(_.pluck(d.strips, "nodes")), d.color.hex);
+	})
+	.on("mouseout", colorAllStrips);
+	var collapseDiv = update.append("div").style("display", function(d) {
+		return _.contains(expandedColorSlots, d) ? "block" : "none";
+	}).attr("id", function(d) { return "collapse" + d.color.id; })
+		.append("ul").classed("strip-table-ul", true);
 
-	update.append("span").classed("colorLabel", true)
-	.text(function(d) {
-		return " " + d.color.name + " (" + d.strips.length + (d.strips.length > 1 ? " strips)" : " strip)");
+	collapseDiv.each(function(d) {
+		d3.select(this).selectAll("li").data(d.strips)
+		.enter().append("li").classed("strip-table-li", true).text(function(d, i) { return "Strip #" + (d.nodes[0].__data__.id || d.nodes[1].__data__.id); })
+		.on("mouseover", function(d1) {
+			emphasizeStrips(d1.nodes, this.parentNode.__data__.color.hex);
+		})
+		.on("mouseout", colorAllStrips);
+	});
+	$(".strip-table-ul").sortable({
+		connectWith: 'strip-table-ul',
+		hoverClass: 'hovered-li'
+	})
+	.bind('sortupdate', function(e, ui) {
+		var startParentArray = ui.startparent[0].__data__.strips;
+		var endParentArray = ui.endparent[0].__data__.strips;
+		startParentArray.splice(ui.oldindex, 1);
+		endParentArray.splice(ui.index, 0, ui.item[0].__data__);
+		d3.select(ui.endparent[0].parentNode.parentNode).select(".colorLabel")
+		.select("span").text(function(d) { return d.color.name + " (" + d.strips.length + ")"; });
+		if (ui.startparent[0].__data__.strips.length === 0) {
+			d3.select(ui.startparent[0].parentNode.parentNode).remove();
+		} else {
+			d3.select(ui.startparent[0].parentNode.parentNode).select(".colorLabel")
+			.select("span").text(function(d) { return d.color.name + " (" + d.strips.length + ")"; });
+		}
 	});
 };
 

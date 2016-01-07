@@ -22,9 +22,11 @@ margin-top: -72px;
 }
 #assembleSvg{
   position: relative;
+  margin-bottom: 22px;
 }
 #traceSvg {
   position: relative;
+  margin-bottom: 22px;
 }
 .shadedOverlay {
   position: absolute;
@@ -115,19 +117,19 @@ path.patternHelperLine {
   fill: none;
 }
 path.strip-outline {
-  transition: stroke 0.5s ease;
-  -moz-transition: stroke 0.5s ease;
-  -o-transition: stroke 0.5s ease;
-  -webkit-transition: stroke 0.5s ease;
+  transition: stroke 0.3s ease;
+  -moz-transition: stroke 0.3s ease;
+  -o-transition: stroke 0.3s ease;
+  -webkit-transition: stroke 0.3s ease;
   stroke-width: 8;
   fill: none;
   stroke: black;
 }
 path.strip {
-  transition: stroke 0.5s ease;
-  -moz-transition: stroke 0.5s ease;
-  -o-transition: stroke 0.5s ease;
-  -webkit-transition: stroke 0.5s ease;
+  transition: stroke 0.3s ease;
+  -moz-transition: stroke 0.3s ease;
+  -o-transition: stroke 0.3s ease;
+  -webkit-transition: stroke 0.3s ease;
   stroke-width: 6;
   fill: none;
 }
@@ -166,10 +168,10 @@ line.edgehandle {
   stroke-width: 20;
 }
 circle.vertex {
-  transition: all 0.5s ease;
-  -moz-transition: all 0.5s ease;
-  -o-transition: all 0.5s ease;
-  -webkit-transition: all 0.5s ease;
+  transition: fill 0.5s ease;
+  -moz-transition: fill 0.5s ease;
+  -o-transition: fill 0.5s ease;
+  -webkit-transition: fill 0.5s ease;
   fill: #808080;
 }
 circle.vertex.actionable:hover {
@@ -198,10 +200,10 @@ path.cropOverlayPath {
   stroke-width: 5;
 }
 circle.patternHandle {
-  transition: all 0.5s ease;
-  -moz-transition: all 0.5s ease;
-  -o-transition: all 0.5s ease;
-  -webkit-transition: all 0.5s ease;
+  transition: fill 0.5s ease;
+  -moz-transition: fill 0.5s ease;
+  -o-transition: fill 0.5s ease;
+  -webkit-transition: fill 0.5s ease;
   fill: pink;
 }
 circle.patternHandle:hover,
@@ -349,6 +351,37 @@ li.done a {
   font-weight: 300;
 }
 
+.colorLabel {
+  cursor: pointer;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.colorLabel:hover {
+  font-weight: 700;
+}
+
+.strip-table-ul {
+  padding: 0px 28px;
+  margin-bottom: 0px;
+}
+
+.strip-table-li, .sortable-placeholder {
+  list-style: none;
+  cursor: pointer;
+  height: 23px;
+  width: 150px;
+}
+
+.sortable-placeholder {
+  background: silver;
+}
+
+.strip-table-li.hovered-li {
+  font-weight: 700;
+}
+
+
 .loading-overlay {
   pointer-events: none;
   position: absolute;
@@ -359,6 +392,9 @@ li.done a {
   z-index: 1040;
   background-color: #ffffff;
   transition: opacity 0.15s linear;
+  -moz-transition: opacity 0.15s linear;
+  -o-transition: opacity 0.15s linear;
+  -webkit-transition: opacity 0.15s linear;
   opacity: 0;
 }
 .loading-overlay.in {

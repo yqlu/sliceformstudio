@@ -126,7 +126,7 @@ var fo = tracePaletteContainer.append("foreignObject")
 	.append("div").classed("stripTablePadded", true);
 
 fo.append("h4")
-	.text("Strip generation");
+	.html("Strip generation <a href='#'><i class='fa fa-question-circle'></i></a>");
 
 var sidebarForm = fo
 	.append("form").classed("form-horizontal", true);
@@ -134,7 +134,7 @@ var sidebarForm = fo
 var noneSoFar = fo
 	.append("span")
 	.attr("id", "noneSoFar")
-	.text("You haven't assigned colors to any strips yet!");
+	.html("<i class='fa fa-exclamation-triangle'></i> You haven't assigned colors to any strips yet!");
 
 // set listeners on tile / strip view toggles
 var tileView = d3.select("#tileView")
@@ -422,25 +422,25 @@ var patternSlider2 = new Slider("#patternSlider2", {
 // set listener on strip view UI elements
 
 var stripColors = [
-	{hex: "#F44336", name: "Red" },
-	{hex: "#E91E63", name: "Pink"},
-	{hex: "#9c26b0", name: "Purple"},
-	{hex: "#673AB7", name: "Deep Purple"},
-	{hex: "#3F51B5", name: "Indigo"},
-	{hex: "#2196F3", name: "Blue"},
-	{hex: "#03A9F4", name: "Light Blue"},
-	{hex: "#00BCD4", name: "Cyan"},
-	{hex: "#009688", name: "Teal"},
-	{hex: "#4CAF50", name: "Green"},
-	{hex: "#8BC34A", name: "Light Green"},
-	{hex: "#CDDC39", name: "Lime"},
-	{hex: "#FFEB3B", name: "Yellow"},
-	{hex: "#FFC107", name: "Amber"},
-	{hex: "#FF9800", name: "Orange"},
-	{hex: "#FF5722", name: "Deep Orange"},
-	{hex: "#795548", name: "Brown"},
-	{hex: "#9E9E9E", name: "Grey"},
-	{hex: "#607D8B", name: "Blue Grey"}
+	{hex: "#F44336", name: "Red", id: "red"},
+	{hex: "#E91E63", name: "Pink", id: "pink"},
+	{hex: "#9c26b0", name: "Purple", id: "purple"},
+	{hex: "#673AB7", name: "Deep Purple", id: "dpurple"},
+	{hex: "#3F51B5", name: "Indigo", id: "indigo"},
+	{hex: "#2196F3", name: "Blue", id: "blue"},
+	{hex: "#03A9F4", name: "Light Blue", id: "lblue"},
+	{hex: "#00BCD4", name: "Cyan", id: "cyan"},
+	{hex: "#009688", name: "Teal", id: "teal"},
+	{hex: "#4CAF50", name: "Green", id: "green"},
+	{hex: "#8BC34A", name: "Light Green", id: "lgreen"},
+	{hex: "#CDDC39", name: "Lime", id: "lime"},
+	{hex: "#FFEB3B", name: "Yellow", id: "yellow"},
+	{hex: "#FFC107", name: "Amber", id: "amber"},
+	{hex: "#FF9800", name: "Orange", id: "orange"},
+	{hex: "#FF5722", name: "Deep Orange", id: "dorange"},
+	{hex: "#795548", name: "Brown", id: "brown"},
+	{hex: "#9E9E9E", name: "Grey", id: "grey"},
+	{hex: "#607D8B", name: "Blue Grey", id: "bgrey"}
 ];
 
 var colorMap = _.map(stripColors, function(c) {
@@ -645,7 +645,7 @@ $(document).ready(function() {
 	$("#autoSnap").bootstrapSwitch({
 		onInit: function() {
 			var label = d3.select(this.parentNode).select(".bootstrap-switch-label");
-			label.html(label.text() + " <a href='#' id='autoSnapHint'><i class='fa fa-question-circle'></a>");
+			label.html(label.text() + " <a href='#' id='autoSnapHint'><i class='fa fa-question-circle fa-lg'></a>");
 			d3.select("#autoSnapHint").on("click", function() {
 				bootbox.alert({
 					title: "Self joins",

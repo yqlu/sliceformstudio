@@ -309,6 +309,7 @@ var draw = function(container, inputlist, options) {
 	});
 
 	if (options.autoresizeSidebar) {
+
 		var newWidth = 0;
 		var scaleFactor = 1;
 
@@ -336,7 +337,7 @@ var draw = function(container, inputlist, options) {
 			var verticalOffset = this.parentNode.__data__.transform;
 			var fo = assemblePaletteButtons.append("g")
 				.each(function(d) {
-					d.transform = _.cloneDeep(verticalOffset);
+					d.transform = num.translate(0, num.getTranslation(verticalOffset)[1]);
 					d.transform[1][2] = d.transform[1][2] * scaleFactor;
 				})
 				.attr("transform", num.getTransform)
@@ -348,8 +349,9 @@ var draw = function(container, inputlist, options) {
 				.append("xhtml:body")
 				.attr("xmlns", "http://www.w3.org/1999/xhtml")
 				.append("a")
-				.classed("btn btn-primary icon-btn", true)
-				.html("&#xf013;");
+				.classed("btn btn-primary icon-btn", true);
+
+			innerBtn.append("i").classed("fa fa-edit", true);
 
 			innerBtn.on("click", editSpecificPattern(this.parentNode.__data__.tiles));
 
@@ -424,7 +426,7 @@ var spaceOut = function(polygons, options) {
 var createGroups = function(polygons) {
 	return _.map(polygons, function(poly, index) {
 		return {tiles: [poly],
-			transform: num.translate(poly.dimensions.cumWidth, poly.dimensions.cumHeight)
+			transform: num.translate(0, poly.dimensions.cumHeight)
 		};
 	});
 };

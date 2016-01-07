@@ -490,8 +490,19 @@ var groupPattern = function(patternData, strictMode) {
 		d3.selectAll([overStrip, underStrip]).classed("hover", false);
 	})
 	.on("click", function() {
-		assignStripColor([overStrip, underStrip], strip, $("#colorpicker").val());
+		var selectedColor = $("#colorpicker").val();
+		assignStripColor([overStrip, underStrip], strip, selectedColor, _.pluck(traced.patternList, "pattern"));
 		updateStripTable();
+	});
+
+	_.each(_.pluck(traced.patternList, "pattern"), function(p) {
+		p.assembleCounterpart.assignStripColor = function(color) {
+			assignStripColor([overStrip, underStrip], strip, color, _.pluck(traced.patternList, "pattern"));
+			updateStripTable();
+		};
+		p.assembleCounterpart.isStripAssigned = function() {
+			return d3.select(overStrip).attr("assignedColor");
+		};
 	});
 
 	underStrip.__data__ = {};
@@ -618,9 +629,8 @@ var generateCustomStrip = function() {
 };
 
 // assign color to relevant strip
-var assignStripColor = function(nodes, strip, color) {
-
-	d3.selectAll(nodes).style("stroke", color);
+var assignStripColor = function(nodes, strip, color, patternList) {
+	d3.selectAll(nodes).style("stroke", color).attr("assignedColor", true);
 
 	_.each(colorMap, function(c) {
 		if (c.color.hex !== color) {
@@ -631,6 +641,7 @@ var assignStripColor = function(nodes, strip, color) {
 			c.strips.push({
 				lengths: strip,
 				nodes: nodes,
+				patternList: patternList
 			});
 			_.each(nodes, function(n) {
 				n.__data__.colorMapPtr = _.last(c.strips);

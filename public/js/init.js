@@ -443,6 +443,13 @@ var stripColors = [
 	{hex: "#607D8B", name: "Blue Grey"}
 ];
 
+var colorMap = _.map(stripColors, function(c) {
+	return {
+		color: c,
+		strips: []
+	};
+});
+
 d3.select("#colorpicker").selectAll("option")
 .data(stripColors)
 .enter()

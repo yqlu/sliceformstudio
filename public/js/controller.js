@@ -628,32 +628,6 @@ var extensionSliderChange = function() {
 	d3.selectAll(".strip.strip-below").each(function(d) {
 		d.updateExtension(extensionSlider.getValue());
 	});
-
-
-	// // should find way to optimize
-	// traceCanvas.selectAll("path").remove();
-	// var clone = _.cloneDeep(polylist, deepCustomizer(false));
-	// _.each(clone, function(group) {
-	// 	_.each(group.tiles, function(tile) {
-	// 		circularize(tile);
-	// 		generatePatternInterface(tile);
-	// 		if ($("#cropMode").prop("checked") && cropData.hull.length >= 3) {
-	// 			cropPattern(tile, group);
-	// 		}
-	// 	});
-	// });
-	// resetAndDraw(traceCanvas, clone, tracePatternOptions);
-
-	// colorMap = _.map(stripColors, function(c) {
-	// 	return {
-	// 		color: c,
-	// 		strips: []
-	// 	};
-	// });
-	// d3.select("#noneSoFar").style("display", "block");
-	// sidebarForm.selectAll("div").remove();
-
-	// redrawCanvas();
 };
 
 // toggle visibility of edges and vertices
@@ -788,12 +762,21 @@ var stripViewClick = function() {
 	if (!stripView.classed("active")) {
 		setupOverlay();
 
+		d3.selectAll("path.pattern")
+		.each(function(d) {
+			delete d.isStripAssigned;
+			delete d.assignStripColor;
+		});
+
 		traceCanvas.selectAll("path").remove();
 		var clone = _.cloneDeep(polylist, deepCustomizer(false));
-		_.each(clone, function(group) {
-			_.each(group.tiles, function(tile) {
+		_.each(clone, function(group, groupIdx) {
+			_.each(group.tiles, function(tile, tileIdx) {
 				circularize(tile);
 				generatePatternInterface(tile);
+				_.each(tile.patterns, function(pattern, patternIdx) {
+					pattern.assembleCounterpart = polylist[groupIdx].tiles[tileIdx].patterns[patternIdx];
+				});
 				if ($("#cropMode").prop("checked") && cropData.hull.length >= 3) {
 					cropPattern(tile, group);
 				}
@@ -805,12 +788,16 @@ var stripViewClick = function() {
 			d.transform = assembleCanvas.datum().transform;
 		})
 		.attr("transform", num.getTransform);
+
+		oldColorMap = colorMap;
+
 		colorMap = _.map(stripColors, function(c) {
 			return {
 				color: c,
 				strips: []
 			};
 		});
+
 		d3.select("#noneSoFar").style("display", "block");
 		sidebarForm.selectAll("div").remove();
 
@@ -821,6 +808,16 @@ var stripViewClick = function() {
 		d3.select("#traceTab").classed("active", true).classed("hidden", false);
 
 		redrawCanvas();
+
+		_.each(oldColorMap, function(c) {
+			_.each(c.strips, function(s) {
+				_.each(s.patternList, function(p) {
+					if (p.assembleCounterpart.isStripAssigned && !p.assembleCounterpart.isStripAssigned()) {
+						p.assembleCounterpart.assignStripColor(c.color.hex);
+					}
+				});
+			});
+		});
 
 		var noStripsOnCanvas = d3.select("#traceSvg").selectAll(".strip")[0].length === 0;
 		d3.select("#traceSvg").select(".shadedOverlay").style("visibility",

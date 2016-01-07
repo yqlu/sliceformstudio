@@ -155,6 +155,17 @@ var loadFromJson = function(loaded) {
 		assembleSVGDrawer.set(palette);
 		assembleSVGDrawer.draw();
 
+		if (loaded.colorMap) {
+			colorMap = loaded.colorMap;
+			_.each(colorMap, function(c) {
+				_.each(c.strips, function(s) {
+					s.patternList = _.map(s.patternList, function(p) {
+						return {assembleCounterpart: polylist[p[0]].tiles[p[1]].patterns[p[2]]};
+					});
+				});
+			});
+		}
+
 		if (loaded.stripViewParams) {
 			var p = loaded.stripViewParams;
 
@@ -203,6 +214,36 @@ var loadFromJson = function(loaded) {
 	}
 };
 
+var generateAbridgedColorMap = function() {
+	_.each(polylist, function(gp, gpIdx) {
+		_.each(gp.tiles, function(tile, tileIdx) {
+			_.each(tile.patterns, function(pattern, patternIdx) {
+				pattern.uniqId = [gpIdx, tileIdx, patternIdx];
+			});
+		});
+	});
+
+	var colorMapCopy = _.map(colorMap, function(c) {
+		return {
+			color: c.color,
+			strips: _.map(c.strips, function(s) {
+			return {patternList: _.map(s.patternList, function(p) {
+				return p.assembleCounterpart.uniqId;})};
+			})
+		};
+	});
+
+	_.each(polylist, function(gp, gpIdx) {
+		_.each(gp.tiles, function(tile, tileIdx) {
+			_.each(tile.patterns, function(pattern, patternIdx) {
+				delete pattern.uniqId;
+			});
+		});
+	});
+
+	return colorMapCopy;
+};
+
 var saveToFileWithTitle = function(title) {
 
 	var reducedPolylist = _.map(polylist, function(gp) {
@@ -220,6 +261,8 @@ var saveToFileWithTitle = function(title) {
 		return reduceCircularity(tile);
 	});
 
+	var abridgedColorMap = generateAbridgedColorMap();
+
 	var cropVertices = _.map(cropData.vertices, function(v) { return _.pick(v, _.isNumber); });
 
 	var saveFile = {
@@ -229,6 +272,7 @@ var saveToFileWithTitle = function(title) {
 			vertices: cropVertices,
 			cropMode: $("#cropMode").prop("checked")
 		},
+		colorMap: abridgedColorMap,
 		canvasTransform: assembleCanvas.node().__data__.transform,
 		version: wallpaperVersion,
 		stripViewParams: {

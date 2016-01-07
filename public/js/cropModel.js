@@ -207,7 +207,8 @@ var cropPattern = function(tile, parentGroup) {
 			var patterns = curInRegion ? [{
 				start: p.start,
 				end: null,
-				internalVertices: []
+				internalVertices: [],
+				assembleCounterpart: p.assembleCounterpart
 			}] : [];
 
 			for (var ctr = 1; ctr < p.allVertices.length; ctr ++) {
@@ -293,7 +294,8 @@ var cropPattern = function(tile, parentGroup) {
 							patterns.push({
 								start: start,
 								end: end,
-								internalVertices: internalVertices
+								internalVertices: internalVertices,
+								assembleCounterpart: p.assembleCounterpart
 							});
 						}
 						curInRegion = true;
@@ -337,7 +339,8 @@ var cropPattern = function(tile, parentGroup) {
 							patterns.push({
 								start: start,
 								end: end,
-								internalVertices: []
+								internalVertices: [],
+								assembleCounterpart: p.assembleCounterpart
 							});
 						}
 					}

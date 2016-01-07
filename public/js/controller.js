@@ -731,6 +731,12 @@ var tileViewClick = function() {
 		})
 		.attr("transform", num.getTransform);
 
+		assembleCropCanvas
+		.each(function(d, i) {
+			d.transform = assembleCanvas.datum().transform;
+		})
+		.attr("transform", num.getTransform);
+
 		tileView.classed("active", true);
 		stripView.classed("active", false);
 

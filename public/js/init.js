@@ -619,10 +619,28 @@ $(document).ready(function() {
 		stylesheet.insertRule("path.strip.hover { stroke: " + $("#colorpicker").val() + " !important }", 0);
 	});
 
+    var openTime = new Date().getTime();
+
 	$("#patternDropdown").select2({
 		minimumResultsForSearch: Infinity
 	})
-	.on("change", patternDropdownChange);
+	.on("change", patternDropdownChange)
+	// hack to prevent weird auto-behavior of select2
+	.on("select2:open", function() {
+		openTime = new Date().getTime();
+	}).on("select2:closing", function(e) {
+		var tempCounter = new Date().getTime();
+		if (openTime > tempCounter - 1000) {
+			e.preventDefault();
+			return;
+		}
+	}).on("select2:selecting", function(e) {
+		var tempCounter = new Date().getTime();
+		if (openTime > tempCounter - 1000) {
+			e.preventDefault();
+			return;
+		}
+	});
 
 	$("#autoSnap").bootstrapSwitch();
 

@@ -299,8 +299,8 @@ patternDropdown.selectAll("option").data(patternOptions).enter()
 
 // set listeners on custom shape UI elements
 
-var shapeEditToggleButton = d3.select("#shapeEditToggle")
-	.on("click", shapeEditToggle);
+$("#shapeEditToggle").bootstrapSwitch()
+.on('switchChange.bootstrapSwitch', shapeEditToggle);
 
 var addToLineupButton = d3.select("#addToLineup")
 	.on("click", addToLineupClick);
@@ -578,7 +578,7 @@ var thicknessSlider = new Slider("#thickness", {
 	min: 0,
 	max: 10,
 	step: 0.1,
-	value: 3,
+	value: 5,
 	formatter: function(value) {
 		return value + ' px';
 	}
@@ -590,16 +590,16 @@ var extensionSlider = new Slider("#extensionLength", {
 	step: 0.01,
 	value: 0.15,
 	formatter: function(value) {
-		var pixels = value * widthFactor.getValue(); //parseFloat($("#widthFactor").val());
+		var pixels = value * widthFactor.getValue();
 		var mm = Math.round(pixels / config.pixelToMm * 10) / 10;
 		return mm + ' mm';
 	}
 }).on("change", extensionSliderChange);
 
-var outlineToggle = d3.select("#outlineToggle")
-.on("click", function() {
+$("#outlineToggle").bootstrapSwitch()
+.on('switchChange.bootstrapSwitch', function() {
 	d3.selectAll("path.strip-outline")
-	.attr("visibility", outlineToggle.classed("active") ? "hidden" : "visible");
+	.attr("visibility", $("#outlineToggle").prop("checked") ? "visible" : "hidden");
 });
 
 $(".collapse").collapse({toggle: true});

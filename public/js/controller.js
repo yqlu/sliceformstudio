@@ -633,7 +633,7 @@ var extensionSliderChange = function() {
 // toggle visibility of edges and vertices
 var shapeEditToggle = function() {
 	var s =	d3.select(shapeEditSVGDrawer.getTile().this).selectAll(".label")
-	.attr("visibility", shapeEditToggleButton.classed("active") ? "hidden" : "visible");
+	.attr("visibility", $("#shapeEditToggle").prop("checked") ? "visible" : "hidden");
 };
 
 var cropModeToggle = function(e, state) {

@@ -95,17 +95,32 @@ var patternUnidirectionalTrace = function(patternData, nextEdge) {
 					selfPatternObject.intersect = false;
 					bouncePattern.intersect = false;
 
+					// note that all instances of a tile share a reference to the same pattern object initially
+					// when patterns are bounced, we need to mutate instances of the pattern
+					// _.cloneDeep has poor performance, so here we shallow clone enough to change the necessary fields
 					if (currPattern.start.edge.this === nextEdge.this) {
+						currPattern.start = _.clone(currPattern.start);
+						currPattern.intersectedVertices = _.clone(currPattern.intersectedVertices);
+						currPattern.intersectedVertices[0] = _.clone(currPattern.intersectedVertices[0]);
 						currPattern.start.intersect = false;
 						currPattern.intersectedVertices[0].intersect = false;
 					} else {
+						currPattern.end = _.clone(currPattern.end);
+						currPattern.intersectedVertices = _.clone(currPattern.intersectedVertices);
+						currPattern.intersectedVertices[currPattern.intersectedVertices.length - 1] = _.clone(currPattern.intersectedVertices[currPattern.intersectedVertices.length - 1]);
 						currPattern.end.intersect = false;
 						_.last(currPattern.intersectedVertices).intersect = false;
 					}
 					if (bouncePattern.pattern.start.edge.this === nextEdge.this) {
+						bouncePattern.pattern.start = _.clone(bouncePattern.pattern.start);
+						bouncePattern.pattern.intersectedVertices = _.clone(bouncePattern.pattern.intersectedVertices);
+						bouncePattern.pattern.intersectedVertices[0] = _.clone(bouncePattern.pattern.intersectedVertices[0]);
 						bouncePattern.pattern.start.intersect = false;
 						bouncePattern.pattern.intersectedVertices[0].intersect = false;
 					} else {
+						bouncePattern.pattern.end = _.clone(bouncePattern.pattern.end);
+						bouncePattern.pattern.intersectedVertices = _.clone(bouncePattern.pattern.intersectedVertices);
+						bouncePattern.pattern.intersectedVertices[bouncePattern.pattern.intersectedVertices.length - 1] = _.clone(bouncePattern.pattern.intersectedVertices[bouncePattern.pattern.intersectedVertices.length - 1]);
 						bouncePattern.pattern.end.intersect = false;
 						_.last(bouncePattern.pattern.intersectedVertices).intersect = false;
 					}
@@ -416,7 +431,7 @@ var groupPattern = function(patternData, strictMode) {
 					return approxEq(p1.x, p2.x) && approxEq(p1.y, p2.y);
 				});
 			})) {
-				console.debug(overPoints, underPoints, traced);
+				console.debug(overPoints, underPoints, traced, reducedSegments[0]);
 				var msg = "Error: unable to find consistent assignment of over and under.";
 				bootbox.alert(msg);
 				throw msg;

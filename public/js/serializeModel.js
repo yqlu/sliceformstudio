@@ -177,9 +177,7 @@ var loadFromJson = function(loaded) {
 			p.printHeight ? printHeight.setValue(p.printHeight) : null;
 			p.printWidth ? printWidth.setValue(p.printWidth) : null;
 			if (typeof p.outline !== "undefined") {
-				outlineToggle.classed("active", p.outline);
-				outlineToggle.on("click")();
-				outlineToggle.on("click")();
+				$("#outlineToggle").bootstrapSwitch('state', p.outline);
 			}
 		}
 
@@ -278,7 +276,7 @@ var saveToFileWithTitle = function(title) {
 		stripViewParams: {
 			thickness: thicknessSlider.getValue(),
 			extension: extensionSlider.getValue(),
-			outline: outlineToggle.classed("active"),
+			outline: $("#outlineToggle").prop("checked"),
 			stripHeight: stripHeight.getValue(),
 			widthFactor: widthFactor.getValue(),
 			interSpacing: interSpacing.getValue(),
@@ -301,7 +299,7 @@ var saveToFileWithTitle = function(title) {
 
 var getUrlVars = function() {
     var vars = [], hash;
-    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split(/[&#]/);
     for(var i = 0; i < hashes.length; i++)
     {
         hash = hashes[i].split('=');

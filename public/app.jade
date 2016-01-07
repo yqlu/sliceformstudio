@@ -73,12 +73,12 @@
 						label.control-label.col-md-2 Strip width
 						.col-md-4
 							input#thickness(type='text')
-						a#outlineToggle.btn.btn-default.active(data-toggle='button') Toggle outline
-						a#advancedOptions.btn.btn-default Advanced options
 					.form-group
 						label.control-label.col-md-2 Extension length
 						.col-md-4
 							input#extensionLength(type='text')
+						a#advancedOptions.btn.btn-primary #[i.fa.fa-cog] Advanced options
+
 		#customStripPanel.toolbar
 			.panel.panel-default
 				.panel-heading
@@ -145,7 +145,7 @@
 										input#sideLength(type='text')
 								.form-group
 									.col-md-offset-4.col-md-8
-										a#shapeEditToggle.btn.btn-default.active(data-toggle='button') Toggle display
+										input#shapeEditToggle(type="checkbox", checked="true", data-label-text="Display labels", data-label-width=110)
 								p
 									| You can customize the polygon on the right by dragging on the vertices before clicking "Add to lineup".
 						.col-md-5

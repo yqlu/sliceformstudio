@@ -10,14 +10,6 @@ p {
     line-height: 1.5;
 }
 
-@media(min-width:768px) {
-    p {
-        margin: 0 0 35px;
-        font-size: 20px;
-        line-height: 1.6;
-    }
-}
-
 h1, h2, h3, h4, h5, h6 {
     margin: 0 0 35px;
 }
@@ -26,7 +18,6 @@ h1, h2, h3, h4, h5, h6 {
     display: table;
     width: 100%;
     height: auto;
-    padding: 200px 0;
     text-align: center;
     background: url(../images/index/bg.png) no-repeat center bottom scroll;
     -webkit-background-size: cover;
@@ -42,50 +33,52 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .intro .intro-body .brand-heading {
-    font-size: 40px;
+    font-size: 70px;
+    margin: 220px 0 0;
 }
 
 .intro .intro-body .intro-text {
-    font-size: 18px;
+    font-size: 24px;
+    margin-top: 30px;
 }
 
-@media(min-width:768px) {
-    .intro {
-        height: 100%;
-        padding: 0;
+.intro .intro-body .intro-cta {
+    margin: 35px 0 130px;
+}
+
+@media(max-width: 767px) {
+    .intro .intro-body .intro-text {
+        font-size: 18px;
     }
 
     .intro .intro-body .brand-heading {
-        font-size: 100px;
-    }
-
-    .intro .intro-body .intro-text {
-        font-size: 26px;
+        font-size: 46px;
+        margin-top: 160px;
     }
 }
 
+.btn.impact {
+    border-radius: 0;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 20px;
+    background: white;
+}
+
+h4.valign {
+    margin-top: 17px;
+    margin-bottom: 17px;
+}
+
 .content-section {
-    margin-top: 50px;
-    margin-bottom: 50px;
     padding-top: 100px;
     padding-bottom: 100px;
 }
 
-.defn-section {
-    width: 100%;
-    padding: 50px 0;
-    color: @fontcolor;
-    background: url(../images/index/ramp.png) no-repeat center center scroll;
-    background-color: @bgcolor;
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    background-size: cover;
-    -o-background-size: cover;
-}
-
 .try-section {
     width: 100%;
-    padding: 50px 0;
+    padding: 100px 0;
     color: @fontcolor;
     background: url(../images/index/planetarium.png) no-repeat left center scroll;
     background-color: @bgcolor;
@@ -94,17 +87,6 @@ h1, h2, h3, h4, h5, h6 {
     background-size: cover;
     -o-background-size: cover;
     background-attachment: fixed;
-}
-
-.side-graphic {
-    width: 100%;
-    color: @fontcolor;
-    background-color: @bgcolor;
-    -webkit-background-size: contain;
-    -moz-background-size: contain;
-    background-size: contain;
-    -o-background-size: contain;
-
 }
 
 .tiles {
@@ -131,16 +113,6 @@ h1, h2, h3, h4, h5, h6 {
     padding-bottom: 30px;
     background-color: rgba(255, 255, 255, 0.9);
 }
-
-@media(min-width:767px) {
-    .content-section {
-        margin-top: 50px;
-        margin-bottom: 50px;
-        padding-top: 100px;
-        padding-bottom: 100px;
-    }
-}
-
 
 [class*="bg__"] {
   height: 50vh;

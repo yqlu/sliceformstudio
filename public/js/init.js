@@ -256,7 +256,7 @@ var tileOptions = {
 var generateHtml = function(container) {
 	return function(opt) {
 		var col = d3.select(container).append("div")
-			.classed("col-md-4 padded-col", true);
+			.classed("col-sm-4 padded-col", true);
 		col.append("div").classed("image-frame", true)
 			.append("img")
 			.attr("src", "images/starter/" + opt.file + ".png")

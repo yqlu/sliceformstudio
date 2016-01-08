@@ -17,42 +17,40 @@ nav.navbar.navbar-custom.navbar-fixed-top(role='navigation')
 header.intro
   .intro-body
     .container
-      .row
-        .col-md-8.col-md-offset-2
-          h1.brand-heading Sliceform Studio
-          p.intro-text.heavy
-            | Design and create your own paper strip sliceforms.
+      h1.brand-heading Sliceform Studio
+      p.intro-text.heavy
+        | Design and create your own paper strip sliceforms.
+      a.intro-cta.impact.btn.btn-default.btn-lg(href="/app.html")
+        | Get started
 section.content-section.text-center
-  .row
-    .col-lg-6.col-lg-offset-3
-      h2 Paper Strip Sliceforms:
-      p.heavy
-          | An art form where long strips of paper are cut, folded, and slotted together to create shapes inspired by Islamic geometry
+  .container
+    .row
+      .col-sm-6.col-md-3
+        img(src="/images/index/step1.png", style="height: 200px; width: 200px;")
+        h4.valign Choose a base tiling
+        p Select your set of tiles from over fifteen presets.
+      .col-sm-6.col-md-3
+        img(src="/images/index/step2.png", style="height: 200px; width: 200px;")
+        h4.valign Inscribe patterns
+        p Generate common motifs for each tile, or design your own.
+      .col-sm-6.col-md-3
+        img(src="/images/index/step3.png", style="height: 200px; width: 200px;")
+        h4.valign Assign colors to strips
+        p Automatically convert your tiles to a set of strips and add some color.
+      .col-sm-6.col-md-3
+        img(src="/images/index/step4.png", style="height: 200px; width: 200px;")
+        h4.valign Export your design
+        p Save your creation as an image. Generate strip templates for easy paper assembly.
 .bg__1
-section.container.side-graphic.tiles.content-section.text-center
+section#contact.container.content-section.text-center
   .row
-    .col-lg-7.col-lg-offset-5.translucent
-      h2 Define the underlying geometry.
+    .col-lg-8.col-lg-offset-2
+      h2 About
       p
-        | Select your set of tiles from over fifteen presets, or specify your own custom tiles. Use a drag-and-drop interface to snap tiles together to create a tiling.
-section.container.side-graphic.patterns.content-section.text-center
-  .row
-    .col-lg-7.translucent
-      h2 Inscribe patterns within each tile.
-      p
-        | Easily generate Islamic motifs like stars and rosettes, or infer a tile's pattern from surrounding constraints. Customize your own patterns by dragging pattern handles around.
-section.container.side-graphic.strip.content-section.text-center
-  .row
-    .col-lg-7.col-lg-offset-5.translucent
-      h2 Trace out strips and assign colors.
-      p
-        | Sliceform Studio automatically traces patterns through tiles to create intricately interlocking strips. Assign colors to each strip to create your own design.
-section.container.side-graphic.strips.content-section.text-center
-  .row
-    .col-lg-7.translucent
-      h2 Assemble paper strips... or not.
-      p
-        | Download the corresponding SVG files and cut them out to get paper strips ready for assembly. Or just use Sliceform Studio as a tool to generate and export digital designs. It's up to you!
+      :markdown
+        Sliceform Studio was built and is maintained by Yongquan ‘YQ’ Lu at [MIT CSAIL](https://www.csail.mit.edu/) under the guidance of [Erik Demaine](http://erikdemaine.org/). The theory behind the application is discussed in [the 2015 Bridges Proceedings](http://archive.bridgesmathart.org/2015/bridges2015-367.html) and [the Journal of Symmetry](http://erikdemaine.org/papers/Sliceform_Symmetry/).
+
+        These sliceform techniques were first developed by artists such as [Chris Palmer and Jeff Rutzky](https://www.youtube.com/watch?v=2TNUxWVgZTs), and have since been popularized by others such as [Christiane Bettens](https://www.flickr.com/photos/melisande-origami/sets/72157613125224450). The concept of the pattern editor is heavily influenced by [Craig Kaplan](http://www.cgl.uwaterloo.ca/~csk/)'s work on [Taprats](http://www.cgl.uwaterloo.ca/~csk/washington/taprats).
 section#try.text-center
   .try-section
     .container
@@ -61,16 +59,4 @@ section#try.text-center
         h4 Sliceform Studio is open source and available free of charge.
         .row
           .col-lg-6(style="text-align:center;")
-            a.btn.impact.btn-default.btn-lg(href='app.html') Jump right in
-          .col-lg-6(style="text-align:center;")
-            a.btn.impact.btn-default.btn-lg(href='tutorial.html') Try the tutorial
-// Contact Section
-section#contact.container.content-section.text-center
-  .row
-    .col-lg-8.col-lg-offset-2
-      h2 About
-      p
-      :markdown
-        Sliceform Studio was built by Yongquan ‘YQ’ Lu at [MIT CSAIL](https://www.csail.mit.edu/) under the guidance of [Erik Demaine](http://erikdemaine.org/). The theory behind the application is discussed in [the 2015 Bridges Proceedings](http://archive.bridgesmathart.org/2015/bridges2015-367.html) and [the Journal of Symmetry](http://erikdemaine.org/papers/Sliceform_Symmetry/).
-
-        These sliceform techniques were first developed by artists such as [Chris Palmer and Jeff Rutzky](https://www.youtube.com/watch?v=2TNUxWVgZTs), and have since been popularized by others such as [Christiane Bettens](https://www.flickr.com/photos/melisande-origami/sets/72157613125224450). The concept of the pattern editor is heavily influenced by [Craig Kaplan](http://www.cgl.uwaterloo.ca/~csk/)'s work on [Taprats](http://www.cgl.uwaterloo.ca/~csk/washington/taprats).
+            a.btn.impact.btn-default.btn-lg(href='app.html') Get started

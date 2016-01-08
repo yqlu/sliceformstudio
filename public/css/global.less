@@ -53,9 +53,16 @@ footer{
 
 h1, h2, h3, h4, h5, h6 {
     text-transform: uppercase;
-    font-family: Montserrat,"Helvetica Neue",Helvetica,Arial,sans-serif;
-    font-weight: 700;
+    font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
     letter-spacing: 1px;
+}
+
+h1, h2, h3 {
+    font-weight: 800;
+}
+
+h4, h5, h6 {
+    font-weight: 700;
 }
 
 a {
@@ -86,7 +93,7 @@ a:focus {
     margin-bottom: 0;
     border-bottom: 4px solid @bordercolor;
     text-transform: uppercase;
-    font-family: Montserrat,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
     background-color: @bgcolor;
 }
 
@@ -98,14 +105,14 @@ a:focus {
     outline: 0;
 }
 
-.navbar-custom .navbar-brand .navbar-toggle {
+.navbar-custom .navbar-header .navbar-toggle {
     padding: 4px 6px;
     font-size: 16px;
     color: @fontcolor;
 }
 
-.navbar-custom .navbar-brand .navbar-toggle:focus,
-.navbar-custom .navbar-brand .navbar-toggle:active {
+.navbar-custom .navbar-header .navbar-toggle:focus,
+.navbar-custom .navbar-header .navbar-toggle:active {
     outline: 0;
 }
 
@@ -155,16 +162,6 @@ a:focus {
         border-bottom: 4px solid rgba(0,0,0,0.5);
         background: @bgcolor;
     }
-}
-
-.btn.impact {
-    border-radius: 0;
-    text-transform: uppercase;
-    font-family: Montserrat,"Helvetica Neue",Helvetica,Arial,sans-serif;
-    font-weight: 400;
-    -webkit-transition: background-color .3s ease-in-out;
-    -moz-transition: background-color .3s ease-in-out;
-    transition: background-color .3s ease-in-out;
 }
 
 .btn-default:hover,

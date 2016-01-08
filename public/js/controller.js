@@ -926,7 +926,7 @@ var saveToFile = function() {
 
 	bootbox.prompt({
 		title: "Save design as:",
-		value: "newfile.wlpr",
+		value: "newfile.slfm",
 		callback: function(result) {
 			if (result !== null) {
 				saveToFileWithTitle(result);

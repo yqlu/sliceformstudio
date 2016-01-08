@@ -5,13 +5,13 @@
 			li
 				figure.centered
 					.thumb
-						a(href="/images/gallery/#{image.filename}", data-lightbox="moo", data-title="#{image.title} (#{image.year})")
-							img(src="/images/gallery/thumbs/#{image.filename}")
+						a(href="/images/gallery/#{image.filename}", data-title="#{image.title} (#{image.year})")
+							img(src="/images/gallery/thumbs/#{image.filename}", alt="#{image.title}")
 							.overlay
 					figcaption
 						label #{image.title} (#{image.year})
 						.subcaption #{image.description}
 						.subcaption(style="height: 19px;")
-							if image.wlpr
-								a(href="/app.html?template=#{image.wlpr}") Try this out
+							if image.slfm
+								a(href="/app.html?template=#{image.slfm}&strips=true") View in app
 script(src='bower/lightbox2/dist/js/lightbox.js')

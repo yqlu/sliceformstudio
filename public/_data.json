@@ -33,31 +33,31 @@
 			"title": "Brimstone",
 			"year": 2015,
 			"description": "12-gons and triangles",
-			"wlpr": "brimstone"
+			"slfm": "brimstone"
 		}, {
 			"filename": "constellation.jpg",
 			"title": "Constellation I",
 			"year": 2013,
 			"description": "12-gons and 9-gons",
-			"wlpr": "constellation_i"
+			"slfm": "constellation_i"
 		}, {
 			"filename": "constellation2.jpg",
 			"title": "Constellation II",
 			"year": 2014,
 			"description": "12-gons, hexagons and squares",
-			"wlpr": "constellation_ii"
+			"slfm": "constellation_ii"
 		}, {
 			"filename": "Dendrite.png",
 			"title": "Dendrite",
 			"year": 2015,
 			"description": "Girih tiles",
-			"wlpr": "dendrite"
+			"slfm": "dendrite"
 		}, {
 			"filename": "festival.png",
 			"title": "Festival",
 			"year": 2010,
 			"description": "12-gons and octagons",
-			"wlpr": "festival"
+			"slfm": "festival"
 		}, {
 			"filename": "foliage.png",
 			"title": "Foliage",
@@ -68,7 +68,7 @@
 			"title": "Garden",
 			"year": 2010,
 			"description": "12-gons and 9-gons",
-			"wlpr": "garden"
+			"slfm": "garden"
 		}, {
 			"filename": "girih.jpg",
 			"title": "Girih I",
@@ -79,7 +79,7 @@
 			"title": "Girih II",
 			"year": 2015,
 			"description": "Girih tiles",
-			"wlpr": "girih2"
+			"slfm": "girih_ii"
 		}, {
 			"filename": "iridescence.jpg",
 			"title": "Iridescence",
@@ -90,7 +90,7 @@
 			"title": "Pentille",
 			"year": 2015,
 			"description": "Hexagons and triangles",
-			"wlpr": "pentille"
+			"slfm": "pentille"
 		}, {
 			"filename": "pleiades.png",
 			"title": "Pleiades",
@@ -111,7 +111,7 @@
 			"title": "Rampart",
 			"year": 2015,
 			"description": "12-gons and triangles",
-			"wlpr": "rampart"
+			"slfm": "rampart"
 		}, {
 			"filename": "sunflowerx.png",
 			"title": "Sunflower",
@@ -127,13 +127,13 @@
 			"title": "Undergrowth",
 			"year": 2015,
 			"description": "12-gons, hexagons and squares",
-			"wlpr": "undergrowth"
+			"slfm": "undergrowth"
 		}, {
 			"filename": "vineyard.png",
 			"title": "Vineyard",
 			"year": 2015,
 			"description": "12-gons and 9-gons",
-			"wlpr": "vineyard"
+			"slfm": "vineyard"
 		}]
 	}
 }

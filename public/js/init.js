@@ -265,8 +265,10 @@ var generateHtml = function(container) {
 			.attr("href", "#")
 			.on("click", function() {
 				$("#newModal").modal("hide");
-				$.getJSON("/images/starter/" + opt.file + ".wlpr")
-				.done(loadFromJson)
+				$.getJSON("/slfm_files/starter/" + opt.file + ".slfm")
+				.done(function(data) {
+					loadFromJson(data, function() {});
+				})
 				.error(function() {
 					bootbox.alert("Error: " + params.template + " is not a valid template.");
 					d3.select(".loading-overlay").classed("in", false);
@@ -282,6 +284,8 @@ $("#customTile").click(function() {
 	$("#newModal").modal("hide");
 	assembleSVGDrawer.set([]);
 	assembleSVGDrawer.draw();
+	polylist = [];
+	assembleCanvas.selectAll("g").remove();
 });
 
 assembleSVGDrawer.set([]);
@@ -689,8 +693,14 @@ $(document).ready(function() {
 		if (params.template) {
 			if (params.template.search(/^\w+$/) >= 0) {
 				d3.select(".loading-overlay").classed("in", true);
-				$.getJSON("/images/gallery/wlpr_files/" + params.template + ".wlpr")
-				.done(loadFromJson)
+				$.getJSON("/slfm_files/gallery/" + params.template + ".slfm")
+				.done(function(data) {
+					loadFromJson(data, function() {
+						if (params.strips) {
+							stripViewClick();
+						}
+					});
+				})
 				.error(function() {
 					bootbox.alert("Error: " + params.template + " is not a valid template.");
 					d3.select(".loading-overlay").classed("in", false);

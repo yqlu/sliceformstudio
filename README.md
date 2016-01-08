@@ -1,12 +1,12 @@
-# Wallpaper
+# Sliceform Studio
 
-My name is Yongquan Lu ("YQ" to most people) and I am a paper artist currently studying mathematics and computer science at MIT. Wallpaper is a system I built with my advisor [Erik Demaine](http://erikdemaine.org) at [CSAIL](http://csail.mit.edu) to simplify the process of creating and designing sliceform paper artwork, an artform where long strips of paper are cut, folded, and slotted together to form geometric configurations.
+My name is Yongquan Lu ("YQ" to most people) and I am a paper artist currently studying mathematics and computer science at MIT. Sliceform Studio (formerly Wallpaper) is a system I built with my advisor [Erik Demaine](http://erikdemaine.org) at [CSAIL](http://csail.mit.edu) to simplify the process of creating and designing sliceform paper artwork, an artform where long strips of paper are cut, folded, and slotted together to form geometric configurations.
 
-The app is currently hosted at [http://wallpaperstudio.co](http://wallpaperstudio.co). The source code is available on [Github](http://github.com/yqlu/wallpaper).
+The source code is available on [Github](http://github.com/yqlu/sliceformstudio).
 
 ### The Theory
 
-For more information about the theory behind the application, please refer to [the 2015 Bridges Proceedings](http://archive.bridgesmathart.org/2015/bridges2015-367.html) or [the upcoming paper in the Journal of Symmetry](http://erikdemaine.org/papers/Sliceform_Symmetry/).
+For more information about the theory behind the application, please refer to [the 2015 Bridges Proceedings](http://archive.bridgesmathart.org/2015/bridges2015-367.html) or [the paper in the Journal of Symmetry](http://erikdemaine.org/papers/Sliceform_Symmetry/).
 
 ### Attributions
 
@@ -36,17 +36,15 @@ harp server
 
 The app should now be running on localhost:9000.
 
+Note that it may not display correctly as the git repo excludes images and other binary assets.
+
 ### Contributions
 
 Any pull requests on Github are welcome!
 
-### In Progress
-
-I am currently working on better documentation and examples as well as some preliminary support for non-planar tilings. Let me know (via email or Github issues) if there are other features Wallpaper should support!
-
 ### Contact
 
-If you wish to contact me, email at: yqlu -at- wallpaperstudio.co.
+If you wish to contact me, email at: yqlu -at- sliceformstudio.com.
 
 ### License
 

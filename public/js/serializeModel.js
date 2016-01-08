@@ -108,7 +108,7 @@ var circularize = function(tile) {
 };
 
 
-var loadFromJson = function(loaded) {
+var loadFromJson = function(loaded, callback) {
 	if (loaded.version >= minSupportedVersion) {
 		d3.select(".loading-overlay").classed("in", true);
 
@@ -200,13 +200,17 @@ var loadFromJson = function(loaded) {
 		}
 		d3.select(".loading-overlay").classed("in", false);
 
+		if (callback) {
+			callback();
+		}
+
 	} else {
 		if (typeof loaded.version === "undefined") {
 			loaded.version = "?";
 		}
 		d3.select(".loading-overlay").classed("in", false);
 		throw {
-			message: "File was from Wallpaper v" + loaded.version +
+			message: "File was from Sliceform Studio v" + loaded.version +
 				" but only >=v" + minSupportedVersion + " is supported."
 		};
 	}

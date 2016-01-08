@@ -73,13 +73,13 @@
 			.panel-body
 				form.form-horizontal
 					.form-group
-						label.control-label.col-sm-2 Strip width
-						.col-sm-4
+						label.control-label.col-xs-2 Strip width
+						.col-xs-4
 							input#thickness(type='text')
 						input#outlineToggle(type="checkbox", checked="true", data-label-text="Draw outline", data-label-width=110)
 					.form-group
-						label.control-label.col-md-2 Extension length
-						.col-md-4
+						label.control-label.col-xs-2 Extension length
+						.col-xs-4
 							input#extensionLength(type='text')
 						a#advancedOptions.btn.btn-primary #[i.fa.fa-cog] Advanced options
 
@@ -90,8 +90,8 @@
 				#customStrips.panel-body
 					form
 						.form-group
-							label.control-label.col-md-2 JSON input:
-							textarea#customStripJson.col-md-10(rows='4')
+							label.control-label.col-xs-2 JSON input:
+							textarea#customStripJson.col-xs-10(rows='4')
 						.form-group
 							a#generateCustomStripBtn.btn.btn-default Generate!
 		#tmpSvg.hidden
@@ -287,7 +287,7 @@
 				.row-fluid.clearfix#quasiperiodic
 				h5 Custom
 				.row-fluid.clearfix
-					.col-sm-4.padded-col
+					.col-md-4.padded-col
 						.image-frame
 							img(src="images/starter/question.png")
 						a#customTile.image-frame.overlap-full(href="#")

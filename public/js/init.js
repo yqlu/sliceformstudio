@@ -467,19 +467,35 @@ d3.select("#colorpicker").selectAll("option")
 
 var exportSvg = d3.select("#exportSvg")
 .on("click", function() {
-	var svg = d3.select("#traceSvg").select("svg").node();
-	svgAsDataUri(svg, {}, function(uri) {
+	var tmpSvg = exportImageInTmpSvg();
+	svgAsDataUri(tmpSvg, {}, function(uri) {
 		var pom = d3.select("#downloadLink").node();
 		pom.download = "design.svg";
 		pom.href = uri;
 		pom.click();
+		d3.select(tmpSvg).remove();
 	});
 });
 
-var exportPng = d3.select("#exportPng")
-.on("click", function() {
-	var svg = d3.select("#traceSvg").select("svg").node();
-	saveSvgAsPng(svg, "design.png");
+d3.select("#exportPngMenu").selectAll("li").data([
+	{factor: 0.5, title: "Small"},
+	{factor: 1, title: "Medium"},
+	{factor: 2, title: "Large"},
+	{factor: 4, title: "Very large"}])
+.enter().append("li")
+.append("a").attr("href", "#")
+.on("click", function(d) {
+	var tmpSvg = exportImageInTmpSvg();
+	saveSvgAsPng(tmpSvg, "design.png", {scale: d.factor});
+	d3.select(tmpSvg).remove();
+});
+
+d3.select("#exportPngDropdown").on("click", function() {
+	d3.select("#exportPngMenu").selectAll("li").selectAll("a").text(function(d) {
+		var width = traceSvg.node().clientWidth - config.stripTableWidth;
+		var height = traceSvg.attr("height");
+		return d.title + " (" + Math.round(width * d.factor) + " x " + Math.round(height * d.factor) + ")";
+	});
 });
 
 // generate dyanmic stylesheet for coloring

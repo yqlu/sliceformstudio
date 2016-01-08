@@ -648,7 +648,7 @@ var zoomToFitHandler = function(d, i) {
 			canvasBbox.y2 = Math.max(canvasBbox.y2, transformedCoords[0][1]);
 		});
 	} else {
-		d3.selectAll(".strip-below").each(function(d) {
+		traceSvg.selectAll(".strip-below").each(function(d) {
 			_.each(_.flatten(d.points), function(p) {
 				canvasBbox.x = Math.min(canvasBbox.x, p.x);
 				canvasBbox.y = Math.min(canvasBbox.y, p.y);

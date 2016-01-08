@@ -55,7 +55,9 @@
 				| Pick a color to assign to strips:#{' '}
 			select#colorpicker
 			a.btn.btn-primary.pull-right#exportSvg #[i.fa.fa-download] SVG
-			a.btn.btn-primary.pull-right#exportPng #[i.fa.fa-download] PNG
+			.btn-group.padded-btn-group.pull-right
+				a.btn.btn-primary.dropdown-toggle(data-toggle="dropdown")#exportPngDropdown #[i.fa.fa-download] PNG
+				ul.dropdown-menu#exportPngMenu
 		#traceSvg
 			.shadedOverlay(style="visibility: hidden;")
 				.innerOverlay
@@ -92,7 +94,7 @@
 							textarea#customStripJson.col-md-10(rows='4')
 						.form-group
 							a#generateCustomStripBtn.btn.btn-default Generate!
-		#stripSvg.hidden
+		#tmpSvg.hidden
 		a.hidden#downloadLink
 #advancedModal.modal.fade(tabindex='-1', role='dialog')
 	.modal-dialog.modal-lg
@@ -147,7 +149,7 @@
 										input#sideLength(type='text')
 								.form-group
 									.col-md-offset-4.col-md-8
-										a#shapeEditToggle.btn.btn-default.active(data-toggle='button') Toggle display
+										input#shapeEditToggle(type="checkbox", checked="true", data-label-text="Display dimensions", data-label-width=150)
 								p
 									| You can customize the polygon on the right by dragging on the vertices before clicking "Add to lineup".
 						.col-md-5

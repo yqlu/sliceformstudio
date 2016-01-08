@@ -10,14 +10,14 @@ var genSVG = function(strips, options) {
 	var cutstyle = "stroke:" + colors[1] + ";" + style;
 	var stripstyle = "stroke:" + colors[2] + ";" + style;
 
-	d3.select("#stripSvg").selectAll("svg").remove();
-	var stripSvg = d3.select("#stripSvg").append("svg")
+	d3.select("#tmpSvg").selectAll("svg").remove();
+	var tmpSvg = d3.select("#tmpSvg").append("svg")
 		.attr("width", size[0])
 		.attr("height", size[1])
 		.attr("version", 1.1);
 
-	stripSvg.node().setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.w3.org/2000/svg");
-	stripSvg.node().setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink");
+	tmpSvg.node().setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.w3.org/2000/svg");
+	tmpSvg.node().setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink");
 
 	_.each(strips, function(strip) {
 		var width = 0;
@@ -35,7 +35,7 @@ var genSVG = function(strips, options) {
 					var height2 = parity ? topHalf[1] : bottomHalf[1];
 					parity = !parity;
 					var style = cutstyle;
-					stripSvg.append("line")
+					tmpSvg.append("line")
 					.attr({
 						x1: function(d) {return xOffset + width;},
 						y1: function(d) {return height1;},
@@ -47,7 +47,7 @@ var genSVG = function(strips, options) {
 			});
 			if (idx !== strip.length - 1) {
 				// score full lines
-				stripSvg.append("line")
+				tmpSvg.append("line")
 				.attr({
 					x1: function(d) {return xOffset + width;},
 					y1: function(d) {return full[0];},
@@ -65,7 +65,7 @@ var genSVG = function(strips, options) {
 			[[xOffset, yOffset+hole], [xOffset, yOffset+height]],
 			[[xOffset+width, yOffset], [xOffset+width, yOffset+height-hole]]];
 		_.each(stripEdges, function(edge) {
-			stripSvg.append("line")
+			tmpSvg.append("line")
 			.attr({
 				x1: function(d) {return edge[0][0];},
 				y1: function(d) {return edge[0][1];},
@@ -77,4 +77,23 @@ var genSVG = function(strips, options) {
 
 		yOffset += options.stripHeight + options.interSpacing;
 	});
+};
+
+var exportImageInTmpSvg = function() {
+	d3.select("#tmpSvg").selectAll("svg").remove();
+	var tmpSvg = d3.select("#tmpSvg").append("svg")
+		.attr("width", traceSvg.node().clientWidth - config.stripTableWidth)
+		.attr("height", traceSvg.attr("height"))
+		.attr("version", 1.1);
+
+	tmpSvg.node().setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.w3.org/2000/svg");
+	tmpSvg.node().setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink");
+
+	var stripsCopy = traceSvg.select(".display.canvas").node().cloneNode(true);
+	stripsCopy.__data__ = {transform: _.cloneDeep(traceSvg.select(".display.canvas").node().__data__.transform)};
+	stripsCopy.__data__.transform = num.translateBy(stripsCopy.__data__.transform, - config.stripTableWidth, 0);
+	d3.select(stripsCopy).attr("transform", num.getTransform);
+	tmpSvg.node().appendChild(traceBg.node().cloneNode(false));
+	tmpSvg.node().appendChild(stripsCopy);
+	return tmpSvg.node();
 };

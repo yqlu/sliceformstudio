@@ -616,7 +616,7 @@ var updateStripTable = function() {
 			printWidth: printWidth.getValue(),
 			printHeight: printHeight.getValue()
 		});
-		var svg = d3.select("#stripSvg").select("svg").node();
+		var svg = d3.select("#tmpSvg").select("svg").node();
 		var serializer = new XMLSerializer();
 		var pom = d3.select("#downloadLink").node();
 		var bb = new Blob([xmlPrefix + serializer.serializeToString(svg)], {type: "image/svg+xml"});
@@ -708,7 +708,7 @@ var generateCustomStrip = function() {
 			printHeight: printHeight.getValue()
 		});
 
-		var svg = d3.select("#stripSvg").select("svg").node();
+		var svg = d3.select("#tmpSvg").select("svg").node();
 		var serializer = new XMLSerializer();
 		var pom = document.createElement('a');
 		pom.setAttribute('href', 'data:image/xvg+xml;charset=utf-8,' + serializer.serializeToString(svg));

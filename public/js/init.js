@@ -617,7 +617,7 @@ var extensionSlider = new Slider("#extensionLength", {
 	min: 0,
 	max: 2,
 	step: 0.01,
-	value: 0.15,
+	value: 0.3,
 	formatter: function(value) {
 		var pixels = value * widthFactor.getValue();
 		var mm = Math.round(pixels / config.pixelToMm * 10) / 10;

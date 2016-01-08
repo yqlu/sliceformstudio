@@ -116,25 +116,20 @@ a:focus {
     outline: 0;
 }
 
-.navbar-custom a {
+.navbar-custom.top-nav-collapse a, .navbar-custom.top-nav-collapse .nav li a {
     color: @fontcolor;
 }
 
-.navbar-custom .nav li a {
+.navbar-custom.top-nav-collapse a, .navbar-custom.top-nav-collapse .nav li a {
     -webkit-transition: background .3s ease-in-out;
     -moz-transition: background .3s ease-in-out;
     transition: background .3s ease-in-out;
 }
 
-.navbar-custom .nav li a:hover {
-    outline: 0;
-    background-color: rgba(0,0,0,0);
-    color: @linkfocusedcolor;
-}
-
 .navbar-custom.top-nav-collapse .nav li a:hover {
     outline: 0;
     background-color: @activebtn;
+    color: @fontcolor
 }
 
 .navbar-custom.top-nav-collapse .nav li a.active {
@@ -144,6 +139,10 @@ a:focus {
 
 .top-nav-collapse a.navbar-brand:hover {
     background-color: @activebtn;
+}
+
+.navbar-custom a {
+    color: @fontcolor;
 }
 
 @media(min-width:768px) {
@@ -162,6 +161,16 @@ a:focus {
         border-bottom: 4px solid rgba(0,0,0,0.5);
         background: @bgcolor;
     }
+
+    .navbar-custom a, .navbar-custom .nav li a {
+        color: lighten(#0087D6,55%);
+    }
+
+    .navbar-custom a:hover, .navbar-custom .nav li a:hover {
+        background-color: #000;
+    }
+
+
 }
 
 .btn-default:hover,

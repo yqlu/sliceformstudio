@@ -47,21 +47,10 @@
 				"year": 2010,
 				"description": "12-gons and 9-gons",
 				"slfm": "garden"
-			}, {
-				"filename": "rampart.png",
-				"title": "Rampart",
-				"year": 2015,
-				"description": "12-gons and triangles",
-				"slfm": "rampart"
 			}]
 		}, {
 			"title": "Intermediate",
 			"items": [{
-				"filename": "foliage.png",
-				"title": "Foliage",
-				"year": 2015,
-				"description": "Hexagons"
-			}, {
 				"filename": "constellation.jpg",
 				"title": "Constellation I",
 				"year": 2013,
@@ -74,6 +63,12 @@
 				"description": "12-gons, hexagons and squares",
 				"slfm": "constellation_ii"
 			}, {
+				"filename": "foliage.png",
+				"title": "Foliage",
+				"year": 2015,
+				"description": "Hexagons",
+				"slfm": "foliage"
+			}, {
 				"filename": "festival.png",
 				"title": "Festival",
 				"year": 2010,
@@ -85,6 +80,12 @@
 				"year": 2015,
 				"description": "12-gons, hexagons and squares",
 				"slfm": "undergrowth"
+			}, {
+				"filename": "rampart.png",
+				"title": "Rampart",
+				"year": 2015,
+				"description": "12-gons and triangles",
+				"slfm": "rampart"
 			}]
 		}, {
 			"title": "Advanced",
@@ -112,7 +113,7 @@
 				"description": "Girih tiles",
 				"slfm": "girih_ii"
 			}, {
-				"filename": "brimstone.jpg",
+				"filename": "brimstone.png",
 				"title": "Brimstone",
 				"year": 2015,
 				"description": "12-gons and triangles",

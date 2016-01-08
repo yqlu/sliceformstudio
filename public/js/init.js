@@ -318,6 +318,14 @@ var sideNumberSlider = new Slider("#sideNumber", {
 	}
 }).on("change", shapeEditCustomDraw);
 
+d3.selectAll("#assembleOrigZoom, #traceOrigZoom")
+.on("click", originalZoomHandler);
+
+d3.selectAll("#assembleZoomToFit, #traceZoomToFit")
+.on("click", zoomToFitHandler);
+
+$("#assembleOrigZoom, #traceOrigZoom, #assembleZoomToFit, #traceZoomToFit").tooltip({container: 'body#body'});
+
 var sideLengthSlider = new Slider('#sideLength', {
 	min: 0.5,
 	max: 4,
@@ -648,8 +656,8 @@ $(document).ready(function() {
 			label.html(label.text() + " <a href='#' id='autoSnapHint'><i class='fa fa-question-circle fa-lg'></a>");
 			d3.select("#autoSnapHint").on("click", function() {
 				bootbox.alert({
-					title: "Self joins",
-					message: "<p>Under normal circumstances, Sliceform Studio will forbid you from joining two edges belonging to the same tile or to tiles in the same group. You can disable this check by turning off 'Snap Edges' in the toolbar. Now when you click on two edges in succession, the two tiles will no longer snap together, but the edges will still turn green to indicate that they are now joined.</p> <p>This is useful for creating non-planar configurations like cylinders, polyhedra and other configurations where edges are identified in topologically interesting ways. Refer to Rampart or Planetarium in the <a href='/gallery'>gallery</a> as examples of this.</p>"
+					title: "Planar tilings only",
+					message: "<p>Under normal circumstances, Sliceform Studio will forbid you from joining two edges belonging to the same tile or to tiles in the same group. You can disable this check by turning off 'Planar tilings only' in the toolbar. Now when you click on two edges in succession, the two tiles will no longer snap together, but the edges will still turn green to indicate that they are now joined.</p> <p>This is useful for creating non-planar configurations like cylinders, polyhedra and other configurations where edges are identified in topologically interesting ways. Refer to Rampart or Planetarium in the <a href='/gallery'>gallery</a> as examples of this.</p>"
 				});
 			});
 		}

@@ -134,7 +134,7 @@ var dragSvgHandler = d3.behavior.drag()
 	.attr("y2", newHeight);
 	d3.selectAll("#assembleSvg svg > line").attr("y1", newHeight)
 	.attr("y2", newHeight);
-	var existingWidth = (tileView.classed("active")) ? assembleSvg.node().getBBox().width : traceSvg.node().getBBox().width;
+	var existingWidth = (tileView.classed("active")) ? assembleSvg.node().clientWidth : traceSvg.node().clientWidth;
 	assembleSvgDimensions
 	.attr("y", newHeight - 20)
 	.text(existingWidth + "px x " + newHeight + "px");
@@ -619,6 +619,65 @@ var inferHandler = function(d, i) {
 	});
 };
 
+var originalZoomHandler = function(d, i) {
+	commonZoomHandler.scale(1);
+	var bbox = d3.select(this.parentNode.parentNode.parentNode).selectAll(".display.canvas")[0][0].getBBox();
+	var svgWidth = (tileView.classed("active")) ? assembleSvg.node().clientWidth : traceSvg.node().clientWidth;
+	var svgHeight = parseInt(assembleSvg.attr("height"),10);
+	var paletteWidth = config.stripTableWidth;
+
+	commonZoomHandler.translate([-bbox.x - bbox.width / 2 + paletteWidth + (svgWidth - paletteWidth) / 2,
+		-bbox.y - bbox.height / 2 + svgHeight / 2]);
+	d3.selectAll("#traceSvg, #assembleSvg").selectAll(".display.canvas").each(function(d) {
+		d.transform = num.matrixRound(num.translateBy(num.scaleBy(num.id, commonZoomHandler.scale()),
+			commonZoomHandler.translate()[0], commonZoomHandler.translate()[1]));
+	}).attr("transform", num.getTransform);
+};
+
+var zoomToFitHandler = function(d, i) {
+	var canvasBbox = {x: Infinity, y: Infinity, x2: -Infinity, y2: -Infinity};
+	if (tileView.classed("active")) {
+		d3.select(".canvas").selectAll(".vertex").each(function(d) {
+			var localCoords = [[d.x, d.y]];
+			var transformedCoords = num.matrixToCoords(
+				num.dot(this.parentNode.parentNode.__data__.transform, num.dot(this.parentNode.__data__.transform,
+					num.coordsToMatrix(localCoords))));
+			canvasBbox.x = Math.min(canvasBbox.x, transformedCoords[0][0]);
+			canvasBbox.y = Math.min(canvasBbox.y, transformedCoords[0][1]);
+			canvasBbox.x2 = Math.max(canvasBbox.x2, transformedCoords[0][0]);
+			canvasBbox.y2 = Math.max(canvasBbox.y2, transformedCoords[0][1]);
+		});
+	} else {
+		d3.selectAll(".strip-below").each(function(d) {
+			_.each(_.flatten(d.points), function(p) {
+				canvasBbox.x = Math.min(canvasBbox.x, p.x);
+				canvasBbox.y = Math.min(canvasBbox.y, p.y);
+				canvasBbox.x2 = Math.max(canvasBbox.x2, p.x);
+				canvasBbox.y2 = Math.max(canvasBbox.y2, p.y);
+			});
+		});
+	}
+	canvasBbox.width = canvasBbox.x2 - canvasBbox.x;
+	canvasBbox.height = canvasBbox.y2 - canvasBbox.y;
+	var svgWidth = (tileView.classed("active")) ? assembleSvg.node().clientWidth : traceSvg.node().clientWidth;
+	var svgHeight = parseInt(assembleSvg.attr("height"),10);
+	var paletteWidth = config.stripTableWidth;
+
+	var scale = 1.05 * Math.max(canvasBbox.height / svgHeight, canvasBbox.width / (svgWidth - paletteWidth));
+
+	commonZoomHandler.scale(1 / scale);
+
+	var translate = [
+		(- canvasBbox.x - canvasBbox.width / 2) / scale + paletteWidth + (svgWidth - paletteWidth) / 2,
+		(- canvasBbox.y - canvasBbox.height / 2) / scale + svgHeight / 2];
+	commonZoomHandler.translate(translate);
+
+	d3.selectAll("#traceSvg, #assembleSvg").selectAll(".display.canvas").each(function(d) {
+		d.transform = num.matrixRound(num.translateBy(num.scaleBy(num.id, commonZoomHandler.scale()),
+			commonZoomHandler.translate()[0], commonZoomHandler.translate()[1]));
+	}).attr("transform", num.getTransform);
+};
+
 var thicknessSliderChange = function() {
 	d3.selectAll("path.strip").style("stroke-width", thicknessSlider.getValue());
 	d3.selectAll("path.strip-outline").style("stroke-width", thicknessSlider.getValue() + 1);
@@ -695,7 +754,9 @@ var cropDesignClick = function() {
 	.duration(1000)
 	.attr("transform", num.getTransform);
 
-	// assemblePalette.classed("hidden", true);
+	d3.selectAll("#assembleSvgToolbar").transition().duration(1000)
+	.style("left", "5px").style("opacity", 0);
+
 	setupOverlay();
 
 	d3.select("#assembleSvgContainer").select(".shadedOverlay").style("visibility",
@@ -707,14 +768,19 @@ var exitCropView = function() {
 	d3.select("#tileViewMenu").classed("hidden", false);
 	d3.select("#cropViewMenu").classed("hidden", true);
 
+	var paletteWidth = parseInt(assembleSvg.select(".palette-background").attr("width"),10);
+
+
 	assembleCanvas.classed("bg", false);
 	assemblePalette.each(function(d) {
-		var width = d3.select(this).select(".palette-background").attr("width");
-		d.transform = num.translate(width / 2, 0);
+		d.transform = num.translate(paletteWidth / 2, 0);
 	})
 	.transition()
 	.duration(1000)
 	.attr("transform", num.getTransform);
+
+	d3.selectAll("#assembleSvgToolbar").transition().duration(1000)
+	.style("left", (paletteWidth + 5) + "px").style("opacity", 1);
 
 	d3.select("#assembleSvgContainer").select(".shadedOverlay").style("visibility", "hidden");
 

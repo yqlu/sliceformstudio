@@ -482,8 +482,8 @@ var groupPattern = function(patternData, strictMode) {
 					.classed("strip-outline", true)
 					.attr("d", underStrip.getAttribute("d")).node();
 
-	overStrip.__data__ = {outline: overOutline};
-	underStrip.__data__ = {outline: underOutline};
+	overStrip.__data__ = {outline: overOutline, points: reducedSegments};
+	underStrip.__data__ = {outline: underOutline, points: reducedSegments};
 
 	d3.selectAll([overOutline, underOutline]).attr("stroke-linejoin", "miter").style("stroke-width", thicknessSlider.getValue()+1);
 

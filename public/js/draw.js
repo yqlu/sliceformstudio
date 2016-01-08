@@ -383,6 +383,8 @@ var draw = function(container, inputlist, options) {
 		.select("rect")
 		.attr("width", newWidth)
 		.attr("x", - newWidth / 2);
+
+		d3.selectAll("#assembleSvgToolbar").style("left", (newWidth + 5) + "px");
 	}
 
 	return groups;

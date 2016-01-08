@@ -45,6 +45,10 @@
 					.innerOverlay
 						h2 #[i.fa.fa-exclamation-triangle] There are no tiles to crop.
 						p(style="font-size: 20px; text-transform: none; color: black; margin: 20px;") You need to drag tiles onto the canvas first.
+				.svg-toolbar#assembleSvgToolbar
+					.btn-group.padded-btn-group
+						a.btn.btn-default.btn-sm(title="Zoom to fit")#traceZoomToFit #[i.fa.fa-fw.fa-arrows-alt]
+						a.btn.btn-default.btn-sm(title="Reset zoom level")#traceOrigZoom 1:1
 	#traceTab.hidden
 		.toolbar
 			span
@@ -57,6 +61,10 @@
 				.innerOverlay
 					h2 #[i.fa.fa-exclamation-triangle] There are no strips on the canvas.
 					p(style="font-size: 20px; text-transform: none; color: black; margin: 20px;") You need to drag tiles onto the canvas under "Edit tiles and patterns" and add patterns to them via the #[i.fa.fa-cog] buttons first.
+			.svg-toolbar#traceSvgToolbar
+				.btn-group.padded-btn-group
+					a.btn.btn-default.btn-sm(title="Zoom to fit")#assembleZoomToFit #[i.fa.fa-fw.fa-arrows-alt]
+					a.btn.btn-default.btn-sm(title="Reset zoom level")#assembleOrigZoom 1:1
 		.panel.panel-default
 			.panel-heading
 				h3.panel-title Display parameters

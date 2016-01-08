@@ -206,8 +206,8 @@ var approxEqEdges = function(x, y, tolerance) {
 // pass in a tile node
 // transform group coordinates to center the origin at that tile
 var centerCoords = function(tileNode) {
-	tileTransform = d3.select(tileNode).datum().transform;
-	tileInverse = num.inv(tileTransform);
+	var tileTransform = d3.select(tileNode).datum().transform;
+	var tileInverse = num.inv(tileTransform);
 
 	d3.select(tileNode.parentNode)
 	.each(function(d) {

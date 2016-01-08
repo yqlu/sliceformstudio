@@ -25,7 +25,7 @@
 				.btn-group.padded-btn-group
 					a#cropDesign.btn.btn-primary #[i.fa.fa-crop] Crop
 				.btn-group.padded-btn-group
-					input#autoSnap(type="checkbox", checked="true", data-label-text="Planar tilings only", data-label-width=160)
+					input#autoSnap(type="checkbox", checked="true", data-label-text="Planar ", data-label-width=80)
 				.btn-group.padded-btn-group
 					a#infer.btn.btn-primary Infer
 			form#cropViewMenu.form-inline.hidden
@@ -54,9 +54,9 @@
 			span
 				| Pick a color to assign to strips:#{' '}
 			select#colorpicker
-			a.btn.btn-primary.pull-right#exportSvg #[i.fa.fa-download] SVG
+			a.btn.btn-primary.btn-sm.pull-right#exportSvg #[i.fa.fa-download] SVG
 			.btn-group.padded-btn-group.pull-right
-				a.btn.btn-primary.dropdown-toggle(data-toggle="dropdown")#exportPngDropdown #[i.fa.fa-download] PNG
+				a.btn.btn-primary.btn-sm.dropdown-toggle(data-toggle="dropdown")#exportPngDropdown #[i.fa.fa-download] PNG
 				ul.dropdown-menu#exportPngMenu
 		#traceSvg
 			.shadedOverlay(style="visibility: hidden;")
@@ -73,8 +73,8 @@
 			.panel-body
 				form.form-horizontal
 					.form-group
-						label.control-label.col-md-2 Strip width
-						.col-md-4
+						label.control-label.col-sm-2 Strip width
+						.col-sm-4
 							input#thickness(type='text')
 						input#outlineToggle(type="checkbox", checked="true", data-label-text="Draw outline", data-label-width=110)
 					.form-group
@@ -287,7 +287,7 @@
 				.row-fluid.clearfix#quasiperiodic
 				h5 Custom
 				.row-fluid.clearfix
-					.col-lg-4.padded-col
+					.col-sm-4.padded-col
 						.image-frame
 							img(src="images/starter/question.png")
 						a#customTile.image-frame.overlap-full(href="#")

@@ -256,7 +256,7 @@ var tileOptions = {
 var generateHtml = function(container) {
 	return function(opt) {
 		var col = d3.select(container).append("div")
-			.classed("col-lg-4 padded-col", true);
+			.classed("col-md-4 padded-col", true);
 		col.append("div").classed("image-frame", true)
 			.append("img")
 			.attr("src", "images/starter/" + opt.file + ".png");
@@ -669,11 +669,11 @@ $(document).ready(function() {
 	$("#autoSnap").bootstrapSwitch({
 		onInit: function() {
 			var label = d3.select(this.parentNode).select(".bootstrap-switch-label");
-			label.html(label.text() + " <a href='#' id='autoSnapHint'><i class='fa fa-question-circle fa-lg'></a>");
+			label.html(label.text() + " <a href='#' id='autoSnapHint'><i class='fa fa-question-circle'></a>");
 			d3.select("#autoSnapHint").on("click", function() {
 				bootbox.alert({
 					title: "Planar tilings only",
-					message: "<p>Under normal circumstances, Sliceform Studio will forbid you from joining two edges belonging to the same tile or to tiles in the same group. You can disable this check by turning off 'Planar tilings only' in the toolbar. Now when you click on two edges in succession, the two tiles will no longer snap together, but the edges will still turn green to indicate that they are now joined.</p> <p>This is useful for creating non-planar configurations like cylinders, polyhedra and other configurations where edges are identified in topologically interesting ways. Refer to Rampart or Planetarium in the <a href='/gallery'>gallery</a> as examples of this.</p>"
+					message: "<p>Under normal circumstances, Sliceform Studio will forbid you from joining two edges belonging to the same tile or to tiles in the same group. You can disable this check by turning off 'Planar' in the toolbar. Now when you click on two edges in succession, the two tiles will no longer snap together, but the edges will still turn green to indicate that they are now joined.</p> <p>This is useful for creating non-planar configurations like cylinders, polyhedra and other configurations where edges are identified in topologically interesting ways. Refer to Rampart or Planetarium in the <a href='/gallery'>gallery</a> as examples of this.</p>"
 				});
 			});
 		}
@@ -683,28 +683,40 @@ $(document).ready(function() {
 
 	stylesheet.insertRule("path.strip.hover { stroke: " + $("#colorpicker").val() + " !important }", 0);
 
-	var params = getUrlVars();
-
-	if (params.template) {
-		if (params.template.search(/^\w+$/) >= 0) {
-			d3.select(".loading-overlay").classed("in", true);
-			$.getJSON("/images/gallery/wlpr_files/" + params.template + ".wlpr")
-			.done(loadFromJson)
-			.error(function() {
+	var loadOrNewFile = function() {
+		var params = getUrlVars();
+		if (params.template) {
+			if (params.template.search(/^\w+$/) >= 0) {
+				d3.select(".loading-overlay").classed("in", true);
+				$.getJSON("/images/gallery/wlpr_files/" + params.template + ".wlpr")
+				.done(loadFromJson)
+				.error(function() {
+					bootbox.alert("Error: " + params.template + " is not a valid template.");
+					d3.select(".loading-overlay").classed("in", false);
+				});
+			} else {
 				bootbox.alert("Error: " + params.template + " is not a valid template.");
-				d3.select(".loading-overlay").classed("in", false);
-			});
+			}
 		} else {
-			bootbox.alert("Error: " + params.template + " is not a valid template.");
+			$("#newModal").modal("show")
+			.on("show.bs.modal", function() {
+				$("#newModal .modal-body").scrollTop(0);
+			})
+			.on("shown.bs.modal", function() {
+				$("#newModal .modal-body").scrollTop(0);
+			});
 		}
-	} else {
-		$("#newModal").modal("show")
-		.on("show.bs.modal", function() {
-			$("#newModal .modal-body").scrollTop(0);
-		})
-		.on("shown.bs.modal", function() {
-			$("#newModal .modal-body").scrollTop(0);
+	};
+
+	if (window.innerWidth < 1024) {
+		bootbox.alert({
+			title: "Warning: screen size",
+			message: "Sliceform Studio is designed to be accessed with screens of width 1200px and above. Some functionality may be inaccessible on smaller screens.",
+			callback: loadOrNewFile
 		});
+	} else {
+		loadOrNewFile();
+
 	}
 
 });

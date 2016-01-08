@@ -657,11 +657,32 @@ var updateStripTable = function() {
 
 	collapseDiv.each(function(d) {
 		d3.select(this).selectAll("li").data(d.strips)
-		.enter().append("li").classed("strip-table-li", true).text(function(d, i) { return "Strip #" + (d.nodes[0].__data__.id || d.nodes[1].__data__.id); })
+		.enter().append("li").classed("strip-table-li", true)
+		.html(function(d, i) { return "Strip #" + (d.nodes[0].__data__.id || d.nodes[1].__data__.id)
+			+ " (<a href='#'><i class='fa fa-times'></i></a>)"; })
 		.on("mouseover", function(d1) {
 			emphasizeStrips(d1.nodes, this.parentNode.__data__.color.hex);
 		})
 		.on("mouseout", colorAllStrips);
+
+		d3.select(this).selectAll("li").selectAll("a")
+		.on("click", function(d) {
+			var parentArray = this.parentNode.parentNode.parentNode.__data__.strips;
+			var thisStrip = this.parentNode.__data__;
+			var thisStripIndex = _.findIndex(parentArray, function(s) {
+				return s === thisStrip;
+			});
+			parentArray.splice(thisStripIndex, 1);
+			if (parentArray.length === 0) {
+				d3.select(this.parentNode.parentNode.parentNode.parentNode).remove();
+			} else {
+				d3.select(this.parentNode.parentNode.parentNode.parentNode).select(".colorLabel")
+				.select("span").text(function(d) { return d.color.name + " (" + d.strips.length + ")"; });
+				d3.select(this.parentNode).remove();
+			}
+			d3.selectAll(thisStrip.nodes).style("stroke", "gainsboro");
+			colorAllStrips();
+		});
 	});
 	$(".strip-table-ul").sortable({
 		connectWith: 'strip-table-ul',

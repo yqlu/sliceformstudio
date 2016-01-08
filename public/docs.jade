@@ -4,14 +4,13 @@
 		ul.sidebar-nav
 	#page-content-wrapper
 		.alert.alert-info(role='alert')
-			| #[h6.inline Note:] Sliceform Studio works best on Google Chrome; some unexpected behavior might arise on other browsers. If you are using Sliceform Studio on Google Chrome and have discovered a bug, please report it at bugs@(this-domain).
 		h2#tileSelect Tile selection
 
-		p The first step to making a geometric design is picking the right set of tiles (your "palette") via the "Tiles" dropdown in the upper left corner. Different sets of tiles fit together differently and have different symmetries.
+		p When the app first starts up, you are asked to "initialize your design" by picking a set of tiles. Different set of tiles fit together differently and have different symmetries.
 
-		h4#regularPoly Regular polygons
+		h4#regularPoly Regular tiles
 
-		p There are three options here: "Triangles, squares and hexagons", "Squares and octagons" and "Triangles, squares, hexagons and 12-gons". Between these options you should be able to recreate #[a(href='https://en.wikipedia.org/wiki/Euclidean_tilings_by_convex_regular_polygons') any of the regular and Archimedean tilings – and then some]!
+		p All of these options are made up of only regular polygons – triangles, squares, hexagons, octagons and 12-gons. Note that the canvas is pre-populated with a basic tiling, but there are many #[a(href='https://en.wikipedia.org/wiki/Euclidean_tilings_by_convex_regular_polygons') many different ways] to fit these tiles together!
 
 		.row
 			.col-sm-4.img-with-label
@@ -30,7 +29,7 @@
 				.label-container
 					label A 4.6.12 tiling
 
-		h4#regularFiller Regular polygons with fillers
+		h4#regularFiller Regular and filler tiles
 
 		p All the options in this subsection feature regular polygons coupled with other shapes like bowties that enable the set to fully tile the plane. Here are some examples:
 
@@ -51,7 +50,7 @@
 				.label-container
 					label 9-gons and 12-gons with fillers
 
-		h4#almostReg Almost regular polygons
+		h4#almostReg Almost-regular tiles
 
 		p These are deceptive sets of polygons that look like they shouldn't be able to tile the plane but do because they are ever so slightly skewed.
 
@@ -67,7 +66,7 @@
 				.label-container
 					label Altair tiling
 
-		h4#quasiperiodic Quasiperiodic tilings
+		h4#quasiperiodic Quasiperiodic tiles
 
 		p These tilings all have to do with 5-fold or 7-fold symmetry.
 
@@ -92,15 +91,15 @@
 
 		h4#customPalette Customizing your palette
 
-		p The final option, 'Custom', defaults to a blank palette. This is convenient if you want to start from scratch and specify every single tile. Note, however that you can #[b always] customize your palette, even if you picked another option from the dropdown!
+		p The final option, 'Custom', defaults to a blank palette and canvas. This is convenient if you want to start from scratch and specify every single tile. Note, however that you can #[b always] customize your palette, even if you picked another option from the dropdown!
 
 		h6 Adding a new tile
 
-		p Click the #[i.fa.fa-plus.fa-border] in the toolbar and a Custom Tile Editor modal should appear. There are two different ways to add a new shape - graphically or by specifying the side lengths and interior angles.
+		p There are two ways to add a new tile to your palette; both are accessed via the #[i.fa.fa-plus.fa-border] Add Tile button in the toolbar.
 
-		p With the former option, you can pick a new shape by dragging the sliders for number of sides and side lengths. The display always defaults to a regular polygon, but you can further specify the dimensions of the polygon by dragging around individual vertices in the display with your mouse. The side lengths and angles update continuously to tell you what the new dimensions are. Add it to the palette by clicking "Add to Lineup".
+		p The graphical editor is the simpler option. In the modal that pops up, you can pick a new shape by dragging the sliders for number of sides and side lengths. The display always defaults to a regular polygon, but you can further specify the dimensions of the polygon by dragging around individual vertices in the display with your mouse. The side lengths and angles update continuously to tell you what the new dimensions are. Add it to the palette by clicking "Add to Lineup".
 
-		p With the latter option, you can pick a new shape by specifying the side-lengths and interior angles in degrees. Sidelengths default to all 1s if left unspecified; interior angles default to a regular polygon if left unspecified. Note that the first interior angle you specify is between the first and the second edge you specify. Sliceform Studio alerts you with an error if it is unable to parse your input or get a closed polygon from your input.
+		p The manual text editor is the more advanced option. You can pick a new shape by specifying the side-lengths and interior angles in degrees. Sidelengths default to all 1s if left unspecified; interior angles default to a regular polygon if left unspecified. Note that the first interior angle you specify is between the first and the second edge you specify. Sliceform Studio alerts you with an error if it is unable to parse your input or get a closed polygon from your input.
 
 		.row
 			.col-sm-4.img-with-label
@@ -127,15 +126,19 @@
 
 		h6 Deleting a tile
 
-		p Click on the tile in the palette (it should turn blue) and click the #[i.fa.fa-trash.fa-border] in the toolbar.
+		p Click on the tile in the palette (it should turn blue) and click the #[i.fa.fa-trash.fa-border] Delete button in the toolbar.
+
+		p Since the palette is effectively the template for everything in the canvas, you are not allowed to delete a tile in the palette if there are instances of that tile on the canvas.
 
 		h6 Copying a tile
 
-		p On occasion you might want more than one instance of a tile (so that they can be inscribed with different patterns). Click on the tile in the palette (it should turn blue) and click the #[i.fa.fa-files-o.fa-border] in the toolbar.
+		p On occasion you might want more than one instance of a tile (so that they can be inscribed with different patterns). Click on the tile in the palette (it should turn blue) and click the #[i.fa.fa-files-o.fa-border] Copy button in the toolbar.
 
 		h2#tileAssembly Tile assembly
 
 		h4#canvasPop Populating the canvas
+
+		p If you pick one of the preset options, the canvas is prepopulated with a sample tiling. You can grow it by adding more tiles from the palette.
 
 		p Drag tiles out from the palette on the right to the main canvas (the large white area). When you release the cursor, the palette should repopulate itself.
 
@@ -182,18 +185,17 @@
 				.label-container
 					label Breaking the minimal number of edges to separate the two tiles.
 
-		.alert.alert-danger
-			#[i.fa.fa-exclamation-triangle] Note that edge joining is forbidden if the two edges have different lengths.
+		p Note that edge joining is forbidden if the two edges have different lengths.
 
 		h6 Snapping edges
 
-		p Under normal circumstances, Sliceform Studio will forbid you from joining two edges belonging to the same tile or to tiles in the same group. You can disable this check by turning off "Snap Edges" in the toolbar. Now when you click on two edges in succession, no snapping of the tiles will occur, but the edges will still turn green to indicate that they are now joined.
+		p Under normal circumstances, Sliceform Studio will forbid you from joining two edges belonging to the same tile or to tiles in the same group. You can disable this check by turning off 'Planar' in the toolbar. Now when you click on two edges in succession, the two tiles will no longer snap together, but the edges will still turn green to indicate that they are now joined.
 
 		p This is useful for creating non-planar configurations like cylinders, polyhedra and other configurations where edges are identified in topologically interesting ways. Refer to #[a(href="/gallery.html") Rampart or Planetarium in the gallery] as examples of this.
 
 		h4#copyDel Copy and delete
 
-		p Select a tile or a group of joined tiles in the canvas by clicking it (they should turn blue). You can then copy your selection by clicking #[i.fa.fa-files-o.fa-border] and delete your selection by clicking #[i.fa.fa-trash.fa-border] in the toolbar. You can also use the hotkeys #[kbd d] (for duplicate) and #[kbd(style="") Delete] to do the same thing.
+		p Select a tile or a group of joined tiles in the canvas by clicking it (they should turn blue). You can then copy your selection by clicking the #[i.fa.fa-files-o.fa-border] Copy button and delete your selection by clicking #[i.fa.fa-trash.fa-border] Delete button in the toolbar. You can also use the hotkeys #[kbd d] (for duplicate) and #[kbd(style="") Backspace] to do the same thing.
 
 		p Copying a group of tiles can save you a lot of work when you are making a symmetric configuration of tiles.
 
@@ -206,7 +208,7 @@
 
 		h2#patternDesign Pattern design
 
-		p Click on a tile in the palette to select it. The Edit Pattern button in the toolbar should become enabled. Clicking it brings up the Pattern Editor. Here you can pick a motif in the dropdown menu to apply to the selected tile.
+		p Each tile in the palette has an associated #[i.fa.fa-edit.fa-border] button beside it. Click on this to bring up the pattern editor for that tile.
 
 		h4#basicMotifs Basic motifs
 
@@ -229,7 +231,7 @@
 				.label-container
 					label Extended rosette motif
 
-		.alert.alert-warning Note that trying to apply one of these motifs to irregular polygons (e.g. filler bowtie shapes) will generate some bizarre results. Your best bet is Hankin, inference or a custom pattern.
+		p Note that these motifs are only applicable to regular polygonal tiles.
 
 		h4#hankin Hankin motifs
 
@@ -239,7 +241,7 @@
 
 		p For an n-sided polygon, Sliceform Studio constructs #[i 2n] rays: two for each edge at the specified angles and offsets. It then matches pairs of the rays up greedily to minimize total internal pattern length. For a more involved discussion of this algorithm, refer to #[a(href="http://www.cgl.uwaterloo.ca/~csk/papers/gi2005.html") Craig Kaplan’s paper on this technique].
 
-		.alert.alert-warning Note that for some polygons and some inputs a matching of all 2n rays is not possible.
+		.alert.alert-warning Note that for some polygons and some values of angles and offsets a matching of all 2n rays is not possible.
 
 		.row
 			.col-sm-3.img-with-label
@@ -399,9 +401,9 @@
 				.label-container
 					label Two patterns with different symmetries and edge mappings superimposed on the same tile
 
-		h2#cropMode Crop mode
+		h2#cropping Cropping
 
-		p Sometimes, it is desirable for the final design to show just a fraction of the original tiling – for instance, if you want the result to be bounded by a rectangle. That is where Crop mode comes in.
+		p Sometimes, it is desirable for the final design to show just a fraction of the original tiling – for instance, if you want the result to be bounded by a rectangle. That is where the cropping feature comes in.
 
 		.row
 			.col-sm-4.img-with-label
@@ -421,15 +423,15 @@
 					label The cropped final result
 
 
-		p Select "Crop view" at the top of the screen. If "Crop mode" is turned on, your tiling is overlaid with multiple black "crop points" – one for every vertex, edge midpoint and polygon center of every tile.
+		p Click on the #[i.fa.fa-crop.fa-border] Crop button in the toolbar. If "Crop mode" is turned on, your tiling is overlaid with multiple black "crop points" – one for every vertex, edge midpoint and polygon center of every tile.
 
-		p You can click on crop points individually to select them (and unselect them again). The cropped area of the final design will be defined as the convex hull of the selected crop points. The "Select All" and "Unselect All" buttons are quick shortcuts that do exactly as they say.
+		p You can click on crop points individually to select them (and unselect them again). The cropped area of the final design will be defined as the convex hull of the selected crop points. The "Select All" button selects every black "crop point" to be part of the convex hull; the "Reset" button unselects everything.
 
 		p If fewer than 3 points are selected, the corresponding convex hull has no internal area and no cropping will be applied.
 
 		h2#stripTrace Strip tracing
 
-		p Select "Strip view" at the top of the screen. Sliceform Studio automatically figures out how to trace patterns across the joined edges at the boundary of tiles and match them up. Your tiles has been converted into interlaced strips weaving through the design!
+		p Select "Trace and export strips" at the top of the screen. Sliceform Studio automatically figures out how to trace patterns across the joined edges at the boundary of tiles and match them up. Your tiles has been converted into interlaced strips weaving through the design!
 
 		h4#traceRules Tracing rules
 
@@ -454,11 +456,9 @@
 
 		h4#color Color assignment
 
-		p The Strip view canvas works similarly to the Tile view canvas – you can drag to pan and scroll to zoom. What's new is the color picker on top of the canvas. When you mouseover and click on a grey strip, it is assigned the color currently active in the color picker.
+		p The strip canvas works similarly to the tile canvas – you can drag to pan and scroll to zoom. What's new is the color picker on top of the canvas. When you mouseover and click on a grey strip, it is assigned the color currently active in the color picker.
 
 		p Colors serve two purposes. They can be entirely aesthetic and a way to create a visually appealing image for exporting. On the other hand, if you would like to create paper strips, colors serve as categories for strips that should be generated in the same SVG files. This allows you to group strips together to be printed or laser-cut or die-cut at one go.
-
-		.alert.alert-warning Note that your color assignment will be lost if you navigate to Tile view or Crop view. This is because Sliceform Studio recomputes the traced strips every time you enter Strip view (since the strip configuration could have changed in the meantime).
 
 		h4#displayParam Display parameters
 
@@ -468,11 +468,9 @@
 
 		p The extension length slider controls the width of the line segment that is appended to the ends of strips. Note that this is only applicable to strips that terminate in an intersection; a non-zero extension length is required to generate paper strips so that they can properly slot into each other. If you are only generating the final image digitally for aesthetic reasons, you can freely set extension length to 0.
 
-		.alert.alert-warning Note that changing extension length can be very slow on large designs because Sliceform Studio recomputes the traced strips every time. This also means that your color assignment will be lost upon changing extension length. This is currently a focus for future optimization.
-
 		p The outline toggle is purely aesthetic and does exactly as it says.
 
-		p Under "Advanced Options" are multiple sliders that control further parameters for the generated SVG files and the display. Note that display height changes the height of the canvas. This is useful if you want to expand the canvas height to capture more of the design when exporting the image.
+		p Under "Advanced Options" are multiple sliders that control further parameters for the generated SVG files and the display.
 
 		h2#export Exporting
 

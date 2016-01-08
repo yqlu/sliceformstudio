@@ -259,7 +259,8 @@ var generateHtml = function(container) {
 			.classed("col-md-4 padded-col", true);
 		col.append("div").classed("image-frame", true)
 			.append("img")
-			.attr("src", "images/starter/" + opt.file + ".png");
+			.attr("src", "images/starter/" + opt.file + ".png")
+			.attr("alt", opt.name);
 		col.append("a").classed("image-frame overlap-full", true)
 			.attr("href", "#")
 			.on("click", function() {

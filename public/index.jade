@@ -1,18 +1,17 @@
 script(src='#{baseUrl}/js/script.js')
 // Navigation
 nav.navbar.navbar-custom.navbar-fixed-top(role='navigation')
-  .container
-    .navbar-header
-      button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-main-collapse')
-        i.fa.fa-bars
-      a.navbar-brand
-        span.light Sliceform Studio
-    // Collect the nav links, forms, and other content for toggling
-    .collapse.navbar-collapse.navbar-right.navbar-main-collapse
-      ul.nav.navbar-nav
-        each term, i in public._data.contents
-          li
-            a.nav(href="#{term.url}")(class= (i === 0) ? "active" : "")= term.label
+  .navbar-header
+    button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-main-collapse')
+      i.fa.fa-bars
+    a.navbar-brand
+      span.light Sliceform Studio
+  // Collect the nav links, forms, and other content for toggling
+  .collapse.navbar-collapse.navbar-right.navbar-main-collapse
+    ul.nav.navbar-nav
+      each term, i in public._data.contents
+        li
+          a.nav(href="#{term.url}")(class= (i === 0) ? "active" : "")= term.label
 // Intro Header
 header.intro
   .intro-body

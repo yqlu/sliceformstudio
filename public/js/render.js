@@ -82,7 +82,7 @@ var genSVG = function(strips, options) {
 var exportImageInTmpSvg = function() {
 	d3.select("#tmpSvg").selectAll("svg").remove();
 	var tmpSvg = d3.select("#tmpSvg").append("svg")
-		.attr("width", traceSvg.node().clientWidth - config.stripTableWidth)
+		.attr("width", traceSvg.node().parentNode.clientWidth - config.stripTableWidth)
 		.attr("height", traceSvg.attr("height"))
 		.attr("version", 1.1);
 

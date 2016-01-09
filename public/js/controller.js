@@ -134,7 +134,7 @@ var dragSvgHandler = d3.behavior.drag()
 	.attr("y2", newHeight);
 	d3.selectAll("#assembleSvg svg > line").attr("y1", newHeight)
 	.attr("y2", newHeight);
-	var existingWidth = (tileView.classed("active")) ? assembleSvg.node().clientWidth : traceSvg.node().clientWidth;
+	var existingWidth = (tileView.classed("active")) ? assembleSvg.node().parentNode.clientWidth : traceSvg.node().parentNode.clientWidth;
 	assembleSvgDimensions
 	.attr("y", newHeight - 20)
 	.text(existingWidth + "px x " + newHeight + "px");
@@ -622,7 +622,7 @@ var inferHandler = function(d, i) {
 var originalZoomHandler = function(d, i) {
 	commonZoomHandler.scale(1);
 	var bbox = d3.select(this.parentNode.parentNode.parentNode).selectAll(".display.canvas")[0][0].getBBox();
-	var svgWidth = (tileView.classed("active")) ? assembleSvg.node().clientWidth : traceSvg.node().clientWidth;
+	var svgWidth = (tileView.classed("active")) ? assembleSvg.node().parentNode.clientWidth : traceSvg.node().parentNode.clientWidth;
 	var svgHeight = parseInt(assembleSvg.attr("height"),10);
 	var paletteWidth = config.stripTableWidth;
 
@@ -659,10 +659,11 @@ var zoomToFitHandler = function(d, i) {
 	}
 	canvasBbox.width = canvasBbox.x2 - canvasBbox.x;
 	canvasBbox.height = canvasBbox.y2 - canvasBbox.y;
-	var svgWidth = (tileView.classed("active")) ? assembleSvg.node().clientWidth : traceSvg.node().clientWidth;
+	var svgWidth = (tileView.classed("active")) ? assembleSvg.node().parentNode.clientWidth : traceSvg.node().parentNode.clientWidth;
 	var svgHeight = parseInt(assembleSvg.attr("height"),10);
 	var paletteWidth = config.stripTableWidth;
 
+	console.log(svgWidth)
 	var scale = 1.05 * Math.max(canvasBbox.height / svgHeight, canvasBbox.width / (svgWidth - paletteWidth));
 
 	commonZoomHandler.scale(1 / scale);
@@ -901,10 +902,13 @@ var loadFromFile = function() {
 	var reader = new FileReader();
 	var files = $("#loadFileInput")[0].files;
 	if (files.length === 1) {
+		var loadedFilename = files[0].name;
 		reader.onload = function() {
 			try {
 				var loaded = JSON.parse(reader.result);
-				loadFromJson(loaded);
+				loadFromJson(loaded, function() {
+					currentFilename = loadedFilename.slice(0, loadedFilename.search(/\.slfm/));
+				});
 			} catch (err) {
 				bootbox.alert(err.message);
 				console.log(err);
@@ -926,10 +930,43 @@ var saveToFile = function() {
 
 	bootbox.prompt({
 		title: "Save design as:",
-		value: "newfile.slfm",
+		value: currentFilename + ".slfm",
 		callback: function(result) {
 			if (result !== null) {
 				saveToFileWithTitle(result);
+			}
+		}
+	});
+};
+
+var exportSvgHandler = function() {
+	bootbox.prompt({
+		title: "Export SVG as:",
+		value: currentFilename + ".svg",
+		callback: function(result) {
+			if (result !== null) {
+				var tmpSvg = exportImageInTmpSvg();
+				svgAsDataUri(tmpSvg, {}, function(uri) {
+					var pom = d3.select("#downloadLink").node();
+					pom.download = result;
+					pom.href = uri;
+					pom.click();
+					d3.select(tmpSvg).remove();
+				});
+			}
+		}
+	});
+};
+
+var exportPngHandler = function(d) {
+	bootbox.prompt({
+		title: "Export PNG as:",
+		value: currentFilename + ".png",
+		callback: function(result) {
+			if (result !== null) {
+				var tmpSvg = exportImageInTmpSvg();
+				saveSvgAsPng(tmpSvg, result, {scale: d.factor});
+				d3.select(tmpSvg).remove();
 			}
 		}
 	});

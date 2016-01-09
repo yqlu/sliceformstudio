@@ -57,7 +57,7 @@
 				"description": "12-gons and 9-gons",
 				"slfm": "constellation_i"
 			}, {
-				"filename": "constellation2.jpg",
+				"filename": "constellation_ii.png",
 				"title": "Constellation II",
 				"year": 2014,
 				"description": "12-gons, hexagons and squares",
@@ -102,10 +102,11 @@
 				"description": "12-gons and 9-gons",
 				"slfm": "vineyard"
 			}, {
-				"filename": "girih.jpg",
+				"filename": "girih_i.png",
 				"title": "Girih I",
 				"year": 2010,
-				"description": "Girih tiles"
+				"description": "Girih tiles",
+				"slfm": "girih_i"
 			}, {
 				"filename": "girih2.jpg",
 				"title": "Girih II",

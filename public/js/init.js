@@ -438,22 +438,22 @@ var stripColors = [
 	{hex: "#F44336", name: "Red", id: "red"},
 	{hex: "#E91E63", name: "Pink", id: "pink"},
 	{hex: "#9c26b0", name: "Purple", id: "purple"},
-	{hex: "#673AB7", name: "Deep Purple", id: "dpurple"},
+	{hex: "#673AB7", name: "Deep Purple", id: "deep_purple"},
 	{hex: "#3F51B5", name: "Indigo", id: "indigo"},
 	{hex: "#2196F3", name: "Blue", id: "blue"},
-	{hex: "#03A9F4", name: "Light Blue", id: "lblue"},
+	{hex: "#03A9F4", name: "Light Blue", id: "light_blue"},
 	{hex: "#00BCD4", name: "Cyan", id: "cyan"},
 	{hex: "#009688", name: "Teal", id: "teal"},
 	{hex: "#4CAF50", name: "Green", id: "green"},
-	{hex: "#8BC34A", name: "Light Green", id: "lgreen"},
+	{hex: "#8BC34A", name: "Light Green", id: "light_green"},
 	{hex: "#CDDC39", name: "Lime", id: "lime"},
 	{hex: "#FFEB3B", name: "Yellow", id: "yellow"},
 	{hex: "#FFC107", name: "Amber", id: "amber"},
 	{hex: "#FF9800", name: "Orange", id: "orange"},
-	{hex: "#FF5722", name: "Deep Orange", id: "dorange"},
+	{hex: "#FF5722", name: "Deep Orange", id: "deep_orange"},
 	{hex: "#795548", name: "Brown", id: "brown"},
 	{hex: "#9E9E9E", name: "Grey", id: "grey"},
-	{hex: "#607D8B", name: "Blue Grey", id: "bgrey"}
+	{hex: "#607D8B", name: "Blue Grey", id: "blue_grey"}
 ];
 
 var colorMap = _.map(stripColors, function(c) {
@@ -471,16 +471,7 @@ d3.select("#colorpicker").selectAll("option")
 .html(function(d) { return d.name; });
 
 var exportSvg = d3.select("#exportSvg")
-.on("click", function() {
-	var tmpSvg = exportImageInTmpSvg();
-	svgAsDataUri(tmpSvg, {}, function(uri) {
-		var pom = d3.select("#downloadLink").node();
-		pom.download = "design.svg";
-		pom.href = uri;
-		pom.click();
-		d3.select(tmpSvg).remove();
-	});
-});
+.on("click", exportSvgHandler);
 
 d3.select("#exportPngMenu").selectAll("li").data([
 	{factor: 0.5, title: "Small"},
@@ -489,15 +480,11 @@ d3.select("#exportPngMenu").selectAll("li").data([
 	{factor: 4, title: "Very large"}])
 .enter().append("li")
 .append("a").attr("href", "#")
-.on("click", function(d) {
-	var tmpSvg = exportImageInTmpSvg();
-	saveSvgAsPng(tmpSvg, "design.png", {scale: d.factor});
-	d3.select(tmpSvg).remove();
-});
+.on("click", exportPngHandler);
 
 d3.select("#exportPngDropdown").on("click", function() {
 	d3.select("#exportPngMenu").selectAll("li").selectAll("a").text(function(d) {
-		var width = traceSvg.node().clientWidth - config.stripTableWidth;
+		var width = traceSvg.node().parentNode.clientWidth - config.stripTableWidth;
 		var height = traceSvg.attr("height");
 		return d.title + " (" + Math.round(width * d.factor) + " x " + Math.round(height * d.factor) + ")";
 	});
@@ -640,6 +627,8 @@ bootbox.setDefaults({
 	container: "body#body"
 });
 
+var currentFilename = "my_design";
+
 // wrap jQuery plugins in document.ready
 $(document).ready(function() {
 	$("#colorpicker").simplecolorpicker({theme: 'regularfont'})
@@ -696,6 +685,7 @@ $(document).ready(function() {
 				$.getJSON("/slfm_files/gallery/" + params.template + ".slfm")
 				.done(function(data) {
 					loadFromJson(data, function() {
+						currentFilename = params.template;
 						if (params.strips) {
 							stripViewClick();
 						}

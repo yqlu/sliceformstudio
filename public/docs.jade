@@ -3,7 +3,6 @@
 	#sidebar-wrapper
 		ul.sidebar-nav
 	#page-content-wrapper
-		.alert.alert-info(role='alert')
 		h2#tileSelect Tile selection
 
 		p When the app first starts up, you are asked to "initialize your design" by picking a set of tiles. Different set of tiles fit together differently and have different symmetries.
@@ -106,23 +105,17 @@
 				.img-container
 					img(src="/images/docs/customTile1.png")
 				.label-container
-					label sides = #[code [1,1,1,1,1,1]]
-				.label-container
-					label angles = #[code [120,120,120,60,240,60]]
+					label sides = #[span.code [1,1,1,1,1,1]], angles = #[span.code [120,120,120,60,240,60]]
 			.col-sm-4.img-with-label
 				.img-container
 					img(src="/images/docs/customTile2.png")
 				.label-container
-					label sides = #[code [1,1,1,1,1,1]]
-				.label-container
-					label angles = #[code [72,216,72,72,216,72]]
+					label sides = #[span.code [1,1,1,1,1,1]], angles = #[span.code [72,216,72,72,216,72]]
 			.col-sm-4.img-with-label
 				.img-container
 					img(src="/images/docs/customTile3.png")
 				.label-container
-					label sides = #[code [1.618,1,1,1.618]]
-				.label-container
-					label angles = #[code [72,144,72,72]]
+					label sides = #[span.code [1.618,1,1,1.618]], angles = #[span.code [72,144,72,72]]
 
 		h6 Deleting a tile
 
@@ -145,7 +138,7 @@
 		.row
 			.img-with-label.col-sm-12
 				.img-container
-					img(style="height: auto", data-gifffer="/images/tutorial/step2.gif")
+					img(style="height: auto", data-gifffer="/images/docs/pop-canvas.gif")
 
 		h4#tileManip Manipulating tiles
 
@@ -202,9 +195,15 @@
 		.row
 			.img-with-label.col-sm-12
 				.img-container
-					img(style="height: 100%", data-gifffer="/images/docs/duppenrose.gif")
+					img(data-gifffer="/images/docs/duppenrose.gif")
 				.label-container
 					label Using the copy feature to rapidly assemble a large symmetric configuration.
+
+		h4#canvasControl Canvas control
+
+		p The #[i.fa.fa-arrows-alt] and 1:1 buttons are useful canvas control utilities. The former ("Zoom to fit") automatically zooms to fit everything on the canvas, while the latter ("Reset zoom level") resets the scale and centers the contents of the canvas.
+
+		p Note that your cursor changes from #[i.fa.fa-arrows.fa-border] (indicating the panning action) to #[i.fa.fa-arrows-v.fa-border] when you hover over the bottom edge of the canvas. When this happens, you can drag the bottom edge of the canvas to resize the display from its default height of 500px.
 
 		h2#patternDesign Pattern design
 
@@ -269,7 +268,7 @@
 		.row
 			.img-with-label.col-sm-12
 				.img-container
-					img(style="height: 100%", src="/images/docs/inferdemo.png")
+					img(src="/images/docs/inferdemo.png")
 				.label-container
 					label Example of patterns inferred from smoothly varying boundary conditions.
 
@@ -304,9 +303,9 @@
 
 		p When you drag around the red pattern handles, you determine a pattern template which is copied multiple times and pasted onto different edges within the same polygon. This is very useful to impose certain symmetries onto the patterns within the tile. The exact way that the template is copied and pasted is defined by an #[i edge mapping].
 
-		p An edge mapping looks like a list of pairs of integers: #[code [[1,2], [4,5], [7,8]]]. In this example, the template specified by the red pattern handles enters the tile via edge 1 and leaves via edge 2. Sliceform Studio then copies and pastes two more copies of the pattern that enter from edges 4 and 7 and leave from edges 5 and 8 respectively.
+		p An edge mapping looks like a list of pairs of integers: #[span.code [[1,2], [4,5], [7,8]]]. In this example, the template specified by the red pattern handles enters the tile via edge 1 and leaves via edge 2. Sliceform Studio then copies and pastes two more copies of the pattern that enter from edges 4 and 7 and leave from edges 5 and 8 respectively.
 
-		.alert.alert-info Each polygon has an implicit numbering of edges from 0 to n-1 counting clockwise. To figure out this implicit labelling, set a pattern's edge mapping to #[code [[0,1]]]. You can then deduce the 0th edge, and count the edges clockwise.
+		.alert.alert-info Each polygon has an implicit numbering of edges from 0 to n-1 counting clockwise. To figure out this implicit labelling, set a pattern's edge mapping to #[span.code [[0,1]]]. You can then deduce the 0th edge, and count the edges clockwise.
 
 		p If your polygon has radial symmetry, you can specify the edge mapping by providing as input the interval between consecutive patterns, the starting edge, and the number of edges spanned by the pattern.
 
@@ -315,27 +314,23 @@
 				.img-container
 					img(src="/images/docs/custom1-1.png")
 				.label-container
-					label #[code interval = 3, span = 2].
+					label #[span.code interval = 3, span = 2].
 				.label-container
-					label This gives the mapping #[code [[0,2],[3,5],[6,8],[9,11]]]
+					label This gives the mapping #[span.code [[0,2],[3,5],[6,8],[9,11]]]
 			.col-sm-4.img-with-label
 				.img-container
 					img(src="/images/docs/custom1-2.png")
 				.label-container
-					label #[code interval = 2, span = 3].
+					label #[span.code interval = 2, span = 3].
 				.label-container
-					label This gives the mapping #[code [[0,3],[2,5],[4,7],[6,9],[8,11],[10,1]]]
+					label This gives the mapping #[span.code [[0,3],[2,5],[4,7],[6,9],[8,11],[10,1]]]
 			.col-sm-4.img-with-label
 				.img-container
 					img(src="/images/docs/custom1-3.png")
 				.label-container
-					label #[code interval = 1, span = 2].
+					label #[span.code interval = 1, span = 2].
 				.label-container
-					label This gives the mapping
-						br
-						code [[0,2],[1,3],[2,4],[3,5],[4,6],[5,7],
-						br
-						code [6,8],[7,9],[8,10],[9,11],[10,0],[11,1]]
+					label This gives the mapping #[span.code [[0,2],[1,3],[2,4],[3,5],[4,6],[5,7], [6,8],[7,9],[8,10],[9,11],[10,0],[11,1]]]
 
 		p You can also manually type in the array. If Sliceform Studio can't parse the text input into a list of pairs of integers, it will alert you of the error.
 
@@ -346,17 +341,17 @@
 				.img-container
 					img(src="/images/docs/custom_flip_1.png")
 				.label-container
-					label #[code [[0,1],[3,2,true]]]
+					label #[span.code [[0,1],[3,2,true]]]
 			.col-sm-4.img-with-label
 				.img-container
 					img(src="/images/docs/custom_flip_2.png")
 				.label-container
-					label #[code [[1,5],[4,0,true],[6,0],[9,5,true]]]
+					label #[span.code [[1,5],[4,0,true],[6,0],[9,5,true]]]
 			.col-sm-4.img-with-label
 				.img-container
 					img(src="/images/docs/custom_flip_3.png")
 				.label-container
-					label #[code [[0,1],[2,1,true],[3,4],[5,4,true]]]
+					label #[span.code [[0,1],[2,1,true],[3,4],[5,4,true]]]
 
 		h6 Offset
 
@@ -450,13 +445,15 @@
 		.row
 			.img-with-label.col-sm-12
 				.img-container
-					img(style="height: 100%", src="/images/docs/matching.png")
+					img(src="/images/docs/matching.png")
 				.label-container
 					label A summary of the matching procedure. Here two edges with incompatible pattern interfaces are being joined. Sliceform Studio matches up (a,b), (b,x), (c,w), (e,y) and (f,g). Patterns d and z are unmatched and their strips terminate at this edge.
 
 		h4#color Color assignment
 
-		p The strip canvas works similarly to the tile canvas – you can drag to pan and scroll to zoom. What's new is the color picker on top of the canvas. When you mouseover and click on a grey strip, it is assigned the color currently active in the color picker.
+		p The strip canvas works similarly to the tile canvas – you can drag to pan and scroll to zoom. The same canvas control buttons exist on the bottom left corner of the canvas.
+
+		p What's new is the color picker on top of the canvas. When you mouseover and click on a grey strip, it is assigned the color currently active in the color picker.
 
 		p Colors serve two purposes. They can be entirely aesthetic and a way to create a visually appealing image for exporting. On the other hand, if you would like to create paper strips, colors serve as categories for strips that should be generated in the same SVG files. This allows you to group strips together to be printed or laser-cut or die-cut at one go.
 
@@ -468,9 +465,9 @@
 
 		p The extension length slider controls the width of the line segment that is appended to the ends of strips. Note that this is only applicable to strips that terminate in an intersection; a non-zero extension length is required to generate paper strips so that they can properly slot into each other. If you are only generating the final image digitally for aesthetic reasons, you can freely set extension length to 0.
 
-		p The outline toggle is purely aesthetic and does exactly as it says.
+		p The Draw outline switch is purely aesthetic and does exactly as it says.
 
-		p Under "Advanced Options" are multiple sliders that control further parameters for the generated SVG files and the display.
+		p Under "Advanced Options" are multiple sliders that control further parameters for the generated SVG files.
 
 		h2#export Exporting
 
@@ -480,9 +477,13 @@
 
 		h4#exportStrip Export strips
 
-		p Any strips you assigned colors to show up in the "Color-coded SVG Files" section. Click "Generate SVG" beside the name of the relevant color to download a SVG file corresponding to the strips assigned that color.
+		p Any strips you assigned colors are categorized and show up in the "Strip Generation" sidebar on the left of the canvas. You can click on the #[i.fa.fa-download.fa-border] button beside each color to download a SVG file corresponding to the strips assigned that color.
 
-		p The generated feature 3 colors – the slits in black, the creases in red and the outlines in blue. This is optimized for laser cutters and die cutters, where you can pick an order to cut each color and have a different speed / power setting for each color.
+		p When you hover over a color category in the sidebar, the display highlights all strips of that color; all other strips fade temporarily to the default grey. You can also click on the #[i.fa.fa-caret-right] beside color categories to show a listing of all strips of that color. Hovering over a strip's label will highlight that strip in the display; reminding you which strip it is.
+
+		p The Strip Generation sidebar is not just informational, but also provides an alternate way to edit the color assignments of strips. Click on the (#[i.fa.fa-times]) beside a strip label to unassign colors; the strip will fade back to neutral grey. You can also drag strip labels to another color category (equivalent to clicking on that strip to paint it another color), or drag to reorder strips within the same category (no difference aesthetically, but this affects the generated paper strip SVG output).
+
+		p The generated SVG file features 3 colors – the slits in black, the creases in red and the outlines in blue. This is optimized for laser cutters and die cutters, where you can pick an order to cut each color and have a different speed / power setting for each color.
 
 		h4#manualStrip Manual strip generation
 
@@ -499,7 +500,7 @@
 				.img-container(style="height: auto;")
 					img(src="/images/docs/sample_strip.png")
 				.label-container
-					label SVG corresponding to input: #[code [[[10,20,30,40],[10,20,30,40]],[[15,25,35,45],[45,35,25,15]]]]
+					label SVG corresponding to input: #[span.code [[[10,20,30,40],[10,20,30,40]],[[15,25,35,45],[45,35,25,15]]]]
 
 		p See #[a(href="/gallery.html") Sunflower in the gallery] for an example of an artwork that used this feature.
 

@@ -81,8 +81,9 @@ var dragMove = d3.behavior.drag()
 // drag handler for rotation, attached to vertex element
 var dragRotate = d3.behavior.drag()
 .on("drag", function(d,i) {
-	// update rotation
-	var angle = num.getAngle(d3.event.x, d3.event.y) - num.getAngle(d.x, d.y);
+	var angle = num.getAngle(d3.event.x, d3.event.y) -
+		num.getAngle(d.x, d.y);
+
 	d3.select(this.parentNode.parentNode)
 	.attr("transform", function(d) {
 		d.transform = num.rotateBy(d.transform, angle);
@@ -101,6 +102,12 @@ var dragRotate = d3.behavior.drag()
 		d.transform = num.matrixRound(d.transform);
 		return num.getTransform(d);
 	});
+
+	// keep relative transforms of the tiles within the group unchanged
+	// before and after dragging action
+	// important for strip caching
+	this.parentNode.parentNode.undoCentering();
+	delete this.parentNode.parentNode.undoCentering;
 
 	d3.select("body").style("cursor", "auto");
 });
@@ -457,6 +464,7 @@ var updateTileWithPatternClick = function() {
 	});
 
 	updateInferButton();
+	invalidateStripCache();
 };
 
 var newCustomPatternClick = function() {
@@ -501,6 +509,7 @@ var copyHandler = function(d, i) {
 		} else if (selection.get().groupNode.parentNode === assemblePaletteContainer.node()) {
 			selection.copy(assembleSVGDrawer);
 		}
+		invalidateStripCache();
 	}
 };
 
@@ -510,6 +519,7 @@ var deleteHandler = function(d, i) {
 			// if there are no more inferTiles in the canvas, hide the infer button
 			selection.delete();
 			updateInferButton();
+			invalidateStripCache();
 		} else if (selection.get().groupNode.parentNode === assemblePaletteContainer.node()) {
 			var id = d3.select(selection.get().groupNode).select("g.tile").node().__data__.tiles[0].polygonID;
 			if (_.any(assembleCanvas.selectAll("g.tile")[0], function(t) {
@@ -518,6 +528,7 @@ var deleteHandler = function(d, i) {
 				bootbox.alert("You cannot delete a template tile in the palette if there are copies of it on the canvas.");
 			} else {
 				selection.delete(assembleSVGDrawer);
+				invalidateStripCache();
 			}
 		}
 	}
@@ -529,6 +540,7 @@ var clearHandler = function(d, i) {
 			polylist = [];
 			assembleCanvas.selectAll("g").remove();
 			inferButton.classed("hidden", true);
+			invalidateStripCache();
 		}
 	});
 };
@@ -649,11 +661,14 @@ var zoomToFitHandler = function(d, i) {
 		});
 	} else {
 		traceSvg.selectAll(".strip-below").each(function(d) {
+			var strip = this;
 			_.each(_.flatten(d.points), function(p) {
-				canvasBbox.x = Math.min(canvasBbox.x, p.x);
-				canvasBbox.y = Math.min(canvasBbox.y, p.y);
-				canvasBbox.x2 = Math.max(canvasBbox.x2, p.x);
-				canvasBbox.y2 = Math.max(canvasBbox.y2, p.y);
+				var transformedCoords = num.matrixToCoords(
+					num.dot(strip.parentNode.__data__.transform, num.coordsToMatrix([[p.x, p.y]])));
+				canvasBbox.x = Math.min(canvasBbox.x, transformedCoords[0][0]);
+				canvasBbox.y = Math.min(canvasBbox.y, transformedCoords[0][1]);
+				canvasBbox.x2 = Math.max(canvasBbox.x2, transformedCoords[0][0]);
+				canvasBbox.y2 = Math.max(canvasBbox.y2, transformedCoords[0][1]);
 			});
 		});
 	}
@@ -663,7 +678,6 @@ var zoomToFitHandler = function(d, i) {
 	var svgHeight = parseInt(assembleSvg.attr("height"),10);
 	var paletteWidth = config.stripTableWidth;
 
-	console.log(svgWidth)
 	var scale = 1.05 * Math.max(canvasBbox.height / svgHeight, canvasBbox.width / (svgWidth - paletteWidth));
 
 	commonZoomHandler.scale(1 / scale);
@@ -826,74 +840,94 @@ var tileViewClick = function() {
 	}
 };
 
+var stripViewCached = false;
+
+var invalidateStripCache = function() {
+	stripViewCached = false;
+};
+
 var stripViewClick = function() {
 	keyboardJS.setContext("stripView");
 
 	if (!stripView.classed("active")) {
-		setupOverlay();
+		if (stripViewCached) {
+			traceCanvas.each(function(d, i) {
+				d.transform = assembleCanvas.datum().transform;
+			})
+			.attr("transform", num.getTransform);
 
-		d3.selectAll("path.pattern")
-		.each(function(d) {
-			delete d.isStripAssigned;
-			delete d.assignStripColor;
-		});
+			traceCanvas.selectAll("g.group").each(function(d) {
+				d.transform = d.assembleCounterpart.transform;
+			})
+			.attr("transform", num.getTransform);
+		} else {
+			setupOverlay();
 
-		traceCanvas.selectAll("path").remove();
-		var clone = _.cloneDeep(polylist, deepCustomizer(false));
-		_.each(clone, function(group, groupIdx) {
-			_.each(group.tiles, function(tile, tileIdx) {
-				circularize(tile);
-				generatePatternInterface(tile);
-				_.each(tile.patterns, function(pattern, patternIdx) {
-					pattern.assembleCounterpart = polylist[groupIdx].tiles[tileIdx].patterns[patternIdx];
-				});
-				if ($("#cropMode").prop("checked") && cropData.hull.length >= 3) {
-					cropPattern(tile, group);
-				}
+			d3.selectAll("path.pattern")
+			.each(function(d) {
+				delete d.isStripAssigned;
+				delete d.assignStripColor;
 			});
-		});
-		resetAndDraw(traceCanvas, clone, tracePatternOptions);
-		traceCanvas
-		.each(function(d, i) {
-			d.transform = assembleCanvas.datum().transform;
-		})
-		.attr("transform", num.getTransform);
 
-		oldColorMap = colorMap;
+			traceCanvas.selectAll("path").remove();
+			var clone = _.cloneDeep(polylist, deepCustomizer(false));
+			_.each(clone, function(group, groupIdx) {
+				group.assembleCounterpart = polylist[groupIdx];
+				_.each(group.tiles, function(tile, tileIdx) {
+					circularize(tile);
+					generatePatternInterface(tile);
+					_.each(tile.patterns, function(pattern, patternIdx) {
+						pattern.assembleCounterpart = polylist[groupIdx].tiles[tileIdx].patterns[patternIdx];
+					});
+					if ($("#cropMode").prop("checked") && cropData.hull.length >= 3) {
+						cropPattern(tile, group);
+					}
+				});
+			});
+			resetAndDraw(traceCanvas, clone, tracePatternOptions);
+			traceCanvas
+			.each(function(d, i) {
+				d.transform = assembleCanvas.datum().transform;
+			})
+			.attr("transform", num.getTransform);
 
-		colorMap = _.map(stripColors, function(c) {
-			return {
-				color: c,
-				strips: []
-			};
-		});
+			oldColorMap = colorMap;
 
-		d3.select("#noneSoFar").style("display", "block");
-		sidebarForm.selectAll("div").remove();
+			colorMap = _.map(stripColors, function(c) {
+				return {
+					color: c,
+					strips: []
+				};
+			});
 
+			d3.select("#noneSoFar").style("display", "block");
+			sidebarForm.selectAll("div").remove();
+
+			redrawCanvas();
+
+			_.each(oldColorMap, function(c) {
+				_.each(c.strips, function(s) {
+					_.each(s.patternList, function(p) {
+						if (p.assembleCounterpart.isStripAssigned && !p.assembleCounterpart.isStripAssigned()) {
+							p.assembleCounterpart.assignStripColor(c.color.hex);
+						}
+					});
+				});
+			});
+
+			var noStripsOnCanvas = d3.select("#traceSvg").selectAll(".strip")[0].length === 0;
+			d3.select("#traceSvg").select(".shadedOverlay").style("visibility",
+				(noStripsOnCanvas ? "visible" : "hidden"));
+			d3.select("#traceSvg").select(".palette").style("visibility",
+				(noStripsOnCanvas ? "hidden" : "visible"));
+		}
 		tileView.classed("active", false);
 		stripView.classed("active", true);
 
 		d3.select("#assembleTab").classed("active", false).classed("hidden", true);
 		d3.select("#traceTab").classed("active", true).classed("hidden", false);
 
-		redrawCanvas();
-
-		_.each(oldColorMap, function(c) {
-			_.each(c.strips, function(s) {
-				_.each(s.patternList, function(p) {
-					if (p.assembleCounterpart.isStripAssigned && !p.assembleCounterpart.isStripAssigned()) {
-						p.assembleCounterpart.assignStripColor(c.color.hex);
-					}
-				});
-			});
-		});
-
-		var noStripsOnCanvas = d3.select("#traceSvg").selectAll(".strip")[0].length === 0;
-		d3.select("#traceSvg").select(".shadedOverlay").style("visibility",
-			(noStripsOnCanvas ? "visible" : "hidden"));
-		d3.select("#traceSvg").select(".palette").style("visibility",
-			(noStripsOnCanvas ? "hidden" : "visible"));
+		stripViewCached = true;
 	}
 };
 

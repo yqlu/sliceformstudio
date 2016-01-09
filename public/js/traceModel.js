@@ -308,14 +308,14 @@ var everyOtherIntersect = function(segments, bool) {
 	}), true);
 };
 
-var overPoints = [];
-var underPoints = [];
-
 var redrawCanvas = function() {
-	overPoints = [];
-	underPoints = [];
 	longestStrip = 0;
 	shortestSegment = Infinity;
+
+	traceCanvas.selectAll("g.group").each(function(d) {
+		d.overPoints = [];
+		d.underPoints = [];
+	});
 
 	while ($(traceCanvas.node()).find("path.pattern").length > 0) {
 		var i = 0, strictMode = true;
@@ -340,10 +340,11 @@ var groupPattern = function(patternData, strictMode) {
 	var traced = patternTrace(patternData);
 	var patternList = traced.patternList;
 
+	var groupNode = patternData.this.parentNode.parentNode;
+
 	var rawSegments = _.map(patternList, function(p, index) {
 
-		var transform = num.dot(p.pattern.this.parentNode.parentNode.__data__.transform,
-			p.pattern.this.parentNode.__data__.transform);
+		var transform = p.pattern.this.parentNode.__data__.transform;
 
 		var transformedVertices = _.map(p.pattern.intersectedVertices, function(obj) {
 			var ans = num.dot(transform, obj.coords.concat([1]));
@@ -418,6 +419,9 @@ var groupPattern = function(patternData, strictMode) {
 
 	// assign over and under
 
+	var overPoints = groupNode.__data__.overPoints;
+	var underPoints = groupNode.__data__.underPoints;
+
 	if (overPoints.length === 0) {
 		// easy step: no constraints, so just arbitrarily assign over and under
 		direction = true;
@@ -461,24 +465,24 @@ var groupPattern = function(patternData, strictMode) {
 	}
 
 	// construct lines corresponding to over and under
-	var overOutline = traceCanvas.append("path")
+	var overOutline = d3.select(groupNode).append("path")
 					.classed("strip-outline", true)
 					.attr("d", function() {
 						return altLine(reducedSegments, direction, true);
-					}).node()
-	var overStrip = traceCanvas.append("path")
+					}).node();
+	var overStrip = d3.select(groupNode).append("path")
 					.classed("strip strip-above", true)
 					.attr("d", function() {
 						return altLine(reducedSegments, direction, false);
 					}).node();
-	var underStrip = traceCanvas.insert("path", ":first-child")
+	var underStrip = d3.select(groupNode).insert("path", ":first-child")
 					.classed("strip strip-below", true)
 					.attr("d", function() {
 						return _.map(reducedSegments, function(seg) {
 							return line(seg);
 						}).join(" ");
 					}).node();
-	var underOutline = traceCanvas.insert("path", ":first-child")
+	var underOutline = d3.select(groupNode).insert("path", ":first-child")
 					.classed("strip-outline", true)
 					.attr("d", underStrip.getAttribute("d")).node();
 

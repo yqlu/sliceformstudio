@@ -199,6 +199,7 @@ var loadFromJson = function(loaded, callback) {
 			teardownOverlay();
 		}
 		d3.select(".loading-overlay").classed("in", false);
+		invalidateStripCache();
 
 		if (callback) {
 			callback();

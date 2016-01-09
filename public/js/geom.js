@@ -218,6 +218,18 @@ var centerCoords = function(tileNode) {
 		d.transform = num.matrixRound(num.dot(tileInverse, d.transform));
 	})
 	.attr("transform", num.getTransform);
+
+	tileNode.parentNode.undoCentering = function() {
+		d3.select(tileNode.parentNode)
+		.each(function(d) {
+			d.transform = num.matrixRound(num.dot(d.transform, tileInverse));
+		})
+		.attr("transform", num.getTransform)
+		.selectAll("g").each(function(d) {
+			d.transform = num.matrixRound(num.dot(tileTransform, d.transform));
+		})
+		.attr("transform", num.getTransform);
+	};
 };
 
 // some math to ensure after transfer from palette to canvas

@@ -62,7 +62,7 @@
 			.shadedOverlay(style="visibility: hidden;")
 				.innerOverlay
 					h2 #[i.fa.fa-exclamation-triangle] There are no strips on the canvas.
-					p(style="font-size: 20px; text-transform: none; color: black; margin: 20px;") You need to drag tiles onto the canvas under "Edit tiles and patterns" and add patterns to them via the #[i.fa.fa-cog] buttons first.
+					p(style="font-size: 20px; text-transform: none; color: black; margin: 20px;") You need to drag tiles onto the canvas under “Edit tiles and patterns” and add patterns to them via the #[i.fa.fa-cog] buttons first.
 			.svg-toolbar#traceSvgToolbar
 				.btn-group.padded-btn-group
 					a.btn.btn-default.btn-sm(title="Zoom to fit")#assembleZoomToFit #[i.fa.fa-fw.fa-arrows-alt]
@@ -86,7 +86,8 @@
 		#customStripPanel.toolbar
 			.panel.panel-default
 				.panel-heading
-					h4.panel-title Manual strip generation
+					h4.panel-title #[span Manual strip generation ]
+						a(href='docs.html#manualStrip', target='_blank') #[i.fa.fa-question-circle.fa-lg]
 				#customStrips.panel-body
 					form
 						.form-group
@@ -105,7 +106,7 @@
 				h4.modal-title Advanced options
 			.modal-body
 				p
-					| Specify parameters for the generated SVG files here. The defaults work well for generic laser cutters, but you can tweak them to your own preferences.
+					| Specify parameters for the generated paper strip SVG files here. The defaults work well for generic laser cutters, but you can tweak them to your own preferences.
 				form.form-horizontal
 					.form-group
 						label.control-label.col-md-2 Strip height
@@ -151,7 +152,7 @@
 									.col-md-offset-4.col-md-8
 										input#shapeEditToggle(type="checkbox", checked="true", data-label-text="Display dimensions", data-label-width=150)
 								p
-									| You can customize the polygon on the right by dragging on the vertices before clicking "Add to lineup".
+									| You can customize the polygon on the right by dragging on the vertices before clicking “Add to lineup”.
 						.col-md-5
 							#shapeEditSvg
 			.modal-footer
@@ -209,7 +210,7 @@
 								#inferText
 									p
 										| In this setting, this tile's pattern will be dynamically inferred from its neighbors' on its canvas.
-									p To trigger the inference algorithm, click the "Infer" button above.
+									p To trigger the inference algorithm, click the “Infer” button above.
 								#customPattern
 									.form-group
 										.col-md-offset-3.col-md-9

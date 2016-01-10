@@ -639,12 +639,14 @@ var originalZoomHandler = function(d, i) {
 	var svgHeight = parseInt(assembleSvg.attr("height"),10);
 	var paletteWidth = config.stripTableWidth;
 
-	commonZoomHandler.translate([-bbox.x - bbox.width / 2 + paletteWidth + (svgWidth - paletteWidth) / 2,
-		-bbox.y - bbox.height / 2 + svgHeight / 2]);
-	d3.selectAll("#traceSvg, #assembleSvg").selectAll(".display.canvas").each(function(d) {
-		d.transform = num.matrixRound(num.translateBy(num.scaleBy(num.id, commonZoomHandler.scale()),
-			commonZoomHandler.translate()[0], commonZoomHandler.translate()[1]));
-	}).attr("transform", num.getTransform);
+	if (bbox.width > 0 && bbox.height > 0) {
+		commonZoomHandler.translate([-bbox.x - bbox.width / 2 + paletteWidth + (svgWidth - paletteWidth) / 2,
+			-bbox.y - bbox.height / 2 + svgHeight / 2]);
+		d3.selectAll("#traceSvg, #assembleSvg").selectAll(".display.canvas").each(function(d) {
+			d.transform = num.matrixRound(num.translateBy(num.scaleBy(num.id, commonZoomHandler.scale()),
+				commonZoomHandler.translate()[0], commonZoomHandler.translate()[1]));
+		}).attr("transform", num.getTransform);
+	}
 };
 
 var zoomToFitHandler = function(d, i) {
@@ -673,25 +675,27 @@ var zoomToFitHandler = function(d, i) {
 			});
 		});
 	}
-	canvasBbox.width = canvasBbox.x2 - canvasBbox.x;
-	canvasBbox.height = canvasBbox.y2 - canvasBbox.y;
-	var svgWidth = (tileView.classed("active")) ? assembleSvg.node().parentNode.clientWidth : traceSvg.node().parentNode.clientWidth;
-	var svgHeight = parseInt(assembleSvg.attr("height"),10);
-	var paletteWidth = config.stripTableWidth;
+	if (_.all(_.values(canvasBbox), isFinite)) {
+		canvasBbox.width = canvasBbox.x2 - canvasBbox.x;
+		canvasBbox.height = canvasBbox.y2 - canvasBbox.y;
+		var svgWidth = (tileView.classed("active")) ? assembleSvg.node().parentNode.clientWidth : traceSvg.node().parentNode.clientWidth;
+		var svgHeight = parseInt(assembleSvg.attr("height"),10);
+		var paletteWidth = config.stripTableWidth;
 
-	var scale = 1.05 * Math.max(canvasBbox.height / svgHeight, canvasBbox.width / (svgWidth - paletteWidth));
+		var scale = 1.05 * Math.max(canvasBbox.height / svgHeight, canvasBbox.width / (svgWidth - paletteWidth));
 
-	commonZoomHandler.scale(1 / scale);
+		commonZoomHandler.scale(1 / scale);
 
-	var translate = [
-		(- canvasBbox.x - canvasBbox.width / 2) / scale + paletteWidth + (svgWidth - paletteWidth) / 2,
-		(- canvasBbox.y - canvasBbox.height / 2) / scale + svgHeight / 2];
-	commonZoomHandler.translate(translate);
+		var translate = [
+			(- canvasBbox.x - canvasBbox.width / 2) / scale + paletteWidth + (svgWidth - paletteWidth) / 2,
+			(- canvasBbox.y - canvasBbox.height / 2) / scale + svgHeight / 2];
+		commonZoomHandler.translate(translate);
 
-	d3.selectAll("#traceSvg, #assembleSvg").selectAll(".display.canvas").each(function(d) {
-		d.transform = num.matrixRound(num.translateBy(num.scaleBy(num.id, commonZoomHandler.scale()),
-			commonZoomHandler.translate()[0], commonZoomHandler.translate()[1]));
-	}).attr("transform", num.getTransform);
+		d3.selectAll("#traceSvg, #assembleSvg").selectAll(".display.canvas").each(function(d) {
+			d.transform = num.matrixRound(num.translateBy(num.scaleBy(num.id, commonZoomHandler.scale()),
+				commonZoomHandler.translate()[0], commonZoomHandler.translate()[1]));
+		}).attr("transform", num.getTransform);
+	}
 };
 
 var thicknessSliderChange = function() {
@@ -727,12 +731,14 @@ var cropSelectAll = function() {
 	d3.selectAll(".crop-vertex").classed("selected", true);
 	cropData.vertices = _.pluck(d3.selectAll(".crop-vertex")[0], "__data__");
 	recomputeHull();
+	invalidateStripCache();
 };
 
 var cropUnselectAll = function() {
 	d3.selectAll(".crop-vertex").classed("selected", false);
 	cropData.vertices = [];
 	recomputeHull();
+	invalidateStripCache();
 };
 
 var cropCircleClick = function(d) {
@@ -746,6 +752,7 @@ var cropCircleClick = function(d) {
 		d3.select(this).classed("selected", true);
 	}
 	recomputeHull();
+	invalidateStripCache();
 };
 
 var cropDesignClick = function() {
@@ -921,6 +928,7 @@ var stripViewClick = function() {
 				(noStripsOnCanvas ? "visible" : "hidden"));
 			d3.select("#traceSvg").select(".palette").style("visibility",
 				(noStripsOnCanvas ? "hidden" : "visible"));
+			d3.selectAll(".svg-toolbar").style("left", noStripsOnCanvas ? "0px" : config.stripTableWidth + "px");
 		}
 		tileView.classed("active", false);
 		stripView.classed("active", true);

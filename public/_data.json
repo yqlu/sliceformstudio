@@ -31,11 +31,6 @@
 		"categories": [{
 			"title": "Beginner",
 			"items": [{
-				"filename": "psychedelica.jpg",
-				"title": "Psychedelica",
-				"year": 2012,
-				"description": "Octagons"
-			}, {
 				"filename": "pentille.jpg",
 				"title": "Pentille",
 				"year": 2015,
@@ -119,6 +114,14 @@
 				"year": 2015,
 				"description": "12-gons and triangles",
 				"slfm": "brimstone"
+			}]
+		}, {
+			"title": "No schematic",
+			"items": [{
+				"filename": "psychedelica.jpg",
+				"title": "Psychedelica",
+				"year": 2012,
+				"description": "Octagons"
 			}, {
 				"filename": "pleiades.png",
 				"title": "Pleiades",

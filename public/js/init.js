@@ -126,14 +126,7 @@ var fo = tracePaletteContainer.append("foreignObject")
 	.append("div").classed("stripTablePadded", true);
 
 fo.append("h4")
-	.html("Strip generation <a href='#'><i class='fa fa-question-circle'></i></a>");
-
-fo.select("h4 a").on("click", function() {
-	bootbox.alert({
-		title: "Strip Generation",
-		message: "<p>This panel shows a summary of all strips which you have assigned colors to.</p><p>You can assign the currently active color to strips by clicking on them. Once they have been colored, you can sort the strips and edit the color assignment below. Use the <i class='fa fa-download fa-border'></i> button to download all generated paper strip templates for a given color.</p><p>"
-	});
-});
+	.html("Strip generation <a href='/docs.html#exportStrip' target='_blank'><i class='fa fa-question-circle'></i></a>");
 
 var sidebarForm = fo
 	.append("form").classed("form-horizontal", true);

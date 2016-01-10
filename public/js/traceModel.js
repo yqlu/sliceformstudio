@@ -750,6 +750,10 @@ var generateCustomStrip = function() {
 		d3.select(svg).remove();
 	} else {
 		console.error("Invalid strip format: ", stripData);
+		bootbox.alert({
+			title: "Error",
+			message: "<p>Unable to parse input as strip:</p><pre>" + d3.select("#customStripJson").node().value + "</pre>"
+		})
 	}
 };
 

@@ -5,7 +5,7 @@
 	#page-content-wrapper
 		h2#tileSelect Tile selection
 
-		p When the app first starts up, you are asked to "initialize your design" by picking a set of tiles. Different set of tiles fit together differently and have different symmetries.
+		p When the app first starts up, you are asked to “initialize your design” by picking a set of tiles. Different set of tiles fit together differently and have different symmetries.
 
 		h4#regularPoly Regular tiles
 
@@ -90,7 +90,7 @@
 
 		h4#customPalette Customizing your palette
 
-		p The final option, 'Custom', defaults to a blank palette and canvas. This is convenient if you want to start from scratch and specify every single tile. Note, however that you can #[b always] customize your palette, even if you picked another option from the dropdown!
+		p The final option, “Custom”, defaults to a blank palette and canvas. This is convenient if you want to start from scratch and specify every single tile. Note, however that you can #[b always] customize your palette, even if you picked another option from the dropdown!
 
 		h6 Adding a new tile
 
@@ -182,7 +182,7 @@
 
 		h6 Snapping edges
 
-		p Under normal circumstances, Sliceform Studio will forbid you from joining two edges belonging to the same tile or to tiles in the same group. You can disable this check by turning off 'Planar' in the toolbar. Now when you click on two edges in succession, the two tiles will no longer snap together, but the edges will still turn green to indicate that they are now joined.
+		p Under normal circumstances, Sliceform Studio will forbid you from joining two edges belonging to the same tile or to tiles in the same group. You can disable this check by turning off “Planar” in the toolbar. Now when you click on two edges in succession, the two tiles will no longer snap together, but the edges will still turn green to indicate that they are now joined.
 
 		p This is useful for creating non-planar configurations like cylinders, polyhedra and other configurations where edges are identified in topologically interesting ways. Refer to #[a(href="/gallery.html") Rampart or Planetarium in the gallery] as examples of this.
 
@@ -201,7 +201,7 @@
 
 		h4#canvasControl Canvas control
 
-		p The #[i.fa.fa-arrows-alt] and 1:1 buttons are useful canvas control utilities. The former ("Zoom to fit") automatically zooms to fit everything on the canvas, while the latter ("Reset zoom level") resets the scale and centers the contents of the canvas.
+		p The #[i.fa.fa-arrows-alt] and 1:1 buttons are useful canvas control utilities. The former (“Zoom to fit”) automatically zooms to fit everything on the canvas, while the latter (“Reset zoom level”) resets the scale and centers the contents of the canvas.
 
 		p Note that your cursor changes from #[i.fa.fa-arrows.fa-border] (indicating the panning action) to #[i.fa.fa-arrows-v.fa-border] when you hover over the bottom edge of the canvas. When this happens, you can drag the bottom edge of the canvas to resize the display from its default height of 500px.
 
@@ -211,7 +211,7 @@
 
 		h4#basicMotifs Basic motifs
 
-		p These are common motifs in Islamic geometry which have been parametrized by sliders. "Angle" controls the contact angle between the motif and its incident edge while "Depth" controls the depth of the pattern. Sliceform Studio's implementation of these motifs is heavily based on #[a(href="http://www.cgl.uwaterloo.ca/~csk/washington/tile/papers/kaplan_bridges2000.pdf/") Craig Kaplan’s implementation of the same in the Java applet Taprats].
+		p These are common motifs in Islamic geometry which have been parametrized by sliders. “Angle” controls the contact angle between the motif and its incident edge while “Depth” controls the depth of the pattern. Sliceform Studio's implementation of these motifs is heavily based on #[a(href="http://www.cgl.uwaterloo.ca/~csk/washington/tile/papers/kaplan_bridges2000.pdf/") Craig Kaplan’s implementation of the same in the Java applet Taprats].
 
 		.row
 			.col-sm-4.img-with-label
@@ -418,9 +418,9 @@
 					label The cropped final result
 
 
-		p Click on the #[i.fa.fa-crop.fa-border] Crop button in the toolbar. If "Crop mode" is turned on, your tiling is overlaid with multiple black "crop points" – one for every vertex, edge midpoint and polygon center of every tile.
+		p Click on the #[i.fa.fa-crop.fa-border] Crop button in the toolbar. If “Crop mode” is turned on, your tiling is overlaid with multiple black “crop points” – one for every vertex, edge midpoint and polygon center of every tile.
 
-		p You can click on crop points individually to select them (and unselect them again). The cropped area of the final design will be defined as the convex hull of the selected crop points. The "Select All" button selects every black "crop point" to be part of the convex hull; the "Reset" button unselects everything.
+		p You can click on crop points individually to select them (and unselect them again). The cropped area of the final design will be defined as the convex hull of the selected crop points. The “Select All” button selects every black "crop point" to be part of the convex hull; the “Reset” button unselects everything.
 
 		p If fewer than 3 points are selected, the corresponding convex hull has no internal area and no cropping will be applied.
 
@@ -440,7 +440,7 @@
 
 		p If there are multiple patterns originating from the same position, the algorithm picks the one with incident angle closest to that of #[i p]. It also checks that this is mutual, i.e. that #[i p] has incident angle closest to the other edge as well. If this is true, the two patterns are matched; otherwise, #[i p] is unmatched.
 
-		p If no corresponding pattern is found on the other edge but there is a second pattern in the same tile as #[i p] incident on the edge at the same offset, Sliceform Studio matches both of them up such that the pattern "bounces" off the edge like a reflection.
+		p If no corresponding pattern is found on the other edge but there is a second pattern in the same tile as #[i p] incident on the edge at the same offset, Sliceform Studio matches both of them up such that the pattern “bounces” off the edge like a reflection.
 
 		.row
 			.img-with-label.col-sm-12
@@ -477,7 +477,7 @@
 
 		h4#exportStrip Export strips
 
-		p Any strips you assigned colors are categorized and show up in the "Strip Generation" sidebar on the left of the canvas. You can click on the #[i.fa.fa-download.fa-border] button beside each color to download a SVG file corresponding to the strips assigned that color.
+		p Any strips you assigned colors are categorized and show up in the “Strip Generation” sidebar on the left of the canvas. You can click on the #[i.fa.fa-download.fa-border] button beside each color to download a SVG file corresponding to the strips assigned that color.
 
 		p When you hover over a color category in the sidebar, the display highlights all strips of that color; all other strips fade temporarily to the default grey. You can also click on the #[i.fa.fa-caret-right] beside color categories to show a listing of all strips of that color. Hovering over a strip's label will highlight that strip in the display; reminding you which strip it is.
 
@@ -487,7 +487,7 @@
 
 		h4#manualStrip Manual strip generation
 
-		p Some users have requested the use of Sliceform Studio's strip generation capabilities independent of the pattern generation or tracing features. If you have a particular sliceform in mind which you have already calculated the dimensions of each strip for, you can type in a JSON input under "Manual strip generation" to generate the corresponding strip.
+		p Some users have requested the use of Sliceform Studio's strip generation capabilities independent of the pattern generation or tracing features. If you have a particular sliceform in mind which you have already calculated the dimensions of each strip for, you can type in a JSON input under “Manual Strip Generation” to generate the corresponding strip.
 
 		p The input format is an array of strips, where:
 		ul

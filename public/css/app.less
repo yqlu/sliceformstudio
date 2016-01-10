@@ -392,8 +392,9 @@ li.done a {
 
 .modal-lg {
   width: auto;
-  margin-left: 50px;
-  margin-right: 50px;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1000px;
 }
 
 .padded-btn-group {
@@ -430,19 +431,26 @@ li.done a {
 
 .strip-table-li, .sortable-placeholder {
   list-style: none;
-  cursor: pointer;
   height: 23px;
   width: 150px;
+  margin-left: -21px;
+  cursor: grab;
+}
+.strip-table-li:active {
+  cursor: grabbing;
+}
+.strip-table-x {
+  color: #d00;
+  margin-right: 8px;
+}
+
+.strip-table-x:hover {
+  color: #f00;
 }
 
 .sortable-placeholder {
   background: silver;
 }
-
-.strip-table-li.hovered-li {
-  font-weight: 700;
-}
-
 
 .loading-overlay {
   pointer-events: none;
@@ -513,6 +521,9 @@ li.done a {
 .gradient-overlay {
   background: rgba(0,0,0,0);
   height: 250px;
+  width: 250px;
+  margin-right: auto;
+  margin-left: auto;
   position: relative;
   transition: background 0.5s ease;
   -moz-transition: background 0.5s ease;

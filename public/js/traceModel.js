@@ -670,8 +670,9 @@ var updateStripTable = function() {
 	collapseDiv.each(function(d) {
 		d3.select(this).selectAll("li").data(d.strips)
 		.enter().append("li").classed("strip-table-li", true)
-		.html(function(d, i) { return "Strip #" + (d.nodes[0].__data__.id || d.nodes[1].__data__.id)
-			+ " (<a href='#'><i class='fa fa-times'></i></a>)"; })
+		.style("cursor", "drag")
+		.html(function(d, i) { return "<a class='strip-table-x' href='#'><i class='fa fa-times'></i></a> Strip #" +
+			(d.nodes[0].__data__.id || d.nodes[1].__data__.id); })
 		.on("mouseover", function(d1) {
 			emphasizeStrips(d1.nodes, this.parentNode.__data__.color.hex);
 		})
@@ -699,8 +700,7 @@ var updateStripTable = function() {
 	$(".strip-table-ul").sortable({
 		connectWith: 'strip-table-ul',
 		hoverClass: 'hovered-li'
-	})
-	.bind('sortupdate', function(e, ui) {
+	}).bind('sortupdate', function(e, ui) {
 		var startParentArray = ui.startparent[0].__data__.strips;
 		var endParentArray = ui.endparent[0].__data__.strips;
 		startParentArray.splice(ui.oldindex, 1);

@@ -145,6 +145,10 @@ a:focus {
     color: @fontcolor;
 }
 
+.navbar-nav > li {
+    text-align: center;
+}
+
 @media(min-width:768px) {
     .navbar-custom {
         padding: 20px 0;
@@ -167,10 +171,23 @@ a:focus {
     }
 
     .navbar-custom a:hover, .navbar-custom .nav li a:hover {
-        background-color: #000;
+        background-color: rgba(0,0,0,0);
+        font-weight: 700;
     }
 
+    .navbar-custom a:focus, .navbar-custom .nav li a:focus {
+        background-color: rgba(0,0,0,0);
+        font-weight: 700;
+    }
+}
 
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .btn-default:hover,

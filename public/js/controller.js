@@ -148,6 +148,7 @@ var dragSvgHandler = d3.behavior.drag()
 	traceSvgDimensions
 	.attr("y", newHeight - 20)
 	.text(existingWidth + "px x " + newHeight + "px");
+	d3.select('#traceSvg foreignObject').attr("height", newHeight + "px");
 })
 .on('dragend', function(d, i) {
 	document.body.style.cursor = 'auto';
@@ -770,7 +771,7 @@ var cropDesignClick = function() {
 	.attr("transform", num.getTransform);
 
 	d3.selectAll("#assembleSvgToolbar").transition().duration(1000)
-	.style("left", "5px").style("opacity", 0);
+	.style("left", "5px");
 
 	setupOverlay();
 
@@ -795,7 +796,7 @@ var exitCropView = function() {
 	.attr("transform", num.getTransform);
 
 	d3.selectAll("#assembleSvgToolbar").transition().duration(1000)
-	.style("left", (paletteWidth + 5) + "px").style("opacity", 1);
+	.style("left", (paletteWidth + 5) + "px");
 
 	d3.select("#assembleSvgContainer").select(".shadedOverlay").style("visibility", "hidden");
 

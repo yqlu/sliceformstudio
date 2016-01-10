@@ -10,11 +10,11 @@
 							if (image.slfm)
 								a(href="/images/gallery/full/#{image.filename}", data-lightbox="#{image.filename}" data-title="#{image.title} (#{image.year})")
 									img(src="/images/gallery/thumbs/#{image.filename}", alt="#{image.title}")
-									.overlay
+									.overlay Click to see schematic
 							else
 								a(href="/images/gallery/#{image.filename}", data-lightbox="#{image.filename}" data-title="#{image.title} (#{image.year})")
 									img(src="/images/gallery/thumbs/#{image.filename}", alt="#{image.title}")
-									.overlay
+									.overlay Click to see larger version
 						figcaption
 							label #{image.title} (#{image.year})
 							.subcaption #{image.description}

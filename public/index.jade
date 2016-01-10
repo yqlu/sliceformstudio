@@ -4,7 +4,7 @@ nav.navbar.navbar-custom.navbar-fixed-top(role='navigation')
   .navbar-header
     button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-main-collapse')
       i.fa.fa-bars
-    a.navbar-brand
+    a.navbar-brand(href="/")
       span.light Sliceform Studio
   // Collect the nav links, forms, and other content for toggling
   .collapse.navbar-collapse.navbar-right.navbar-main-collapse
@@ -15,7 +15,7 @@ nav.navbar.navbar-custom.navbar-fixed-top(role='navigation')
 // Intro Header
 header.intro
   .intro-body
-    .container
+    .container.noselect
       h1.brand-heading Sliceform Studio
       p.intro-text.heavy
         | Design and create your own paper strip sliceforms.
@@ -57,3 +57,12 @@ section#try.text-center
         h2 Try it out.
         h4 Sliceform Studio is open source and available free of charge.
         a.btn.impact.btn-default.btn-lg(href='app.html') Get started
+script(type='text/javascript').
+  (function($) {
+    $(function() {
+      $('ul.nav.navbar-nav > li').each(function(){
+        wid = $(this).width();
+        $(this).css('width', wid + 'px');
+      });
+    });
+  })(jQuery);

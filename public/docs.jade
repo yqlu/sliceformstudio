@@ -329,7 +329,7 @@
 
 		p The custom option allows you to design arbitrary patterns with very high specificity. This is done by dragging around handles in the thick red line (called the #[i template]) to determine the line segments that make up the pattern.
 
-		h6 Degrees of freedom
+		h6#customDof Degrees of freedom
 
 		p The degrees of freedom slider allows you to control the number of handles in the template. When there are 0 degrees of freedom, the pattern becomes a single line segment connecting the incoming and outgoing edge.
 
@@ -356,7 +356,7 @@
 				.label-container
 					label 3 degrees of freedom
 
-		h6 Edge mapping
+		h6#customEdgeMap Edge mapping
 
 		p When you drag around the red pattern handles, you determine a pattern template which is copied multiple times and pasted onto different edges within the same polygon. This is very useful to impose certain symmetries onto the patterns within the tile. The exact way that the template is copied and pasted is defined by an #[i edge mapping].
 
@@ -422,18 +422,18 @@
 				.label-container
 					label #[span.code [[0,1],[2,1,true],[3,4],[5,4,true]]]
 
-		h6 Offset
+		h6#customOffset Offset
 
 		p The offset sliders work the same as they do in the Hankin option. Offsets range from -0.5 to 0.5, with 0 representing that the pattern enters / exits the edge from its midpoint.
 
-		h6 Symmetry
+		h6#customSymmetry Symmetry
 
 		p The three symmetry options determine how a template gets extended into a full pattern that spans two edges.
 
 		ul
-			li The default is "Mirror symmetry with cropping", where the template is built on both the start and end edge and joined in the middle by extending the two terminal rays till they complete. A template with #[i n] handles creates a pattern with #[i 2n] line segments.
+			li The default is "Mirror symmetry by extending rays", where the template is built on both the start and end edge and joined in the middle by extending the two terminal rays till they complete. A template with #[i n] handles creates a pattern with #[i 2n] line segments.
 
-			li Under "Mirror symmetry without cropping", the template is also built on both the start and end edge. Instead of extending the two terminal rays, Sliceform Studio builds an intermediate line segment to join the two terminal rays. A template with #[i n] handles creates a pattern with #[i 2n+1] line segments.
+			li Under "Mirror symmetry by truncating rays", the template is also built on both the start and end edge. Instead of extending the two terminal rays, Sliceform Studio builds an intermediate line segment to join the two terminal rays. A template with #[i n] handles creates a pattern with #[i 2n+1] line segments.
 
 			li Under "No mirror symmetry", the template is only built on the start edge. A final line segment is built to join the final point on the template and the point on the end edge at the appropriate offset. A template with #[i n] handles creates a pattern with #[i n+1] line segments.
 
@@ -444,14 +444,14 @@
 						.responsive-sprites
 							img.icon-custom2-1(src="/images/sprites/docs-sprite.jpg")
 				.label-container
-					label Mirror symmetry with cropping
+					label Mirror symmetry by extending rays
 			.col-sm-4.img-with-label
 				.prop4col
 					.content
 						.responsive-sprites
 							img.icon-custom2-2(src="/images/sprites/docs-sprite.jpg")
 				.label-container
-					label Mirror symmetry without cropping
+					label Mirror symmetry by truncating rays
 			.col-sm-4.img-with-label
 				.prop4col
 					.content
@@ -460,7 +460,7 @@
 				.label-container
 					label No mirror symmetry
 
-		h6 Multiple patterns
+		h6#customMultiple Multiple patterns
 
 		p The "Patterns" multiselect box allows you to superimpose multiple distinct patterns on the same tile. The "Add new pattern" button creates a new pattern; "Delete pattern" deletes the currently selected pattern. The currently active pattern is displayed with a red template while the inactive ones are displayed with a pink template. When you select an inactive template to make it active, all the parameters (degrees of freedom, the edge mapping, etc) automatically update to reflect the active pattern.
 

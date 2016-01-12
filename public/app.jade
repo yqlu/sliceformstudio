@@ -243,15 +243,21 @@
 											a#newCustomPattern.btn.btn-primary Add new pattern
 											a#deleteCustomPattern.btn.btn-primary Delete pattern
 									.form-group
-										label.control-label.col-md-3 Patterns
+										label.control-label.col-md-3 Patterns &nbsp;
+											a(href="/docs.html#customMultiple", target="_blank")
+												i.fa.fa-question-circle
 										.col-md-9
 											select#customPatternSelect.form-control(multiple='', size='3')
 									.form-group
-										label.control-label.col-md-3 Degrees of freedom
+										label.control-label.col-md-3 Degrees of freedom &nbsp;
+											a(href="/docs.html#customDof", target="_blank")
+												i.fa.fa-question-circle
 										.col-md-9
 											input#degreesOfFreedom(type='text')
 									.form-group
-										label.control-label.col-md-3 Edges
+										label.control-label.col-md-3 Edges &nbsp;
+											a(href="/docs.html#customEdgeMap", target="_blank")
+												i.fa.fa-question-circle
 										.col-md-9
 											.radio
 												label
@@ -269,15 +275,21 @@
 													| Manual array specification:
 													input#manualEdges.form-control(type='text', placeholder='[[1,5],[2,3]]')
 									.form-group
-										label.control-label.col-md-3 Start offset
+										label.control-label.col-md-3 Start offset &nbsp;
+											a(href="/docs.html#customOffset", target="_blank")
+												i.fa.fa-question-circle
 										.col-md-9
 											input#startOffset(type='text')
 									.form-group
-										label.control-label.col-md-3 End offset
+										label.control-label.col-md-3 End offset &nbsp;
+											a(href="/docs.html#customOffset", target="_blank")
+												i.fa.fa-question-circle
 										.col-md-9
 											input#endOffset(type='text')
 									.form-group
-										label.control-label.col-md-3 Symmetry
+										label.control-label.col-md-3 Symmetry &nbsp;
+											a(href="/docs.html#customSymmetry", target="_blank")
+												i.fa.fa-question-circle
 										.col-md-9
 											.radio
 												label
@@ -317,7 +329,7 @@
 					.col-md-4.padded-col
 						.image-frame
 							.horiz-centered.responsive-sprites
-								img.icon-question(src="images/starter/starter-sprite.jpg", alt="Custom")
+								img.icon-question(src="images/sprites/starter-sprite.jpg", alt="Custom")
 						a#customTile.image-frame.overlap-full(href="#")
 							.gradient-overlay
 								.gradient-title Custom

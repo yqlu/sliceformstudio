@@ -81,6 +81,7 @@ var breakEdges = function(thisEdgeNode) {
 	.attr("transform", num.getTransform);
 
 	invalidateStripCache();
+	updateConfirmExit();
 };
 
 // used to traverse a group of tiles, figuring out connected components
@@ -141,6 +142,7 @@ var joinEdges = function(thisEdgeNode, selected) {
 			joinNodes(thisEdgeNode, selected.edgeNode);
 			updateJoinedEdges(thisGroupNode.__data__);
 			invalidateStripCache();
+			updateConfirmExit();
 		}
 	} else if (!approxEq(thisEdgeNode.__data__.length, selected.edgeNode.__data__.length)) {
 		bootbox.alert("Error: cannot join edges with different lengths!");
@@ -204,6 +206,7 @@ var joinEdges = function(thisEdgeNode, selected) {
 		// remove group node from DOM
 		d3.select(selected.groupNode).remove();
 		invalidateStripCache();
+		updateConfirmExit();
 
 		setTimeout(function() {
 			if (autoSnapMode) {
@@ -305,4 +308,5 @@ var enterCanvas = function(groupNode) {
 	updateInferButton();
 
 	invalidateStripCache();
+	updateConfirmExit();
 };

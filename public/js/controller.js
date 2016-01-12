@@ -474,6 +474,7 @@ var updateTileWithPatternClick = function() {
 
 	updateInferButton();
 	invalidateStripCache();
+	updateConfirmExit();
 };
 
 var newCustomPatternClick = function() {
@@ -519,6 +520,7 @@ var copyHandler = function(d, i) {
 			selection.copy(assembleSVGDrawer);
 		}
 		invalidateStripCache();
+		updateConfirmExit();
 	}
 };
 
@@ -529,6 +531,7 @@ var deleteHandler = function(d, i) {
 			selection.delete();
 			updateInferButton();
 			invalidateStripCache();
+			updateConfirmExit();
 		} else if (selection.get().groupNode.parentNode === assemblePaletteContainer.node()) {
 			var id = d3.select(selection.get().groupNode).select("g.tile").node().__data__.tiles[0].polygonID;
 			if (_.any(assembleCanvas.selectAll("g.tile")[0], function(t) {
@@ -538,6 +541,7 @@ var deleteHandler = function(d, i) {
 			} else {
 				selection.delete(assembleSVGDrawer);
 				invalidateStripCache();
+				updateConfirmExit();
 			}
 		}
 	}
@@ -550,6 +554,7 @@ var clearHandler = function(d, i) {
 			assembleCanvas.selectAll("g").remove();
 			inferButton.classed("hidden", true);
 			invalidateStripCache();
+			updateConfirmExit();
 		}
 	});
 };
@@ -718,6 +723,7 @@ var cropSelectAll = function() {
 	cropData.vertices = _.pluck(d3.selectAll(".crop-vertex")[0], "__data__");
 	recomputeHull();
 	invalidateStripCache();
+	updateConfirmExit();
 };
 
 var cropUnselectAll = function() {
@@ -725,6 +731,7 @@ var cropUnselectAll = function() {
 	cropData.vertices = [];
 	recomputeHull();
 	invalidateStripCache();
+	updateConfirmExit();
 };
 
 var cropCircleClick = function(d) {
@@ -739,6 +746,7 @@ var cropCircleClick = function(d) {
 	}
 	recomputeHull();
 	invalidateStripCache();
+	updateConfirmExit();
 };
 
 var cropDesignClick = function() {
@@ -927,26 +935,40 @@ var stripViewClick = function() {
 };
 
 var loadFromFile = function() {
-	d3.select(".loading-overlay").classed("in", true);
-	var reader = new FileReader();
-	var files = $("#loadFileInput")[0].files;
-	if (files.length === 1) {
-		var loadedFilename = files[0].name;
-		reader.onload = function() {
-			try {
-				var loaded = JSON.parse(reader.result);
-				loadFromJson(loaded, function() {
-					currentFilename = loadedFilename.slice(0, loadedFilename.search(/\.slfm/));
-				});
-			} catch (err) {
-				bootbox.alert(err.message);
-				console.log(err);
+	var helper = function() {
+		d3.select(".loading-overlay").classed("in", true);
+		var reader = new FileReader();
+		var files = $("#loadFileInput")[0].files;
+		if (files.length === 1) {
+			var loadedFilename = files[0].name;
+			reader.onload = function() {
+				try {
+					var loaded = JSON.parse(reader.result);
+					loadFromJson(loaded, function() {
+						currentFilename = loadedFilename.slice(0, loadedFilename.search(/\.slfm/));
+					});
+				} catch (err) {
+					bootbox.alert(err.message);
+					console.log(err);
+				}
+			};
+			reader.readAsText(files[0]);
+		}
+		resetFormElement($("#loadFileInput"));
+		d3.select(".loading-overlay").classed("in", false);
+	};
+
+	if (confirmExit) {
+		bootbox.confirm("You have not yet saved changes to the current design. Are you sure?", function(res) {
+			if (res) {
+				helper();
+			} else {
+				resetFormElement($("#loadFileInput"));
 			}
-		};
-		reader.readAsText(files[0]);
+		});
+	} else {
+		helper();
 	}
-	resetFormElement($("#loadFileInput"));
-	d3.select(".loading-overlay").classed("in", false);
 };
 
 

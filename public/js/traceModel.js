@@ -521,6 +521,7 @@ var groupPattern = function(patternData, strictMode) {
 		var selectedColor = $("#colorpicker").val();
 		assignStripColor([overStrip, underStrip], strip, selectedColor, _.pluck(traced.patternList, "pattern"));
 		updateStripTable();
+		updateConfirmExit();
 	});
 
 	_.each(_.pluck(traced.patternList, "pattern"), function(p) {
@@ -696,6 +697,7 @@ var updateStripTable = function() {
 			}
 			d3.selectAll(thisStrip.nodes).style("stroke", "gainsboro");
 			colorAllStrips();
+			updateConfirmExit();
 		});
 	});
 	$(".strip-table-ul").sortable({
@@ -714,6 +716,7 @@ var updateStripTable = function() {
 			d3.select(ui.startparent[0].parentNode.parentNode).select(".colorLabel")
 			.select("span").text(function(d) { return d.color.name + " (" + d.strips.length + ")"; });
 		}
+		updateConfirmExit();
 	});
 };
 

@@ -300,6 +300,7 @@ var saveToFileWithTitle = function(title) {
 	pom.href = window.URL.createObjectURL(bb);
 	pom.dataset.downloadurl = ["application/json", pom.download, pom.href].join(':');
 	pom.click();
+	resetConfirmExit();
 };
 
 var getUrlVars = function() {

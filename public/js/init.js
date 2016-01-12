@@ -147,7 +147,15 @@ var stripView = d3.select("#stripView")
 
 var newButton = d3.select("#newDesign")
 .on("click", function() {
-	$("#newModal").modal('show');
+	if (confirmExit) {
+		bootbox.confirm("You have not yet saved changes to the current design. Are you sure?", function(res) {
+			if (res) {
+				$("#newModal").modal('show');
+			}
+		});
+	} else {
+		$("#newModal").modal('show');
+	}
 });
 
 var saveButton = d3.select("#saveFile")
@@ -683,6 +691,19 @@ bootbox.setDefaults({
 });
 
 var currentFilename = "my_design";
+
+var confirmExit = false;
+var resetConfirmExit = function() {
+	confirmExit = false;
+};
+var updateConfirmExit = function() {
+	confirmExit = true;
+};
+window.onbeforeunload = function () {
+	if (confirmExit) {
+		return "This page is asking you to confirm that you want to leave - data you have entered may not be saved.";
+	}
+};
 
 // wrap jQuery plugins in document.ready
 $(document).ready(function() {

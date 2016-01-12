@@ -1,6 +1,6 @@
 {
-  "name": "Sliceform Studio",
-  "version": "0.3",
+  "name": "sliceform-studio",
+  "version": "0.3.0",
   "private": true,
   "keywords": [
     "harp",

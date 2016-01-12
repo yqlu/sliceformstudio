@@ -107,8 +107,8 @@ var tileBFS = function(otherTileNode, thisTileNode, edgesToBreak) {
 	return {
 		seen: seen,
 		edgesToBreak: edgesToBreak
-	}
-}
+	};
+};
 
 // BFS utility function
 var getSuccessors = function(thisTileNode, fromTileNode) {

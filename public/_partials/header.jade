@@ -10,13 +10,3 @@ nav.navbar.navbar-custom.navbar-fixed-top.top-nav-collapse(role='navigation')
         each term in public._data.contents
           li
             a.nav(href="#{term.url}", class = "#{ current.source == term.source ? 'active' : ''}")= term.label
-
-script(type='text/javascript').
-  (function($) {
-    $(function() {
-      $('ul.nav.navbar-nav > li').each(function(){
-        wid = $(this).width();
-        $(this).css('width', wid + 'px');
-      });
-    });
-  })(jQuery);

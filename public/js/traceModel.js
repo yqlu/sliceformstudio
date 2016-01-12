@@ -58,9 +58,9 @@ var patternUnidirectionalTrace = function(patternData, nextEdge) {
 		});
 
 		var otherPattern = _.find(otherEdge.patterns, function(p) {
-			return approxEq(p.angle, otherPatternIdentifier.angle, config.anglesTolerance)
-			&& approxEq(p.proportion, otherPatternIdentifier.proportion, config.proportionTolerance);
-		})
+			return approxEq(p.angle, otherPatternIdentifier.angle, config.anglesTolerance) &&
+				approxEq(p.proportion, otherPatternIdentifier.proportion, config.proportionTolerance);
+		});
 
 		if (otherPatternIdentifier !== Infinity && typeof otherPattern === "undefined") {
 			// pattern should have been mapped to another pattern
@@ -86,9 +86,10 @@ var patternUnidirectionalTrace = function(patternData, nextEdge) {
 				// try bouncing instead
 
 				var bouncePattern = _.find(nextEdge.patterns, function(p) {
-					return p.pattern.this !== currPattern.this && approxEq(p.proportion, selfPatternObject.proportion, config.proportionTolerance)
+					return p.pattern.this !== currPattern.this &&
+						approxEq(p.proportion, selfPatternObject.proportion, config.proportionTolerance) &&
 					// check that the pattern has not already been matched off
-						&& p.pattern.this.parentNode !== null;
+						p.pattern.this.parentNode !== null;
 				});
 
 				if (bouncePattern) {
@@ -303,7 +304,7 @@ var everyOtherIntersect = function(segments, bool) {
 			} else {
 				i += 1;
 			}
-			return !!(i%2) === bool;
+			return (i%2 === (bool ? 1 : 0));
 		});
 	}), true);
 };
@@ -753,7 +754,7 @@ var generateCustomStrip = function() {
 		bootbox.alert({
 			title: "Error",
 			message: "<p>Unable to parse input as strip:</p><pre>" + d3.select("#customStripJson").node().value + "</pre>"
-		})
+		});
 	}
 };
 

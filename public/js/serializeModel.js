@@ -169,13 +169,13 @@ var loadFromJson = function(loaded, callback) {
 		if (loaded.stripViewParams) {
 			var p = loaded.stripViewParams;
 
-			p.thickness ? thicknessSlider.setValue(p.thickness) : null;
-			p.extension ? extensionSlider.setValue(p.extension) : null;
-			p.stripHeight ? stripHeight.setValue(p.stripHeight) : null;
-			p.widthFactor ? widthFactor.setValue(p.widthFactor) : null;
-			p.interSpacing ? interSpacing.setValue(p.interSpacing) : null;
-			p.printHeight ? printHeight.setValue(p.printHeight) : null;
-			p.printWidth ? printWidth.setValue(p.printWidth) : null;
+			if (p.thickness) { thicknessSlider.setValue(p.thickness); }
+			if (p.extension) { extensionSlider.setValue(p.extension); }
+			if (p.stripHeight) { stripHeight.setValue(p.stripHeight); }
+			if (p.widthFactor) { widthFactor.setValue(p.widthFactor); }
+			if (p.interSpacing) { interSpacing.setValue(p.interSpacing); }
+			if (p.printHeight) { printHeight.setValue(p.printHeight); }
+			if (p.printWidth) { printWidth.setValue(p.printWidth); }
 			if (typeof p.outline !== "undefined") {
 				$("#outlineToggle").bootstrapSwitch('state', p.outline);
 			}

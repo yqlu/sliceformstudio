@@ -1,8 +1,9 @@
 # IDE
 .idea
 
-# Bower
+# Bower + Node
 bower_components
+node_modules
 
 www
 public/bower

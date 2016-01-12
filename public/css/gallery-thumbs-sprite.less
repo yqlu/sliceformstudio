@@ -1,0 +1,168 @@
+.responsive-sprites {
+  height: auto;
+  overflow: hidden;
+
+  & > img {
+    display: block;
+    max-width: none;
+  }
+}
+
+// explanation:
+// width         = 100% * spritesheet width                       / image width
+// margin-top    = 100% * distance from top of sprite to image    / image width
+// margin-bottom = 100% * distance from bottom of sprite to image / image width
+// margin-left   = 100% * distance from left of sprite to image   / image width
+
+
+// Constants
+@total_width: 1258;
+@total_height: 1258;
+
+
+img.icon-brimstone {
+  width: 100% * @total_width / 250;
+  margin-top: 100% * 0 / 250;
+  margin-bottom: -100% * (@total_height - (0 + 250)) / 250;
+  margin-left: -100% * 252 / 250;
+}
+
+img.icon-constellation {
+  width: 100% * @total_width / 250;
+  margin-top: 100% * -252 / 250;
+  margin-bottom: -100% * (@total_height - (252 + 250)) / 250;
+  margin-left: -100% * 756 / 250;
+}
+
+img.icon-constellation2 {
+  width: 100% * @total_width / 250;
+  margin-top: 100% * -252 / 250;
+  margin-bottom: -100% * (@total_height - (252 + 250)) / 250;
+  margin-left: -100% * 0 / 250;
+}
+
+img.icon-constellation_ii {
+  width: 100% * @total_width / 250;
+  margin-top: 100% * -252 / 250;
+  margin-bottom: -100% * (@total_height - (252 + 250)) / 250;
+  margin-left: -100% * 252 / 250;
+}
+
+img.icon-dendrite {
+  width: 100% * @total_width / 250;
+  margin-top: 100% * 0 / 250;
+  margin-bottom: -100% * (@total_height - (0 + 250)) / 250;
+  margin-left: -100% * 504 / 250;
+}
+
+img.icon-festival {
+  width: 100% * @total_width / 250;
+  margin-top: 100% * -252 / 250;
+  margin-bottom: -100% * (@total_height - (252 + 250)) / 250;
+  margin-left: -100% * 504 / 250;
+}
+
+img.icon-foliage {
+  width: 100% * @total_width / 250;
+  margin-top: 100% * -504 / 250;
+  margin-bottom: -100% * (@total_height - (504 + 250)) / 250;
+  margin-left: -100% * 0 / 250;
+}
+
+img.icon-garden {
+  width: 100% * @total_width / 250;
+  margin-top: 100% * -504 / 250;
+  margin-bottom: -100% * (@total_height - (504 + 250)) / 250;
+  margin-left: -100% * 252 / 250;
+}
+
+img.icon-girih {
+  width: 100% * @total_width / 250;
+  margin-top: 100% * -504 / 250;
+  margin-bottom: -100% * (@total_height - (504 + 250)) / 250;
+  margin-left: -100% * 504 / 250;
+}
+
+img.icon-girih2 {
+  width: 100% * @total_width / 250;
+  margin-top: 100% * 0 / 250;
+  margin-bottom: -100% * (@total_height - (0 + 250)) / 250;
+  margin-left: -100% * 756 / 250;
+}
+
+img.icon-girih_i {
+  width: 100% * @total_width / 250;
+  margin-top: 100% * 0 / 250;
+  margin-bottom: -100% * (@total_height - (0 + 250)) / 250;
+  margin-left: -100% * 0 / 250;
+}
+
+img.icon-iridescence {
+  width: 100% * @total_width / 250;
+  margin-top: 100% * -504 / 250;
+  margin-bottom: -100% * (@total_height - (504 + 250)) / 250;
+  margin-left: -100% * 756 / 250;
+}
+
+img.icon-pentille {
+  width: 100% * @total_width / 250;
+  margin-top: 100% * -756 / 250;
+  margin-bottom: -100% * (@total_height - (756 + 250)) / 250;
+  margin-left: -100% * 0 / 250;
+}
+
+img.icon-planetarium {
+  width: 100% * @total_width / 250;
+  margin-top: 100% * -756 / 250;
+  margin-bottom: -100% * (@total_height - (756 + 250)) / 250;
+  margin-left: -100% * 252 / 250;
+}
+
+img.icon-pleiades {
+  width: 100% * @total_width / 250;
+  margin-top: 100% * -756 / 250;
+  margin-bottom: -100% * (@total_height - (756 + 250)) / 250;
+  margin-left: -100% * 504 / 250;
+}
+
+img.icon-psychedelica {
+  width: 100% * @total_width / 250;
+  margin-top: 100% * -756 / 250;
+  margin-bottom: -100% * (@total_height - (756 + 250)) / 250;
+  margin-left: -100% * 756 / 250;
+}
+
+img.icon-rampart {
+  width: 100% * @total_width / 250;
+  margin-top: 100% * 0 / 250;
+  margin-bottom: -100% * (@total_height - (0 + 250)) / 250;
+  margin-left: -100% * 1008 / 250;
+}
+
+img.icon-sunflowerx {
+  width: 100% * @total_width / 250;
+  margin-top: 100% * -252 / 250;
+  margin-bottom: -100% * (@total_height - (252 + 250)) / 250;
+  margin-left: -100% * 1008 / 250;
+}
+
+img.icon-torus {
+  width: 100% * @total_width / 250;
+  margin-top: 100% * -504 / 250;
+  margin-bottom: -100% * (@total_height - (504 + 250)) / 250;
+  margin-left: -100% * 1008 / 250;
+}
+
+img.icon-undergrowth {
+  width: 100% * @total_width / 250;
+  margin-top: 100% * -756 / 250;
+  margin-bottom: -100% * (@total_height - (756 + 250)) / 250;
+  margin-left: -100% * 1008 / 250;
+}
+
+img.icon-vineyard {
+  width: 100% * @total_width / 250;
+  margin-top: 100% * -1008 / 250;
+  margin-bottom: -100% * (@total_height - (1008 + 250)) / 250;
+  margin-left: -100% * 0 / 250;
+}

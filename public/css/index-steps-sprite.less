@@ -1,0 +1,49 @@
+.responsive-sprites {
+  height: auto;
+  overflow: hidden;
+
+  & > img {
+    display: block;
+    max-width: none;
+  }
+}
+
+// explanation:
+// width         = 100% * spritesheet width                       / image width
+// margin-top    = 100% * distance from top of sprite to image    / image width
+// margin-bottom = 100% * distance from bottom of sprite to image / image width
+// margin-left   = 100% * distance from left of sprite to image   / image width
+
+
+// Constants
+@total_width: 402;
+@total_height: 402;
+
+
+img.icon-step1 {
+  width: 100% * @total_width / 200;
+  margin-top: 100% * 0 / 200;
+  margin-bottom: -100% * (@total_height - (0 + 200)) / 200;
+  margin-left: -100% * 0 / 200;
+}
+
+img.icon-step2 {
+  width: 100% * @total_width / 200;
+  margin-top: 100% * 0 / 200;
+  margin-bottom: -100% * (@total_height - (0 + 200)) / 200;
+  margin-left: -100% * 202 / 200;
+}
+
+img.icon-step3 {
+  width: 100% * @total_width / 200;
+  margin-top: 100% * -202 / 200;
+  margin-bottom: -100% * (@total_height - (202 + 200)) / 200;
+  margin-left: -100% * 0 / 200;
+}
+
+img.icon-step4 {
+  width: 100% * @total_width / 200;
+  margin-top: 100% * -202 / 200;
+  margin-bottom: -100% * (@total_height - (202 + 200)) / 200;
+  margin-left: -100% * 202 / 200;
+}

@@ -11,36 +11,51 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 10px;
 }
 
-.img-with-label.col-sm-3 .img-container, .img-with-label.col-sm-4 .img-container, .img-with-label.col-sm-6 .img-container {
-    height: 250px;
+.prop3col, .prop4col, .prop6col, .prop12col {
+    width: 90%;
+    position: relative;
+    margin-right: auto;
+    margin-left: auto;
 }
 
-.img-with-label.col-sm-4 img, .img-with-label.col-sm-3 img, .img-with-label.col-sm-6 img {
-    max-width: 90%;
-    height: auto;
-    max-height: 250px;
+.prop3col:before, .prop4col:before, .prop6col:before, .prop12col:before {
+    content: "";
+    display: block;
 }
 
-@media(min-width: 768px) and (max-width: 991px) {
-    .img-with-label.col-sm-3 .img-container, .img-with-label.col-sm-4 .img-container, .img-with-label.col-sm-6 .img-container {
-        height: 180px;
-    }
-
-    .img-with-label.col-sm-4 img, .img-with-label.col-sm-3 img, .img-with-label.col-sm-6 img {
-        max-height: 180px;
-    }
-
+.prop3col .content, .prop4col .content, .prop6col .content, .prop12col .content {
+    position:  absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
 }
 
-@media(min-width: 992px) and (max-width: 1024px) {
-    .img-with-label.col-sm-3 .img-container, .img-with-label.col-sm-4 .img-container, .img-with-label.col-sm-6 .img-container {
-        height: 200px;
-    }
-    .img-with-label.col-sm-4 img, .img-with-label.col-sm-3 img, .img-with-label.col-sm-6 img {
-        max-width: 90%;
-        height: auto;
-        max-height: 200px;
-    }
+.prop3col {
+    max-width: 200px;
+}
+.prop3col:before {
+    padding-top: 150%;
+}
+.prop4col {
+    max-width: 250px;
+}
+.prop4col:before {
+    padding-top: 100%;
+}
+
+.prop6col {
+    max-width: 400px;
+}
+.prop6col:before {
+    padding-top: 75%;
+}
+
+.prop12col {
+    max-width: 900px;
+}
+.prop12col:before {
+    padding-top: 56%;
 }
 
 .img-with-label img {
@@ -51,7 +66,7 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0 auto;
 }
 
-.img-with-label.col-sm-12 img {
+.img-with-label.col-sm-12 .img-container img {
     max-width: 90%;
     height: auto;
 }

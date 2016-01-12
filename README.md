@@ -18,23 +18,25 @@ I owe the concept of the pattern editor to [Craig Kaplan](http://www.cgl.uwaterl
 
 Make sure you have [Node](nodejs.org) and [Bower](bower.io) installed.
 
-First, install Harp with:
-
+In the directory of the app, fetch all node dependencies via:
 ```
-sudo npm install -g harp
+sudo npm install
 ```
 
-Next, in the same directory as Wallpaper, fetch all the packages with:
+Then fetch all bower dependencies:
 ```
 bower install
 ```
 
-Then, run:
+To run the app locally:
 ```
-harp server
+gulp serve
 ```
 
-The app should now be running on localhost:9000.
+To build the app as a static website:
+```
+gulp build
+```
 
 Note that it may not display correctly as the git repo excludes images and other binary assets.
 

@@ -258,8 +258,10 @@ var generateHtml = function(container) {
 		var col = d3.select(container).append("div")
 			.classed("col-sm-4 padded-col", true);
 		col.append("div").classed("image-frame", true)
+			.append("div").classed("horiz-centered responsive-sprites", true)
 			.append("img")
-			.attr("src", "images/starter/" + opt.file + ".png")
+			.attr("src", "images/sprites/starter-sprite.jpg")
+			.classed("icon-" + opt.file, true)
 			.attr("alt", opt.name);
 		col.append("a").classed("image-frame overlap-full", true)
 			.attr("href", "#")

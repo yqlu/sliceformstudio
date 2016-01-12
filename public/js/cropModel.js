@@ -242,7 +242,7 @@ var cropPattern = function(tile, parentGroup) {
 						console.assert(typeof result === "object", "If pattern is leaving region, some intersection with a cropped edge must be found.");
 						// end the pattern at the border
 						if (approxEqPoints(cropPt.coords, prevPt)) {
-							if (curSubpattern.internalVertices.length == 0) {
+							if (curSubpattern.internalVertices.length === 0) {
 								// pattern is only [prevPt, cropPt] but prevPt = cropPt
 								// delete pattern
 								patterns.splice(patterns.length - 1);
@@ -269,6 +269,7 @@ var cropPattern = function(tile, parentGroup) {
 						curInRegion = false;
 					}
 				} else {
+					var start, end;
 					if (inRegion(nextPt)) {
 						console.assert(typeof result === "object",
 							"If pattern is entering region, some intersection with a cropped edge must be found.");
@@ -277,7 +278,7 @@ var cropPattern = function(tile, parentGroup) {
 							// otherwise, push a pattern
 							// starting at cropPt, unless cropPt = prevPt and prevPt is the first point
 							// in which case take p.start
-							var start = ((ctr === 1) && approxEqPoints(cropPt.coords, prevPt)) ?
+							start = ((ctr === 1) && approxEqPoints(cropPt.coords, prevPt)) ?
 								p.start : {
 								proportion: cropPt.relative2,
 								coords: cropPt.coords,
@@ -288,7 +289,7 @@ var cropPattern = function(tile, parentGroup) {
 							// if this is the last point, set pattern.end and have no internal vertices
 							// if cropPt = nextPt, exclude nextPt from internal vertices
 
-							var end = isLastPt ? p.end : null;
+							end = isLastPt ? p.end : null;
 							var internalVertices = isLastPt || approxEqPoints(cropPt.coords, nextPt) ? [] : [nextPt];
 
 							patterns.push({
@@ -320,7 +321,7 @@ var cropPattern = function(tile, parentGroup) {
 							var cropPt2 = results[1] && results[1].intersection && results[1].intersection.points[0];
 							var cropEdge2 = results[1] && results[1].edge;
 
-							var start = (approxEqPoints(cropPt.coords, prevPt) && ctr === 1) ?
+							start = (approxEqPoints(cropPt.coords, prevPt) && ctr === 1) ?
 								p.start : {
 								proportion: cropPt1.relative2,
 								coords: cropPt1.coords,
@@ -328,7 +329,7 @@ var cropPattern = function(tile, parentGroup) {
 								index: cropEdge1.index
 							};
 
-							var end = (approxEqPoints(cropPt2.coords, nextPt) && isLastPt) ?
+							end = (approxEqPoints(cropPt2.coords, nextPt) && isLastPt) ?
 								p.end : {
 								proportion: cropPt2.relative2,
 								coords: cropPt2.coords,

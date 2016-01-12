@@ -31,13 +31,13 @@
 		"categories": [{
 			"title": "Beginner",
 			"items": [{
-				"filename": "pentille.jpg",
+				"filename": "pentille",
 				"title": "Pentille",
 				"year": 2015,
 				"description": "Hexagons and triangles",
 				"slfm": "pentille"
 			}, {
-				"filename": "garden.jpg",
+				"filename": "garden",
 				"title": "Garden",
 				"year": 2010,
 				"description": "12-gons and 9-gons",
@@ -46,37 +46,37 @@
 		}, {
 			"title": "Intermediate",
 			"items": [{
-				"filename": "constellation.jpg",
+				"filename": "constellation",
 				"title": "Constellation I",
 				"year": 2013,
 				"description": "12-gons and 9-gons",
 				"slfm": "constellation_i"
 			}, {
-				"filename": "constellation_ii.png",
+				"filename": "constellation_ii",
 				"title": "Constellation II",
 				"year": 2014,
 				"description": "12-gons, hexagons and squares",
 				"slfm": "constellation_ii"
 			}, {
-				"filename": "foliage.png",
+				"filename": "foliage",
 				"title": "Foliage",
 				"year": 2015,
 				"description": "Hexagons",
 				"slfm": "foliage"
 			}, {
-				"filename": "festival.png",
+				"filename": "festival",
 				"title": "Festival",
 				"year": 2010,
 				"description": "12-gons and octagons",
 				"slfm": "festival"
 			}, {
-				"filename": "undergrowth.png",
+				"filename": "undergrowth",
 				"title": "Undergrowth",
 				"year": 2015,
 				"description": "12-gons, hexagons and squares",
 				"slfm": "undergrowth"
 			}, {
-				"filename": "rampart.png",
+				"filename": "rampart",
 				"title": "Rampart",
 				"year": 2015,
 				"description": "12-gons and triangles",
@@ -85,31 +85,31 @@
 		}, {
 			"title": "Advanced",
 			"items": [{
-				"filename": "Dendrite.png",
+				"filename": "dendrite",
 				"title": "Dendrite",
 				"year": 2015,
 				"description": "Girih tiles",
 				"slfm": "dendrite"
 			}, {
-				"filename": "vineyard.png",
+				"filename": "vineyard",
 				"title": "Vineyard",
 				"year": 2015,
 				"description": "12-gons and 9-gons",
 				"slfm": "vineyard"
 			}, {
-				"filename": "girih_i.png",
+				"filename": "girih_i",
 				"title": "Girih I",
 				"year": 2010,
 				"description": "Girih tiles",
 				"slfm": "girih_i"
 			}, {
-				"filename": "girih2.jpg",
+				"filename": "girih2",
 				"title": "Girih II",
 				"year": 2015,
 				"description": "Girih tiles",
 				"slfm": "girih_ii"
 			}, {
-				"filename": "brimstone.png",
+				"filename": "brimstone",
 				"title": "Brimstone",
 				"year": 2015,
 				"description": "12-gons and triangles",
@@ -118,32 +118,32 @@
 		}, {
 			"title": "No schematic",
 			"items": [{
-				"filename": "psychedelica.jpg",
+				"filename": "psychedelica",
 				"title": "Psychedelica",
 				"year": 2012,
 				"description": "Octagons"
 			}, {
-				"filename": "pleiades.png",
+				"filename": "pleiades",
 				"title": "Pleiades",
 				"year": 2015,
 				"description": "7-fold rhombi"
 			}, {
-				"filename": "sunflowerx.png",
+				"filename": "sunflowerx",
 				"title": "Sunflower",
 				"year": 2014,
 				"description": "Logarithmic spirals"
 			}, {
-				"filename": "planetarium.JPG",
+				"filename": "planetarium",
 				"title": "Planetarium",
 				"year": 2014,
 				"description": "12-gons and 10-gons"
 			}, {
-				"filename": "iridescence.jpg",
+				"filename": "iridescence",
 				"title": "Iridescence",
 				"year": 2011,
 				"description": "10-gons"
 			}, {
-				"filename": "torus.jpg",
+				"filename": "torus",
 				"title": "Torus",
 				"year": 2015,
 				"description": "Heptagons, hexagons and pentagons"

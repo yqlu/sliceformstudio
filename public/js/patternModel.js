@@ -35,8 +35,8 @@ var polygonAddPatternMetadata = function(polygon) {
 			// use that to annotate intersect data
 			_.map(edge.patternInterface, function(pInt, i) {
 				var p = _.find(edge.patterns, function(p) {
-					return approxEq(p.angle, pInt.angle, config.anglesTolerance)
-					&& approxEq(p.proportion, pInt.proportion, config.proportionTolerance);
+					return approxEq(p.angle, pInt.angle, config.anglesTolerance) &&
+						approxEq(p.proportion, pInt.proportion, config.proportionTolerance);
 				});
 				if (p) {
 					// annotate p's intersect information only if p exists

@@ -8,4 +8,5 @@ node_modules
 www
 public/bower
 public/images
+public/*-sprite.less
 public/slfm_files/gallery

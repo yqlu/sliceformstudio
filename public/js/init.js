@@ -302,7 +302,8 @@ var patternDropdown = d3.select("#patternDropdown");
 patternDropdown.selectAll("option").data(patternOptions).enter()
 	.append("option")
 	.attr("value", function(d, i) {return i;})
-	.html(function(d) {return d.name;});
+	.html(function(d) {return d.name;})
+	.classed("betaFeature betaHidden", function(d) { return d.name === "Infer"; });
 
 // set listeners on custom shape UI elements
 
@@ -434,6 +435,11 @@ var patternSlider2 = new Slider("#patternSlider2", {
 	step: 0.01
 });
 
+$("#betaFeaturesBtn").click(function() {
+	$("#betaFeaturesModal").modal('show');
+	d3.select("#betaError").style("display", "none");
+});
+
 // set listener on strip view UI elements
 
 var stripColors = [
@@ -510,9 +516,9 @@ var stylesheet = newStylesheet();
 
 // initialize advanced SVG generation options UI elements
 
-var advancedOptions = d3.select("#advancedOptions")
+var stripParametersBtn = d3.select("#stripParametersBtn")
 .on("click", function() {
-	$('#advancedModal').modal();
+	$('#stripParametersModal').modal();
 	// recompute widthFactor
 	widthFactor.setValue(widthFactor.getValue());
 });
@@ -614,6 +620,66 @@ var extensionSlider = new Slider("#extensionLength", {
 	}
 }).on("change", extensionSliderChange);
 
+$("#patternInferSwitch").bootstrapSwitch({state: false})
+.on('switchChange.bootstrapSwitch', function() {
+	if ($("#patternInferSwitch").prop("checked")) {
+		d3.selectAll("#inferContainer").classed("betaHidden", false);
+		patternDropdown.select("option.betaHidden").classed("betaHidden", false);
+	} else {
+		if (_.any(assembleSVGDrawer.get(), "infer")) {
+			// error
+			d3.select("#betaError").style("display", "block")
+			.html("<i class='fa fa-exclamation-triangle'></i> You cannot turn this feature off when there are still tiles with inferred patterns in the palette!");
+			$("#patternInferSwitch").bootstrapSwitch("state", true);
+		} else {
+			d3.selectAll("#inferContainer").classed("betaHidden", true);
+			patternDropdown.select("option.betaHidden").classed("betaHidden", true);
+		}
+	}
+});
+
+$("#nonPlanarSwitch").bootstrapSwitch({state: false})
+.on('switchChange.bootstrapSwitch', function() {
+	if ($("#nonPlanarSwitch").prop("checked")) {
+		// turn it on
+		d3.selectAll("#planarContainer").classed("betaHidden", false);
+	} else {
+		// todo: add check if non-planar edge joins exist
+		if (false) {
+			// error
+			d3.select("#betaError").style("display", "block")
+			.html("<i class='fa fa-exclamation-triangle'></i> You cannot turn this feature off when there are still non-planar edge joins on the canvas!");
+			$("#nonPlanarSwitch").bootstrapSwitch("state", true);
+		} else {
+			d3.selectAll("#planarContainer").classed("betaHidden", true);
+		}
+	}
+});
+
+$("#patternCroppingSwitch").bootstrapSwitch({state: false})
+.on('switchChange.bootstrapSwitch', function() {
+	if ($("#patternCroppingSwitch").prop("checked")) {
+		// turn it on
+		d3.selectAll("#cropContainer").classed("betaHidden", false);
+	} else {
+		if (cropData.hullEdges.length > 2 && $("#cropMode").prop("checked")) {
+			// error
+			d3.select("#betaError").style("display", "block")
+			.html("<i class='fa fa-exclamation-triangle'></i> Turning off this feature will reset your existing cropping selection.");
+		}
+		d3.selectAll("#cropContainer").classed("betaHidden", true);
+	}
+});
+
+$("#jsonStripGenSwitch").bootstrapSwitch({state: false})
+.on('switchChange.bootstrapSwitch', function() {
+	d3.selectAll("#customStripPanel").classed("betaHidden", !$("#jsonStripGenSwitch").prop("checked"));
+	if ($("#jsonStripGenSwitch").prop("checked")) {
+		stripViewClick();
+		document.getElementById("customStripPanel").scrollIntoView();
+	}
+});
+
 $("#outlineToggle").bootstrapSwitch()
 .on('switchChange.bootstrapSwitch', function() {
 	d3.selectAll("path.strip-outline")
@@ -666,11 +732,13 @@ $(document).ready(function() {
 		onInit: function() {
 			var label = d3.select(this.parentNode).select(".bootstrap-switch-label");
 			label.html(label.text() + " <a href='#' id='autoSnapHint'><i class='fa fa-question-circle'></a>");
-			d3.select("#autoSnapHint").on("click", function() {
+			$("#autoSnapHint").click(function(e) {
 				bootbox.alert({
 					title: "Planar tilings only",
 					message: "<p>Under normal circumstances, Sliceform Studio will forbid you from joining two edges belonging to the same tile or to tiles in the same group. You can disable this check by turning off 'Planar' in the toolbar. Now when you click on two edges in succession, the two tiles will no longer snap together, but the edges will still turn green to indicate that they are now joined.</p> <p>This is useful for creating non-planar configurations like cylinders, polyhedra and other configurations where edges are identified in topologically interesting ways. Refer to Rampart or Planetarium in the <a href='/gallery'>gallery</a> as examples of this.</p>"
 				});
+				// to compensate for click event registering on switch as well
+				$("#autoSnap").bootstrapSwitch("toggleState", true);
 			});
 		}
 	});

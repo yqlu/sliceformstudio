@@ -213,7 +213,9 @@
 
 		p Note that edge joining is forbidden if the two edges have different lengths.
 
-		h6 Snapping edges
+		h6#planar Planar tiles
+
+		.alert.alert-info This experimental feature is still in beta. To access it, click on the “Beta Features” button below the tile screen and turn on Non-planar Tiles.
 
 		p Under normal circumstances, Sliceform Studio will forbid you from joining two edges belonging to the same tile or to tiles in the same group. You can disable this check by turning off “Planar” in the toolbar. Now when you click on two edges in succession, the two tiles will no longer snap together, but the edges will still turn green to indicate that they are now joined.
 
@@ -306,9 +308,11 @@
 
 		h4#infer Infer
 
+		.alert.alert-info This experimental feature is still in beta. To access it, click on the “Beta Features” button below the tile screen and turn on Pattern Inference.
+
 		p The infer option is similar to Hankin above, just that the inference algorithm is deferred and run at a later stage. The boundary conditions are deduced from its neighbors, not from user-defined parameters. This can be very powerful since a different pattern can be generated separately for each tile on the canvas.
 
-		p When the option is first selected, the tile is simply shaded yellow but initialized with no patterns. When there is a tile on the inferred setting in the canvas, the "Infer" button appears on the toolbar. Clicking it triggers the inference algorithm.
+		p When the option is first selected, the tile is simply shaded yellow but initialized with no patterns. When there is a tile on the inferred setting in the canvas, the “Infer” button appears on the toolbar. Clicking it triggers the inference algorithm.
 
 		.row
 			.col-sm-12.img-with-label
@@ -471,6 +475,8 @@
 
 		h2#cropping Cropping
 
+		.alert.alert-info This experimental feature is still in beta. To access it, click on the “Beta Features” button below the tile screen and turn on Pattern Cropping.
+
 		p Sometimes, it is desirable for the final design to show just a fraction of the original tiling – for instance, if you want the result to be bounded by a rectangle. That is where the cropping feature comes in.
 
 		.row
@@ -566,7 +572,9 @@
 
 		p The generated SVG file features 3 colors – the slits in black, the creases in red and the outlines in blue. This is optimized for laser cutters and die cutters, where you can pick an order to cut each color and have a different speed / power setting for each color.
 
-		h4#manualStrip Manual strip generation
+		h4#jsonStripGen JSON strip generation
+
+		.alert.alert-info This experimental feature is still in beta. To access it, click on the “Beta Features” button below the tile screen and turn on JSON Strip Generation.
 
 		p Some users have requested the use of Sliceform Studio's strip generation capabilities independent of the pattern generation or tracing features. If you have a particular sliceform in mind which you have already calculated the dimensions of each strip for, you can type in a JSON input under “Manual Strip Generation” to generate the corresponding strip.
 

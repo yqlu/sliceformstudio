@@ -22,11 +22,11 @@
 					a#delete.btn.btn-primary #[i.fa.fa-trash] Delete
 					a#copy.btn.btn-primary #[i.fa.fa-files-o] Copy
 					a#clear.btn.btn-primary #[i.fa.fa-times-circle] Clear All
-				.btn-group.padded-btn-group
+				.btn-group.padded-btn-group#cropContainer.betaFeature.betaHidden
 					a#cropDesign.btn.btn-primary #[i.fa.fa-crop] Crop
-				.btn-group.padded-btn-group
+				.btn-group.padded-btn-group#planarContainer.betaFeature.betaHidden
 					input#autoSnap(type="checkbox", checked="true", data-label-text="Planar ", data-label-width=80)
-				.btn-group.padded-btn-group
+				.btn-group.padded-btn-group#inferContainer.betaFeature.betaHidden
 					a#infer.btn.btn-primary Infer
 			form#cropViewMenu.form-inline.hidden
 				.btn-group.padded-btn-group
@@ -49,6 +49,8 @@
 					.btn-group.padded-btn-group
 						a.btn.btn-default.btn-sm(title="Zoom to fit")#traceZoomToFit #[i.fa.fa-fw.fa-arrows-alt]
 						a.btn.btn-default.btn-sm(title="Reset zoom level")#traceOrigZoom 1:1
+		div.pull-right
+			a.btn.btn-default#betaFeaturesBtn #[i.fa.fa-flask] Beta features
 	#traceTab.hidden
 		.toolbar
 			span
@@ -81,12 +83,12 @@
 						label.control-label.col-xs-2 Extension length
 						.col-xs-4
 							input#extensionLength(type='text')
-						a#advancedOptions.btn.btn-primary #[i.fa.fa-cog] Advanced options
+						a#stripParametersBtn.btn.btn-primary #[i.fa.fa-cog] Strip parameters
 
-		#customStripPanel.toolbar
+		#customStripPanel.toolbar.betaFeature.betaHidden
 			.panel.panel-default
 				.panel-heading
-					h4.panel-title #[span Manual strip generation ]
+					h4.panel-title #[span JSON strip generation ]
 						a(href='docs.html#manualStrip', target='_blank') #[i.fa.fa-question-circle.fa-lg]
 				#customStrips.panel-body
 					form
@@ -97,13 +99,13 @@
 							a#generateCustomStripBtn.btn.btn-default Generate!
 		#tmpSvg.hidden
 		a.hidden#downloadLink
-#advancedModal.modal.fade(tabindex='-1', role='dialog')
+#stripParametersModal.modal.fade(tabindex='-1', role='dialog')
 	.modal-dialog.modal-lg
 		.modal-content
 			.modal-header
 				button.close(type='button', data-dismiss='modal', aria-label='Close')
 					span(aria-hidden='true') ×
-				h4.modal-title Advanced options
+				h4.modal-title Strip generation parameters
 			.modal-body
 				p
 					| Specify parameters for the generated paper strip SVG files here. The defaults work well for generic laser cutters, but you can tweak them to your own preferences.
@@ -126,6 +128,42 @@
 						label.control-label.col-md-2 Inter-strip spacing
 						.col-md-3
 							input#interSpacing(type='text')
+			.modal-footer
+				button.btn.btn-default(type='button', data-dismiss='modal') Close
+#betaFeaturesModal.modal.fade(tabindex='-1', role='dialog')
+	.modal-dialog.modal-lg
+		.modal-content
+			.modal-header
+				button.close(type='button', data-dismiss='modal', aria-label='Close')
+					span(aria-hidden='true') ×
+				h4.modal-title Beta features
+			.modal-body
+				p
+					| Some experimental features are currently in beta. You can enable these features below.
+				.alert.alert-danger#betaError(style="display: none;")
+				form.form-horizontal
+					.form-group
+						label.control-label.col-md-3 Pattern Inference &nbsp;
+							a(href="/docs.html#infer", target="_blank")
+								i.fa.fa-question-circle
+						.col-md-3
+							input#patternInferSwitch(type="checkbox", checked="false")
+						label.control-label.col-md-3 Non-planar tiles &nbsp;
+							a(href="/docs.html#planar", target="_blank")
+								i.fa.fa-question-circle
+						.col-md-3
+							input#nonPlanarSwitch(type="checkbox", checked="false")
+					.form-group
+						label.control-label.col-md-3 Pattern cropping &nbsp;
+							a(href="/docs.html#planar", target="_blank")
+								i.fa.fa-question-circle
+						.col-md-3
+							input#patternCroppingSwitch(type="checkbox", checked="false")
+						label.control-label.col-md-3 JSON strip generation &nbsp;
+							a(href="/docs.html#jsonStripGen", target="_blank")
+								i.fa.fa-question-circle
+						.col-md-3
+							input#jsonStripGenSwitch(type="checkbox", checked="false")
 			.modal-footer
 				button.btn.btn-default(type='button', data-dismiss='modal') Close
 #customShapeGUIModal.modal.fade(tabindex='-1', role='dialog')

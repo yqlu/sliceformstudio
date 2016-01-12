@@ -558,7 +558,8 @@ var editSpecificPattern = function(tiles) {
 	var isRegular = isRegularPolygon(tiles[0].vertices);
 	return function() {
 		patternDropdown.selectAll("option").attr("disabled", function(d) {
-			return isRegular ? null : (d.regularOnly ? true : null);
+			return (isRegular ? null : (d.regularOnly ? true : null)) ||
+				(d3.select(this).classed("betaFeature betaHidden") ? true : null);
 		});
 		$("#patternDropdown").select2({
 			minimumResultsForSearch: Infinity
@@ -913,7 +914,7 @@ var stripViewClick = function() {
 				(noStripsOnCanvas ? "visible" : "hidden"));
 			d3.select("#traceSvg").select(".palette").style("visibility",
 				(noStripsOnCanvas ? "hidden" : "visible"));
-			d3.selectAll(".svg-toolbar").style("left", noStripsOnCanvas ? "0px" : config.stripTableWidth + "px");
+			traceSvg.selectAll(".svg-toolbar").style("left", noStripsOnCanvas ? "0px" : config.stripTableWidth + "px");
 		}
 		tileView.classed("active", false);
 		stripView.classed("active", true);

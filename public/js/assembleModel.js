@@ -146,8 +146,8 @@ var joinEdges = function(thisEdgeNode, selected) {
 		bootbox.alert("Error: cannot join edges with different lengths!");
 	} else {
 
-		centerCoords(thisTileNode);
-		centerCoords(selected.tileNode);
+		centerTileCoords(thisTileNode);
+		centerTileCoords(selected.tileNode);
 
 		// calculate transformation to destination
 		var t = calculateJoin(thisEdgeNode, selected);

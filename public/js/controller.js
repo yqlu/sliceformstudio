@@ -81,8 +81,14 @@ var dragMove = d3.behavior.drag()
 // drag handler for rotation, attached to vertex element
 var dragRotate = d3.behavior.drag()
 .on("drag", function(d,i) {
-	var angle = num.getAngle(d3.event.x, d3.event.y) -
-		num.getAngle(d.x, d.y);
+	var transformedEvent = num.matrixToCoords(num.dot(this.parentNode.__data__.transform,
+			num.coordsToMatrix([[d3.event.x, d3.event.y]])))[0];
+	var transformedVertex = num.matrixToCoords(
+			num.dot(this.parentNode.__data__.transform,
+				num.coordsToMatrix([[d.x, d.y]])))[0];
+
+	var angle = num.getAngle(transformedEvent[0], transformedEvent[1]) -
+		num.getAngle(transformedVertex[0], transformedVertex[1]);
 
 	d3.select(this.parentNode.parentNode)
 	.attr("transform", function(d) {
@@ -91,10 +97,12 @@ var dragRotate = d3.behavior.drag()
 	});
 })
 .on("dragstart", function() {
+
 	d3.select("body")
 	.style("cursor", "all-scroll");
 	d3.event.sourceEvent.stopPropagation();
-	centerCoords(this.parentNode);
+	centerGroupCoords(this.parentNode.parentNode);
+
 })
 .on("dragend", function(d) {
 	d3.select(this.parentNode.parentNode)
@@ -650,34 +658,11 @@ var originalZoomHandler = function(d, i) {
 };
 
 var zoomToFitHandler = function(d, i) {
-	var canvasBbox = {x: Infinity, y: Infinity, x2: -Infinity, y2: -Infinity};
-	if (tileView.classed("active")) {
-		d3.select(".canvas").selectAll(".vertex").each(function(d) {
-			var localCoords = [[d.x, d.y]];
-			var transformedCoords = num.matrixToCoords(
-				num.dot(this.parentNode.parentNode.__data__.transform, num.dot(this.parentNode.__data__.transform,
-					num.coordsToMatrix(localCoords))));
-			canvasBbox.x = Math.min(canvasBbox.x, transformedCoords[0][0]);
-			canvasBbox.y = Math.min(canvasBbox.y, transformedCoords[0][1]);
-			canvasBbox.x2 = Math.max(canvasBbox.x2, transformedCoords[0][0]);
-			canvasBbox.y2 = Math.max(canvasBbox.y2, transformedCoords[0][1]);
-		});
-	} else {
-		traceSvg.selectAll(".strip-below").each(function(d) {
-			var strip = this;
-			_.each(_.flatten(d.points), function(p) {
-				var transformedCoords = num.matrixToCoords(
-					num.dot(strip.parentNode.__data__.transform, num.coordsToMatrix([[p.x, p.y]])));
-				canvasBbox.x = Math.min(canvasBbox.x, transformedCoords[0][0]);
-				canvasBbox.y = Math.min(canvasBbox.y, transformedCoords[0][1]);
-				canvasBbox.x2 = Math.max(canvasBbox.x2, transformedCoords[0][0]);
-				canvasBbox.y2 = Math.max(canvasBbox.y2, transformedCoords[0][1]);
-			});
-		});
-	}
+	var canvasBbox = tileView.classed("active") ?
+		computeVertexBbox(d3.select(".canvas").selectAll(".vertex")) :
+		computePatternBbox(traceSvg.selectAll(".strip-below"));
+
 	if (_.all(_.values(canvasBbox), isFinite)) {
-		canvasBbox.width = canvasBbox.x2 - canvasBbox.x;
-		canvasBbox.height = canvasBbox.y2 - canvasBbox.y;
 		var svgWidth = (tileView.classed("active")) ? assembleSvg.node().parentNode.clientWidth : traceSvg.node().parentNode.clientWidth;
 		var svgHeight = parseInt(assembleSvg.attr("height"),10);
 		var paletteWidth = config.stripTableWidth;

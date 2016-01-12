@@ -205,7 +205,7 @@ var approxEqEdges = function(x, y, tolerance) {
 
 // pass in a tile node
 // transform group coordinates to center the origin at that tile
-var centerCoords = function(tileNode) {
+var centerTileCoords = function(tileNode) {
 	var tileTransform = d3.select(tileNode).datum().transform;
 	var tileInverse = num.inv(tileTransform);
 
@@ -214,23 +214,90 @@ var centerCoords = function(tileNode) {
 		d.transform = num.matrixRound(num.dot(d.transform, tileTransform));
 	})
 	.attr("transform", num.getTransform)
-	.selectAll("g").each(function(d) {
+	.selectAll("g.tile").each(function(d) {
 		d.transform = num.matrixRound(num.dot(tileInverse, d.transform));
 	})
 	.attr("transform", num.getTransform);
+};
 
-	tileNode.parentNode.undoCentering = function() {
-		d3.select(tileNode.parentNode)
+
+// pass in a group node
+// transform group coordinates to center origin at center of the group
+var centerGroupCoords = function(groupNode) {
+
+	var canvasBbox = computeVertexBbox(d3.select(groupNode).selectAll(".vertex"));
+
+	var translation = num.translate(- canvasBbox.x - canvasBbox.width / 2,
+		- canvasBbox.y - canvasBbox.height / 2);
+	var invTranslation = num.inv(translation);
+
+	d3.select(groupNode)
+	.each(function(d) {
+		d.transform = num.matrixRound(num.dot(d.transform, invTranslation));
+	})
+	.attr("transform", num.getTransform)
+	.selectAll("g.tile").each(function(d) {
+		d.transform = num.matrixRound(num.dot(translation, d.transform));
+	})
+	.attr("transform", num.getTransform);
+
+	groupNode.undoCentering = function() {
+		d3.select(this)
 		.each(function(d) {
-			d.transform = num.matrixRound(num.dot(d.transform, tileInverse));
+			d.transform = num.matrixRound(num.dot(d.transform, translation));
 		})
 		.attr("transform", num.getTransform)
-		.selectAll("g").each(function(d) {
-			d.transform = num.matrixRound(num.dot(tileTransform, d.transform));
+		.selectAll("g.tile").each(function(d) {
+			d.transform = num.matrixRound(num.dot(invTranslation, d.transform));
 		})
 		.attr("transform", num.getTransform);
 	};
 };
+
+var computeVertexBbox = function(vertices) {
+	var canvasBbox = {x: Infinity, y: Infinity, x2: -Infinity, y2: -Infinity};
+
+	vertices.each(function(d) {
+		var localCoords = [[d.x, d.y]];
+		var transformedCoords = num.matrixToCoords(
+			num.dot(this.parentNode.__data__.transform,
+				num.coordsToMatrix(localCoords)));
+		canvasBbox.x = Math.min(canvasBbox.x, transformedCoords[0][0]);
+		canvasBbox.y = Math.min(canvasBbox.y, transformedCoords[0][1]);
+		canvasBbox.x2 = Math.max(canvasBbox.x2, transformedCoords[0][0]);
+		canvasBbox.y2 = Math.max(canvasBbox.y2, transformedCoords[0][1]);
+	});
+
+	if (_.all(_.values(canvasBbox), isFinite)) {
+		canvasBbox.width = canvasBbox.x2 - canvasBbox.x;
+		canvasBbox.height = canvasBbox.y2 - canvasBbox.y;
+	}
+
+	return canvasBbox;
+};
+
+var computeStripBbox = function(strips) {
+	var canvasBbox = {x: Infinity, y: Infinity, x2: -Infinity, y2: -Infinity};
+
+	strips.each(function(d) {
+		var strip = this;
+		_.each(_.flatten(d.points), function(p) {
+			var transformedCoords = num.matrixToCoords(
+				num.dot(strip.parentNode.__data__.transform, num.coordsToMatrix([[p.x, p.y]])));
+			canvasBbox.x = Math.min(canvasBbox.x, transformedCoords[0][0]);
+			canvasBbox.y = Math.min(canvasBbox.y, transformedCoords[0][1]);
+			canvasBbox.x2 = Math.max(canvasBbox.x2, transformedCoords[0][0]);
+			canvasBbox.y2 = Math.max(canvasBbox.y2, transformedCoords[0][1]);
+		});
+	});
+
+	if (_.all(_.values(canvasBbox), isFinite)) {
+		canvasBbox.width = canvasBbox.x2 - canvasBbox.x;
+		canvasBbox.height = canvasBbox.y2 - canvasBbox.y;
+	}
+
+	return canvasBbox;
+}
 
 // some math to ensure after transfer from palette to canvas
 // tiles stay in same position under the mouse but is appropriately scaled

@@ -328,7 +328,7 @@ var patternClick = function(thisNode) {
 };
 
 var shapeEditCustomDraw = function() {
-	shapeEditSVGDrawer.set([regularPolygon(parseInt(sideNumberSlider.getValue(), 10), parseFloat(sideLengthSlider.getValue()))]);
+	shapeEditSVGDrawer.set([regularPolygon(parseInt(sideNumberSlider.getValue(), 10), 1)]);
 	shapeEditSVGDrawer.draw();
 };
 

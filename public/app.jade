@@ -16,7 +16,7 @@
 					a.btn.btn-primary.dropdown-toggle(data-toggle="dropdown") #[i.fa.fa-caret-down] Add Tile
 					ul.dropdown-menu
 						li
-							a#addShapeGUI(href="#") Graphical editor (basic)
+							a#addShapeGUI(href="#") Regular polygon (basic)
 						li
 							a#addShapeText(href="#") Manual text editor (advanced)
 					a#delete.btn.btn-primary #[i.fa.fa-trash] Delete
@@ -167,32 +167,20 @@
 			.modal-footer
 				button.btn.btn-default(type='button', data-dismiss='modal') Close
 #customShapeGUIModal.modal.fade(tabindex='-1', role='dialog')
-	.modal-dialog.modal-lg
+	.modal-dialog
 		.modal-content
 			.modal-header
 				button.close(type='button', data-dismiss='modal', aria-label='Close')
 					span(aria-hidden='true') ×
-				h4.modal-title Custom Tile Editor
+				h4.modal-title Add a regular polygon
 			.modal-body
-				.container-fluid
-					.row
-						.col-md-7
-							form.form-horizontal
-								.form-group
-									label.control-label.col-md-4 No. of sides
-									.col-md-8
-										input#sideNumber(type='text')
-								.form-group
-									label.control-label.col-md-4 Side length
-									.col-md-8
-										input#sideLength(type='text')
-								.form-group
-									.col-md-offset-4.col-md-8
-										input#shapeEditToggle(type="checkbox", checked="true", data-label-text="Display dimensions", data-label-width=150)
-								p
-									| You can customize the polygon on the right by dragging on the vertices before clicking “Add to lineup”.
-						.col-md-5
-							#shapeEditSvg
+				div
+					#shapeEditSvg
+					form.form-horizontal
+						.form-group
+							label.control-label.col-md-5 No. of sides
+							.col-md-7
+								input#sideNumber(type='text')
 			.modal-footer
 				a#addToLineup.btn.btn-primary Add to lineup
 				button.btn.btn-default(type='button', data-dismiss='modal') Close

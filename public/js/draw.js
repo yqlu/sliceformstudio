@@ -131,12 +131,6 @@ var drawEdges = function(tiles, options) {
 		});
 	}
 
-	if (options.vertexEdit) {
-		edges.each(function(d, i) {
-			d.label = drawEdgeLabel(d, i, this);
-		});
-	}
-
 	return edges;
 };
 
@@ -157,28 +151,6 @@ var drawHandle = function(edgeData, index, thisEdgeNode) {
 	.classed("edgehandle", true)
 	.on('mouseover', handleMouseover)
     .on('mouseout', handleMouseout)
-    .node();
-};
-
-var drawVertexLabel = function(vertexData, index, thisVertexNode) {
-	var label = document.createElementNS(assembleSvg.node().namespaceURI, "text");
-    thisVertexNode.parentNode.appendChild(label);
-
-    return d3.select(label)
-    .datum(thisVertexNode)
-    .call(updateVertexLabel)
-	.classed("vertexlabel label", true)
-    .node();
-};
-
-var drawEdgeLabel = function(edgeData, index, thisEdgeNode) {
-	var label = document.createElementNS(assembleSvg.node().namespaceURI, "text");
-    thisEdgeNode.parentNode.appendChild(label);
-
-    return d3.select(label)
-    .datum(thisEdgeNode)
-    .call(updateEdgeLabel)
-	.classed("edgelabel label", true)
     .node();
 };
 
@@ -261,17 +233,6 @@ var drawVertices = function(tiles, options) {
 			vertices
 			.classed("actionable", true)
 			.call(dragRotate);
-		}
-
-		if (options.vertexEdit) {
-			vertices
-			.classed("actionable", true)
-			.call(dragEdit)
-			.each(function(d, i) {
-				d.this = this;
-				d.index = i;
-				d.label = drawVertexLabel(d, i, this);
-			});
 		}
 
 		return vertices;

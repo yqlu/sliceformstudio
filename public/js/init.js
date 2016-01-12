@@ -38,9 +38,9 @@ var tracePatternOptions = {
 var shapeEditPaletteOptions = {
 	orientation: "neutral",
 	visibleVertices: true,
-	vertexEdit: true,
 	visibleEdges: true,
-	displayInterior: true
+	displayInterior: true,
+	groupDraggable: true
 };
 
 var patternEditPaletteOptions = {
@@ -307,9 +307,6 @@ patternDropdown.selectAll("option").data(patternOptions).enter()
 
 // set listeners on custom shape UI elements
 
-$("#shapeEditToggle").bootstrapSwitch()
-.on('switchChange.bootstrapSwitch', shapeEditToggle);
-
 var addToLineupButton = d3.select("#addToLineup")
 	.on("click", addToLineupClick);
 
@@ -333,16 +330,6 @@ d3.selectAll("#assembleZoomToFit, #traceZoomToFit")
 .on("click", zoomToFitHandler);
 
 $("#assembleOrigZoom, #traceOrigZoom, #assembleZoomToFit, #traceZoomToFit").tooltip({container: 'body#body'});
-
-var sideLengthSlider = new Slider('#sideLength', {
-	min: 0.5,
-	max: 4,
-	step: 0.05,
-	value: 1,
-	formatter: function(value) {
-		return 'Current value: ' + value;
-	}
-}).on("change", shapeEditCustomDraw);
 
 shapeEditCustomDraw();
 

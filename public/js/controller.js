@@ -483,7 +483,6 @@ var updateTileWithPatternClick = function() {
 		param1: patternSlider1.getValue(),
 		param2: patternSlider2.getValue()
 	};
-	var index = selection.index();
 	assembleSVGDrawer.replace(newTile);
 	assembleSVGDrawer.draw();
 	$("#patternModal").modal('hide');
@@ -713,7 +712,7 @@ var originalZoomHandler = function(d, i) {
 var zoomToFitHandler = function(d, i) {
 	var canvasBbox = tileView.classed("active") ?
 		computeVertexBbox(d3.select(".canvas").selectAll(".vertex")) :
-		computePatternBbox(traceSvg.selectAll(".strip-below"));
+		computeStripBbox(traceSvg.selectAll(".strip-below"));
 
 	if (_.all(_.values(canvasBbox), isFinite)) {
 		var svgWidth = (tileView.classed("active")) ? assembleSvg.node().parentNode.clientWidth : traceSvg.node().parentNode.clientWidth;

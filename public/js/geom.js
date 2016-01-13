@@ -225,7 +225,7 @@ var centerTileCoords = function(tileNode) {
 // transform group coordinates to center origin at center of the group
 var centerGroupCoords = function(groupNode) {
 
-	var canvasBbox = computeVertexBbox(d3.select(groupNode).selectAll(".vertex"));
+	var canvasBbox = computeVertexBbox(d3.select(groupNode).selectAll(".vertex"), true);
 
 	var translation = num.translate(- canvasBbox.x - canvasBbox.width / 2,
 		- canvasBbox.y - canvasBbox.height / 2);
@@ -254,14 +254,18 @@ var centerGroupCoords = function(groupNode) {
 	};
 };
 
-var computeVertexBbox = function(vertices) {
+var computeVertexBbox = function(vertices, forGroupLevel) {
 	var canvasBbox = {x: Infinity, y: Infinity, x2: -Infinity, y2: -Infinity};
 
 	vertices.each(function(d) {
 		var localCoords = [[d.x, d.y]];
-		var transformedCoords = num.matrixToCoords(
-			num.dot(this.parentNode.__data__.transform,
-				num.coordsToMatrix(localCoords)));
+		var transformedCoords = forGroupLevel ?
+			// transform to group coordinates
+			num.matrixToCoords(num.dot(this.parentNode.__data__.transform,
+				num.coordsToMatrix(localCoords))) :
+			// transform to canvas coordinates
+			num.matrixToCoords(num.dot(this.parentNode.parentNode.__data__.transform,
+				num.dot(this.parentNode.__data__.transform, num.coordsToMatrix(localCoords))));
 		canvasBbox.x = Math.min(canvasBbox.x, transformedCoords[0][0]);
 		canvasBbox.y = Math.min(canvasBbox.y, transformedCoords[0][1]);
 		canvasBbox.x2 = Math.max(canvasBbox.x2, transformedCoords[0][0]);

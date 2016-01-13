@@ -702,7 +702,7 @@ var originalZoomHandler = function(d, i) {
 
 var zoomToFitHandler = function(d, i) {
 	var canvasBbox = tileView.classed("active") ?
-		computeVertexBbox(d3.select(".canvas").selectAll(".vertex")) :
+		computeVertexBbox(d3.select(".canvas").selectAll(".vertex"), false) :
 		computeStripBbox(traceSvg.selectAll(".strip-below"));
 
 	if (_.all(_.values(canvasBbox), isFinite)) {

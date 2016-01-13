@@ -706,7 +706,9 @@ var patternOptions = [
 							selectedTemplate.points = _.take(selectedTemplate.points, degrees);
 						}
 
-						var toPush = selectedTemplate.points.length > 0 ? _.last(selectedTemplate.points) : {transform: num.translate(0,0)};
+						var toPush = selectedTemplate.points.length > 0 ?
+							{transform: num.translateBy(_.last(selectedTemplate.points).transform, -10, 10)}
+							: {transform: num.translate(-10,10)};
 						while (selectedTemplate.points.length < degrees) {
 							selectedTemplate.points.push(_.cloneDeep(toPush));
 						}

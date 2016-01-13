@@ -8,10 +8,10 @@
 					figure.centered
 						.thumb
 							if (image.slfm)
-								a(href="/images/gallery-schematics/#{image.filename}.jpg", data-lightbox="#{image.filename}" data-title="#{image.title} (#{image.year})")
+								a(href="/images/gallery-diagrams/#{image.filename}.jpg", data-lightbox="#{image.filename}" data-title="#{image.title} (#{image.year})")
 									div.responsive-sprites
 										img(class="icon-#{image.filename}", alt="#{image.title}", src="/images/sprites/gallery-thumbs-sprite.jpg")
-									.overlay Click to view schematic
+									.overlay Click to view diagrams
 							else
 								a(href="/images/gallery/#{image.filename}.jpg", data-lightbox="#{image.filename}" data-title="#{image.title} (#{image.year})")
 									div.responsive-sprites

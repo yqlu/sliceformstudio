@@ -56,10 +56,11 @@
 			span
 				| Pick a color to assign to strips:#{' '}
 			select#colorpicker
-			a.btn.btn-primary.btn-sm.pull-right#exportSvg #[i.fa.fa-download] SVG
 			.btn-group.padded-btn-group.pull-right
-				a.btn.btn-primary.btn-sm.dropdown-toggle(data-toggle="dropdown")#exportPngDropdown #[i.fa.fa-download] PNG
+				a.btn.btn-primary.dropdown-toggle(data-toggle="dropdown")#exportImageDropdown Export Image #[i.fa.fa-caret-down]
 				ul.dropdown-menu#exportPngMenu
+					li.divider
+					li #[a#exportSvg(href="#") SVG format]
 		#traceSvg
 			.shadedOverlay(style="visibility: hidden;")
 				.innerOverlay

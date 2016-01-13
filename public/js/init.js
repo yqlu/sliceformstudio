@@ -126,7 +126,7 @@ var fo = tracePaletteContainer.append("foreignObject")
 	.append("div").classed("stripTablePadded", true);
 
 fo.append("h4")
-	.html("Strip generation <a href='/docs.html#exportStrip' target='_blank'><i class='fa fa-question-circle'></i></a>");
+	.html("Export Strips <a href='/docs.html#exportStrip' target='_blank'><i class='fa fa-question-circle'></i></a>");
 
 var sidebarForm = fo
 	.append("form").classed("form-horizontal", true);
@@ -468,17 +468,17 @@ d3.select("#colorpicker").selectAll("option")
 var exportSvg = d3.select("#exportSvg")
 .on("click", exportSvgHandler);
 
-d3.select("#exportPngMenu").selectAll("li").data([
+d3.select("#exportPngMenu").selectAll("li.exportPng").data([
 	{factor: 0.5, title: "Small"},
 	{factor: 1, title: "Medium"},
 	{factor: 2, title: "Large"},
 	{factor: 4, title: "Very large"}])
-.enter().append("li")
+.enter().insert("li", ":first-child").order().classed("exportPng", true)
 .append("a").attr("href", "#")
 .on("click", exportPngHandler);
 
-d3.select("#exportPngDropdown").on("click", function() {
-	d3.select("#exportPngMenu").selectAll("li").selectAll("a").text(function(d) {
+d3.select("#exportImageDropdown").on("click", function() {
+	d3.select("#exportPngMenu").selectAll("li.exportPng").selectAll("a").text(function(d) {
 		var width = traceSvg.node().parentNode.clientWidth - config.stripTableWidth;
 		var height = traceSvg.attr("height");
 		return d.title + " (" + Math.round(width * d.factor) + " x " + Math.round(height * d.factor) + ")";

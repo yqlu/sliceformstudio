@@ -306,3 +306,20 @@ var enterCanvas = function(groupNode) {
 
 	invalidateStripCache();
 };
+
+var deletePaletteTile = function(groupNode) {
+	d3.select(groupNode).remove();
+
+	// redraw sidebar while preserving previous scroll point
+	var scrollPoint = assemblePaletteContainer[0][0].__data__.transform;
+	var btnScrollPoint = assemblePaletteButtons[0][0].__data__.transform;
+
+	assembleSVGDrawer.draw();
+
+	assemblePaletteContainer
+	.each(function(d) { d.transform = scrollPoint; })
+	.attr("transform", num.getTransform);
+	assemblePaletteButtons
+	.each(function(d) { d.transform = btnScrollPoint; })
+	.attr("transform", num.getTransform);
+}

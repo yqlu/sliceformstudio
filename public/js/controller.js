@@ -39,7 +39,15 @@ var dragMove = d3.behavior.drag()
 
 	// enter canvas if hover group originates from palette
 	if (!isClick && this.parentNode === assemblePaletteContainer.node()) {
-		enterCanvas(this);
+		var absoluteCoords = num.getTranslation(num.dot(this.parentNode.parentNode.__data__.transform,
+			num.dot(this.parentNode.__data__.transform, this.__data__.transform)));
+		var paletteWidth = parseFloat(assemblePaletteBg.attr("width"));
+		console.log(absoluteCoords[0], paletteWidth);
+		if (absoluteCoords[0] > paletteWidth) {
+			enterCanvas(this);
+		} else {
+			deletePaletteTile(this);
+		}
 		selection.clear();
 	}
 
@@ -718,6 +726,8 @@ var zoomToFitHandler = function(d, i) {
 			(- canvasBbox.x - canvasBbox.width / 2) / scale + paletteWidth + (svgWidth - paletteWidth) / 2,
 			(- canvasBbox.y - canvasBbox.height / 2) / scale + svgHeight / 2];
 		commonZoomHandler.translate(translate);
+
+		console.log(scale, canvasBbox, translate);
 
 		d3.selectAll("#traceSvg, #assembleSvg").selectAll(".display.canvas").each(function(d) {
 			d.transform = num.matrixRound(num.translateBy(num.scaleBy(num.id, commonZoomHandler.scale()),

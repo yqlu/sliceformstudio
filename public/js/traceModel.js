@@ -594,9 +594,9 @@ var colorAllStrips = function() {
 
 // update display for strip table
 var updateStripTable = function() {
-	var expandedColorSlots = _.filter(colorMap, function(c) {
+	var collapsedColorSlots = _.filter(colorMap, function(c) {
 		return d3.select("#collapse" + c.color.id)[0][0] &&
-		d3.select("#collapse" + c.color.id).style("display") === "block";
+		d3.select("#collapse" + c.color.id).style("display") === "none";
 	});
 
 	var update = sidebarForm
@@ -642,8 +642,8 @@ var updateStripTable = function() {
 	update.append("h5").classed("colorLabel", true)
 	.attr("id", function(d) { return "collapser" + d.color.id; })
 	.html(function(d) {
-		var caret = _.contains(expandedColorSlots, d) ? "fa-caret-down" : "fa-caret-right";
-		return "<i class='fa fa-fw fa-caret-right'></i> <span>" + d.color.name + " (" + d.strips.length + ")</span>";
+		var caret = _.contains(collapsedColorSlots, d) ? "fa-caret-right" : "fa-caret-down";
+		return "<i class='fa fa-fw fa-caret-down'></i> <span>" + d.color.name + " (" + d.strips.length + ")</span>";
 	})
 	.each(function(d) {
 		$("#collapser" + d.color.id).click(function() {
@@ -664,7 +664,7 @@ var updateStripTable = function() {
 	})
 	.on("mouseout", colorAllStrips);
 	var collapseDiv = update.append("div").style("display", function(d) {
-		return _.contains(expandedColorSlots, d) ? "block" : "none";
+		return _.contains(collapsedColorSlots, d) ? "none" : "block";
 	}).attr("id", function(d) { return "collapse" + d.color.id; })
 		.append("ul").classed("strip-table-ul", true);
 
@@ -714,6 +714,7 @@ var updateStripTable = function() {
 			d3.select(ui.startparent[0].parentNode.parentNode).select(".colorLabel")
 			.select("span").text(function(d) { return d.color.name + " (" + d.strips.length + ")"; });
 		}
+		emphasizeStrips(ui.item[0].__data__.nodes, ui.endparent[0].__data__.color.hex);
 	});
 };
 

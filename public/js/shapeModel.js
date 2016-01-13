@@ -280,6 +280,8 @@ var polygonFromAnglesAndLengths = function(angles, lengths, theta) {
 	// else, treat array of n lengths and angles as specifying polygon of (n+1) sides
 	if (approxEqPoints(_.first(vertexData).coords, _.last(vertexData).coords, config.polygonTolerance)) {
 		vertexData.pop();
+	} else {
+		throw new Error("The provided angles and lengths do not specify a valid polygon!");
 	}
 
 	var transform = theta ? num.rotate(theta) : num.id;

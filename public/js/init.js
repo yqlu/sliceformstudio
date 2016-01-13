@@ -134,7 +134,7 @@ var sidebarForm = fo
 var noneSoFar = fo
 	.append("span")
 	.attr("id", "noneSoFar")
-	.html("<i class='fa fa-exclamation-triangle'></i> You haven't assigned colors to any strips yet!");
+	.html("Strips you assign colors to will show up here!");
 
 // set listeners on tile / strip view toggles
 var tileView = d3.select("#tileView")
@@ -597,13 +597,13 @@ var thicknessSlider = new Slider("#thickness", {
 
 var extensionSlider = new Slider("#extensionLength", {
 	min: 0,
-	max: 2,
+	max: 0.8,
 	step: 0.01,
 	value: 0.3,
 	formatter: function(value) {
-		var pixels = value * widthFactor.getValue();
+		var pixels = value * config.sidelength * widthFactor.getValue();
 		var mm = Math.round(pixels / config.pixelToMm * 10) / 10;
-		return mm + ' mm';
+		return Math.round(pixels) + " px = " + mm + ' mm';
 	}
 }).on("change", extensionSliderChange);
 

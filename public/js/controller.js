@@ -384,6 +384,8 @@ var patternDropdownChange = function() {
 		}
 	} else {
 		delete tile.customTemplate;
+		// reset the custom template UI to its default values
+		updateUIForCustomTemplate(null, true);
 		patternUpdate();
 	}
 
@@ -424,6 +426,33 @@ var patternUpdate = function() {
 	patternEditSVGDrawer.redrawPatterns();
 };
 
+var patternPreview = function(motif, customTemplate) {
+	var previousSelectedMotif = patternOptions[patternDropdown.node().value];
+	var patternFn;
+	var tile = patternEditSVGDrawer.getTile();
+	var n = tile.vertices.length;
+
+	if (motif.parameters.length === 2) {
+		if (previousSelectedMotif.name === motif.name) {
+			// use the slider values
+			patternFn = makePatterns(motif.generator(tile,
+				patternSlider1.getValue(), patternSlider2.getValue()));
+		} else {
+			// use the default values
+			patternFn = makePatterns(motif.generator(tile,
+				motif.parameters[0].options(n).value,
+				motif.parameters[1].options(n).value));
+		}
+	} else {
+		// reset customTemplate if present
+		// custom preview takes values from existing DOM sliders
+		tile.customTemplate = customTemplate;
+		patternFn = makePatterns(motif.generator(tile));
+	}
+	polygonAddPattern(tile, patternFn);
+	patternEditSVGDrawer.redrawPatterns();
+};
+
 var addToLineupClick = function() {
 	pushPolygonToLineup(_.cloneDeep(shapeEditSVGDrawer.getTile()));
 	$("#customShapeGUIModal").modal('hide');
@@ -458,7 +487,7 @@ var updateTileWithPatternClick = function() {
 	assembleSVGDrawer.replace(newTile);
 	assembleSVGDrawer.draw();
 	$("#patternModal").modal('hide');
-	selection.set(assembleSVGDrawer.container.selectAll("g.group")[0][index], {type: "group", updatePatternDisplay: false});
+	selection.clear();
 
 	var tilesInCanvas = assembleCanvas.selectAll("g.tile").filter(function(d, i) { return d.polygonID === newTile.polygonID; });
 
@@ -561,10 +590,6 @@ var editSpecificPattern = function(tiles) {
 			return (isRegular ? null : (d.regularOnly ? true : null)) ||
 				(d3.select(this).classed("betaFeature betaHidden") ? true : null);
 		});
-		$("#patternDropdown").select2({
-			minimumResultsForSearch: Infinity
-		})
-		.on("change", patternDropdownChange);
 		var defaultOption = isRegular ? 0 : 3;
 		selection.set(tiles[0].this.parentNode, {type: 'group'});
 		$("#patternModal").modal();
@@ -588,6 +613,33 @@ var editSpecificPattern = function(tiles) {
 			patternDropdown.node().value = defaultOption;
 			$("#patternDropdown").trigger("change");
 		}
+
+		var optionMouseenter = function(e){
+			var motif = _.find(patternOptions, function(o) {
+				return o.name === e.currentTarget.innerHTML;
+			});
+			patternPreview(motif, originalTile.customTemplate);
+		};
+
+		var originalTile;
+
+		$("#patternDropdown").select2({
+			minimumResultsForSearch: Infinity
+		})
+		.on("select2:open", function() {
+			$('body').on('mouseenter', '.select2-results__option', optionMouseenter);
+			originalTile = _.cloneDeep(patternEditSVGDrawer.getTile());
+		})
+		.on("select2:close", function() {
+			// unbind mouseenter event, reset original version of tile before pattern previews
+			$('body').off('mouseenter', '.select2-results__option', optionMouseenter);
+			tiles[0] = originalTile;
+			patternUpdate();
+		})
+		.on("select2:select", patternDropdownChange);
+
+
+
 	};
 };
 
@@ -940,7 +992,7 @@ var loadFromFile = function() {
 				});
 			} catch (err) {
 				bootbox.alert(err.message);
-				console.log(err);
+				console.error(err);
 			}
 		};
 		reader.readAsText(files[0]);

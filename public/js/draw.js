@@ -165,7 +165,11 @@ var drawPatternHelpers = function(tiles, options) {
 		.each(function(d) {
 			d.this = this;
 		})
-		.classed("patternHelper", true);
+		.classed("patternHelper", true)
+		.classed("active", function(d, i) {
+			return $("#customPatternSelect").val() &&
+				i === parseInt($("#customPatternSelect").val()[0], 10);
+		});
 	} else {
 		return null;
 	}
@@ -434,7 +438,9 @@ var svgDrawer = function(container, options) {
 			});
 		},
 		replace: function(p) {
-			var index = d3.select(selection.get().groupNode).selectAll("g.tile").datum().index;
+			var index = _.findIndex(assembleSVGDrawer.get(),function(t) {
+				return t.polygonID === patternEditSVGDrawer.getTile().polygonID;
+			});
 			this.palettePolygons[index] = p;
 		},
 		pop: function(index) {

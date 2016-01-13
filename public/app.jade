@@ -144,7 +144,7 @@
 				.alert.alert-danger#betaError(style="display: none;")
 				form.form-horizontal
 					.form-group
-						label.control-label.col-md-3 Pattern Inference &nbsp;
+						label.control-label.col-md-3 Pattern inference &nbsp;
 							a(href="/docs.html#infer", target="_blank")
 								i.fa.fa-question-circle
 						.col-md-3
@@ -262,7 +262,7 @@
 										.col-md-9
 											.radio
 												label
-													input(type='radio', name='edgeRadios', value='auto', checked='')
+													input#edgeRadiosAuto(type='radio', name='edgeRadios', value='auto', checked='')
 													| Extends from every
 													input#patternInterval.form-control.input-small-padded.input-small(value='2', type='text')
 													| edge(s) starting from edge
@@ -272,7 +272,7 @@
 													| edges counting clockwise.
 											.radio
 												label
-													input(type='radio', name='edgeRadios', value='manual')
+													input#edgeRadiosManual(type='radio', name='edgeRadios', value='manual')
 													| Manual array specification:
 													input#manualEdges.form-control(type='text', placeholder='[[1,5],[2,3]]')
 									.form-group
@@ -295,11 +295,11 @@
 											.radio
 												label
 													input(type='radio', name='symmetryRadios', value='mirrorCrop', checked='')
-													|  Mirror symmetry with cropping
+													|  Mirror symmetry by extending rays
 											.radio
 												label
 													input(type='radio', name='symmetryRadios', value='mirrorNoCrop')
-													|  Mirror symmetry without cropping
+													|  Mirror symmetry by truncating rays
 											.radio
 												label
 													input(type='radio', name='symmetryRadios', value='noMirror')

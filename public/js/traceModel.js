@@ -604,6 +604,7 @@ var updateStripTable = function() {
 	.data(colorMap);
 
 	noneSoFar.style("display", "none");
+	resetAllStrips.style("display", "block");
 
 	update.enter().append("div").classed("color-slot", true);
 

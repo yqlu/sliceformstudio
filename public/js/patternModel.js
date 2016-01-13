@@ -682,7 +682,7 @@ var patternOptions = [
 						edgesSpec: edgesSpec,
 						applicableEdges: applicableEdges,
 						points: _.map(_.range(degrees), function(t) {
-							return {transform: num.translate([-10,10])};
+							return {transform: num.translate([-20,10])};
 						})
 					}];
 				} else {

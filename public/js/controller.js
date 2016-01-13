@@ -178,7 +178,7 @@ var updateUIForCustomTemplate = function(template, forceFlag) {
 			($("#customPatternSelect").val() && $("#customPatternSelect").val().length === 1 &&
 			$("#customPatternSelect").val()[0] !== ""+thisIndex)) {
 
-			var templateClone = template; // _.cloneDeep(template);
+			var templateClone = template;
 
 			$("#customPatternSelect").val(thisIndex);
 			$(":radio[value=" + templateClone.edgesSpec + "]").prop("checked", true);
@@ -196,6 +196,11 @@ var updateUIForCustomTemplate = function(template, forceFlag) {
 		d3.select(template.this.parentNode).selectAll("g.patternHelper").classed("active", false);
 		d3.select(template.this).classed("active", true);
 	}
+};
+
+var updateUIForCustomTemplateWithDefault = function(i) {
+	updateUIForCustomTemplate(
+		patternEditSVGDrawer.getTile().customTemplate[$("#customPatternSelect").val()[0]],true);
 };
 
 var resetCustomPatternUIValues = function() {
@@ -388,7 +393,6 @@ var patternDropdownChange = function() {
 		updateUIForCustomTemplate(null, true);
 		patternUpdate();
 	}
-
 };
 
 var patternMultiSelectUpdate = function(customTemplate) {
@@ -463,15 +467,6 @@ var addToLineupManualClick = function() {
 	$("#customShapeTextModal").modal('hide');
 };
 
-var updateShapeClick = function() {
-	var newTile = shapeEditSVGDrawer.getTile();
-	var index = selection.index();
-	shapeSVGDrawer.replace(newTile);
-	shapeSVGDrawer.draw();
-	selection.set(shapeSVGDrawer.container.selectAll("g.group")[0][index], {type: "group", updatePatternDisplay: false});
-};
-
-
 var updateTileWithPatternClick = function() {
 	var motifIndex = patternDropdown.node().value;
 	var motif = patternOptions[motifIndex];
@@ -486,7 +481,6 @@ var updateTileWithPatternClick = function() {
 	assembleSVGDrawer.replace(newTile);
 	assembleSVGDrawer.draw();
 	$("#patternModal").modal('hide');
-	selection.clear();
 
 	var tilesInCanvas = assembleCanvas.selectAll("g.tile").filter(function(d, i) { return d.polygonID === newTile.polygonID; });
 
@@ -590,7 +584,6 @@ var editSpecificPattern = function(tiles) {
 				(d3.select(this).classed("betaFeature betaHidden") ? true : null);
 		});
 		var defaultOption = isRegular ? 0 : 3;
-		selection.set(tiles[0].this.parentNode, {type: 'group'});
 		$("#patternModal").modal();
 		patternEditSVGDrawer.set(_.cloneDeep(tiles));
 		patternEditSVGDrawer.draw();
@@ -622,7 +615,7 @@ var editSpecificPattern = function(tiles) {
 
 		var originalTile;
 
-		$("#patternDropdown").select2({
+		$("#patternDropdown").select2('destroy').select2({
 			minimumResultsForSearch: Infinity
 		})
 		.on("select2:open", function() {
@@ -636,8 +629,6 @@ var editSpecificPattern = function(tiles) {
 			patternUpdate();
 		})
 		.on("select2:select", patternDropdownChange);
-
-
 
 	};
 };

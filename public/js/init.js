@@ -128,11 +128,27 @@ var fo = tracePaletteContainer.append("foreignObject")
 fo.append("h4")
 	.html("Export Strips <a href='/docs.html#exportStrip' target='_blank'><i class='fa fa-question-circle'></i></a>");
 
+var resetAllStrips = fo.append("span")
+	.append("div")
+	.attr("id", "resetAllStrips").style("margin-left", "10px").style("display", "none")
+	.html("<a href='#' class='strip-table-x'><i class='fa fa-times'></i></a> Reset all strips");
+
+resetAllStrips.select("a")
+	.on("click", function() {
+		_.each(colorMap, function(c) {
+			c.strips = [];
+		});
+		d3.selectAll(".strip-below, .strip-above").style("stroke", "gainsboro");
+		updateStripTable();
+		resetAllStrips.style("display", "none");
+		noneSoFar.style("display", "block");
+	});
+
 var sidebarForm = fo
 	.append("form").classed("form-horizontal", true);
 
 var noneSoFar = fo
-	.append("span")
+	.append("div")
 	.attr("id", "noneSoFar")
 	.html("Strips you assign colors to will show up here!");
 
@@ -356,10 +372,8 @@ keyboardJS.bind(['+'], kbdWrapper(function() {
 
 // set listeners on edit pattern UI elements
 
-$("#customPatternSelect").change(function(i) {
-	updateUIForCustomTemplate(
-		patternEditSVGDrawer.getTile().customTemplate[$("#customPatternSelect").val()[0]],true);
-});
+$("#customPatternSelect").change(updateUIForCustomTemplateWithDefault)
+.focus(updateUIForCustomTemplateWithDefault);
 
 var confirmPatternButton = d3.select("#confirmPattern")
 	.on("click", updateTileWithPatternClick);
@@ -392,10 +406,10 @@ var endOffset = new Slider('#endOffset', {
 })
 .on("change", patternUpdate);
 
-$('form input[name=symmetryRadios][type=radio]:checked')
+$('form input[name=symmetryRadios][type=radio]')
 .change(patternUpdate);
 
-$('form input[name=edgeRadios][type=radio]:checked')
+$('form input[name=edgeRadios][type=radio]')
 .change(patternUpdate);
 
 var degreesOfFreedom = new Slider('#degreesOfFreedom', {
@@ -407,6 +421,17 @@ var degreesOfFreedom = new Slider('#degreesOfFreedom', {
 		return 'Current value: ' + value;
 	}
 }).on("change", patternUpdate);
+
+$("#patternInterval, #patternStart, #patternDepth")
+.focus(function() {
+	$(":radio[value=auto]").prop("checked", true);
+	patternUpdate();
+}).blur(patternUpdate);
+
+$("#manualEdges").focus(function() {
+	$(":radio[value=manual]").prop("checked", true);
+	patternUpdate();
+}).blur(patternUpdate);
 
 var patternSlider1 = new Slider("#patternSlider1", {
 	value: 0,
@@ -697,23 +722,7 @@ $(document).ready(function() {
 	$("#patternDropdown").select2({
 		minimumResultsForSearch: Infinity
 	})
-	.on("change", patternDropdownChange)
-	// hack to prevent weird auto-behavior of select2
-	.on("select2:open", function() {
-		openTime = new Date().getTime();
-	}).on("select2:closing", function(e) {
-		var tempCounter = new Date().getTime();
-		if (openTime > tempCounter - 1000) {
-			e.preventDefault();
-			return;
-		}
-	}).on("select2:selecting", function(e) {
-		var tempCounter = new Date().getTime();
-		if (openTime > tempCounter - 1000) {
-			e.preventDefault();
-			return;
-		}
-	});
+	.on("change", patternDropdownChange);
 
 	$("#autoSnap").bootstrapSwitch({
 		onInit: function() {

@@ -410,7 +410,7 @@ var patternOptions = [
 				return {
 					value: n > 4 ? 2 : 1,
 					min: 1,
-					max: Math.floor(n/2),
+					max: Math.floor((n - 1)/2),
 					step: 1,
 					formatter: function(value) {
 						return 'Current value: ' + value;
@@ -424,8 +424,11 @@ var patternOptions = [
 			var n = tile.vertices.length;
 			var r = 1 / (2 * Math.tan(Math.PI / n));
 			var theta = (2 * angle - 90 ) / 180 * Math.PI;
+
+			var maxPossibleDepth = Math.floor(angle * n / 180);
+
 			var template = [num.vecSum([0, r], num.polarToRect(r, theta))];
-			return regularPolygonPattern(n, depth, template);
+			return regularPolygonPattern(n, Math.min(depth, maxPossibleDepth), template);
 		}
 	},{
 		name: "Rosette",
@@ -436,7 +439,7 @@ var patternOptions = [
 				return {
 					value: 180 / n,
 					min: 0,
-					max: 90,
+					max: 90 - 45 * (n - 2) / n,
 					step: 0.01,
 					formatter: function(value) {
 						return 'Current value: ' + value + '°';
@@ -447,7 +450,7 @@ var patternOptions = [
 			name: "Depth",
 			options: function(n) {
 				return {
-					value: 2,
+					value: n === 6 ? 2 : 3,
 					min: 1,
 					max: Math.floor(n/2),
 					step: 1,
@@ -466,7 +469,13 @@ var patternOptions = [
 			var x = 1/2 * Math.sin(Math.PI * (n-2) / (4*n)) / Math.sin(Math.PI - Math.PI * (n-2) / (4*n) - theta);
 			var y = 1/2 * Math.sin(Math.PI * (n-2) / (2*n)) / Math.sin(Math.PI / 2 - Math.PI * (n-2) / (4*n));
 			template = [num.polarToRect(x, theta), num.polarToRect(y, rho)];
-			return regularPolygonPattern(n, depth, template);
+
+			var secondSeg = num.vecSub(template[1], template[0]);
+			var firstSegParallelToSecondSegLength =  numeric.dotVV(template[0], secondSeg) / numeric.dotVV(secondSeg, secondSeg);
+			var alpha = Math.atan2(secondSeg[1] * (1 + firstSegParallelToSecondSegLength), secondSeg[0] * (1 + firstSegParallelToSecondSegLength));
+			var maxPossibleDepth = Math.floor(alpha * n / Math.PI);
+
+			return regularPolygonPattern(n, Math.min(depth, maxPossibleDepth), template);
 		}
 	},
 	{
@@ -478,7 +487,7 @@ var patternOptions = [
 				return {
 					value: 360 / n,
 					min: 180 / n,
-					max: 90,
+					max: 180 * (1/2 + (6 - n) / (4 * n)),
 					step: 0.01,
 					formatter: function(value) {
 						return 'Current value: ' + value + '°';
@@ -515,7 +524,13 @@ var patternOptions = [
 
 			template = [num.vecSum(refPoint, num.polarToRect(x * ratio, theta + Math.PI / n)),
 			num.vecSum(refPoint, num.polarToRect(y * ratio, rho + Math.PI / n))];
-			return regularPolygonPattern(n, depth, template);
+
+			var secondSeg = num.vecSub(template[1], template[0]);
+			var firstSegParallelToSecondSegLength =  numeric.dotVV(template[0], secondSeg) / numeric.dotVV(secondSeg, secondSeg);
+			var alpha = Math.atan2(secondSeg[1] * (1 + firstSegParallelToSecondSegLength), secondSeg[0] * (1 + firstSegParallelToSecondSegLength));
+			var maxPossibleDepth = Math.floor(alpha * n / Math.PI);
+
+			return regularPolygonPattern(n, Math.min(depth, maxPossibleDepth), template);
 		}
 	},
 	{

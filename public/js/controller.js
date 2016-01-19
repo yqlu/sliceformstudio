@@ -347,7 +347,10 @@ var shapeEditCustomDraw = function() {
 
 var patternDropdownChange = function() {
 
-	var index = patternDropdown.node().value;
+	if (patternSelectize.items.length !== 1) {
+		return;
+	}
+	var index = patternSelectize.items[0];
 	var motif = patternOptions[index];
 	var tile = patternEditSVGDrawer.getTile();
 
@@ -424,7 +427,11 @@ var patternMultiSelectUpdate = function(customTemplate) {
 };
 
 var patternUpdate = function() {
-	var index = patternDropdown.node().value;
+
+	if (patternSelectize.items.length !== 1) {
+		return;
+	}
+	var index = patternSelectize.items[0];
 	var motif = patternOptions[index];
 	var tile = patternEditSVGDrawer.getTile();
 	var patternFn;
@@ -587,11 +594,18 @@ var clearHandler = function(d, i) {
 var editSpecificPattern = function(tiles) {
 	var isRegular = isRegularPolygon(tiles[0].vertices);
 	return function() {
-		patternDropdown.selectAll("option").attr("disabled", function(d) {
-			return (isRegular ? null : (d.regularOnly ? true : null)) ||
-				(d3.select(this).classed("betaFeature betaHidden") ? true : null);
+		var patternSelectize = $("#patternDropdown")[0].selectize;
+
+		var filteredPatterns = _.filter(patternOptions, function(opt) {
+			if (!isRegular && opt.regularOnly) {
+				return false;
+			} else {
+				return !(opt.betaFeature && opt.betaHidden);
+			}
 		});
-		var defaultOption = isRegular ? 0 : 3;
+		patternSelectize.clearOptions();
+		patternSelectize.addOption(filteredPatterns);
+		patternSelectize.refreshOptions(false);
 		$("#patternModal").modal();
 		patternEditSVGDrawer.set(_.cloneDeep(tiles));
 		patternEditSVGDrawer.draw();
@@ -605,12 +619,13 @@ var editSpecificPattern = function(tiles) {
 		}).attr("transform", num.getTransform);
 		if (tiles[0].patternParams) {
 			var params = tiles[0].patternParams;
-			patternDropdown.node().value = params.index;
+			patternSelectize.setValue(params.index + "");
 			$("#patternDropdown").trigger("change");
 			patternSlider1.setValue(params.param1);
 			patternSlider2.setValue(params.param2);
 		} else {
-			patternDropdown.node().value = defaultOption;
+			var defaultOption = isRegular ? "0" : "3";
+			patternSelectize.setValue(defaultOption);
 			$("#patternDropdown").trigger("change");
 		}
 
@@ -621,31 +636,18 @@ var editSpecificPattern = function(tiles) {
 			patternPreview(motif, originalTile.customTemplate);
 		};
 
-		var originalTile, openingTime;
+		var originalTile;
 
-		$("#patternDropdown").select2('destroy').select2({
-			minimumResultsForSearch: Infinity
-		})
-		.on("select2:open", function() {
-			openingTime = new Date();
-			$('body').on('mouseenter', '.select2-results__option', optionMouseenter);
+		patternSelectize.on("dropdown_open", function() {
+			$('body').on('mouseenter', '.selectize-dropdown-content .option', optionMouseenter);
 			originalTile = _.cloneDeep(patternEditSVGDrawer.getTile());
-		})
-		.on("select2:close", function() {
+		});
+		patternSelectize.on("dropdown_close", function() {
 			// unbind mouseenter event, reset original version of tile before pattern previews
 			$('body').off('mouseenter', '.select2-results__option', optionMouseenter);
 			tiles[0] = originalTile;
 			patternUpdate();
-		})
-		.on("select2:closing", function(e) {
-			// on some browsers select2 will automatically close upon opening
-			// hack to prevent this if the dropdown has been open for <0.5 seconds
-			if (new Date() - openingTime < 500) {
-				e.preventDefault();
-			}
-		})
-		.on("select2:select", patternDropdownChange);
-
+		});
 	};
 };
 

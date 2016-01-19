@@ -767,3 +767,7 @@ var patternOptions = [
 		}
 	},
 ];
+
+_.each(patternOptions, function(opt, i) {
+	opt.index = i;
+});

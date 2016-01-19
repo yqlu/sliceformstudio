@@ -314,12 +314,12 @@ _.each(tileOptions, function(opts, name) {
 });
 
 var patternDropdown = d3.select("#patternDropdown");
-
-patternDropdown.selectAll("option").data(patternOptions).enter()
-	.append("option")
-	.attr("value", function(d, i) {return i;})
-	.html(function(d) {return d.name;})
-	.classed("betaFeature betaHidden", function(d) { return d.name === "Infer"; });
+_.each(patternOptions, function(opt) {
+	if (opt.name === "Infer") {
+		opt.betaFeature = true;
+		opt.betaHidden = true;
+	}
+});
 
 // set listeners on custom shape UI elements
 
@@ -634,9 +634,10 @@ var extensionSlider = new Slider("#extensionLength", {
 
 $("#patternInferSwitch").bootstrapSwitch({state: false})
 .on('switchChange.bootstrapSwitch', function() {
+	var inferPatternObject = _.find(patternOptions, function(opt) { return opt.name === "Infer"; });
 	if ($("#patternInferSwitch").prop("checked")) {
+		inferPatternObject.betaHidden = false;
 		d3.selectAll("#inferContainer").classed("betaHidden", false);
-		patternDropdown.select("option.betaHidden").classed("betaHidden", false);
 	} else {
 		if (_.any(assembleSVGDrawer.get(), "infer")) {
 			// error
@@ -644,8 +645,8 @@ $("#patternInferSwitch").bootstrapSwitch({state: false})
 			.html("<i class='fa fa-exclamation-triangle'></i> You cannot turn this feature off when there are still tiles with inferred patterns in the palette!");
 			$("#patternInferSwitch").bootstrapSwitch("state", true);
 		} else {
+			inferPatternObject.betaHidden = true;
 			d3.selectAll("#inferContainer").classed("betaHidden", true);
-			patternDropdown.select("option.betaHidden").classed("betaHidden", true);
 		}
 	}
 });
@@ -710,6 +711,8 @@ bootbox.setDefaults({
 var currentFilename = "my_design";
 
 // wrap jQuery plugins in document.ready
+var patternSelectize;
+
 $(document).ready(function() {
 	$("#colorpicker").simplecolorpicker({theme: 'regularfont'})
 	.on("change", function() {
@@ -719,10 +722,13 @@ $(document).ready(function() {
 
     var openTime = new Date().getTime();
 
-	$("#patternDropdown").select2({
-		minimumResultsForSearch: Infinity
+	$("#patternDropdown").selectize({
+		valueField: "index",
+		labelField: "name",
+		sortField: "index"
 	})
 	.on("change", patternDropdownChange);
+	patternSelectize = $("#patternDropdown")[0].selectize;
 
 	$("#autoSnap").bootstrapSwitch({
 		onInit: function() {

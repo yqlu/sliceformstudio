@@ -392,8 +392,7 @@ var startOffset = new Slider('#startOffset', {
 	formatter: function(value) {
 		return 'Current value: ' + value;
 	}
-})
-.on("change", patternUpdate);
+}).on("change", patternUpdate);
 
 var endOffset = new Slider('#endOffset', {
 	value: 0,
@@ -403,8 +402,7 @@ var endOffset = new Slider('#endOffset', {
 	formatter: function(value) {
 		return 'Current value: ' + value;
 	}
-})
-.on("change", patternUpdate);
+}).on("change", patternUpdate);
 
 $('form input[name=symmetryRadios][type=radio]')
 .change(patternUpdate);

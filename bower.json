@@ -24,7 +24,7 @@
     "numeric": "https://github.com/sloisel/numeric.git#~1.2.6",
     "twitter-bootstrap-wizard": "git://github.com/VinceG/twitter-bootstrap-wizard.git#master",
     "jquery-simplecolorpicker": "https://github.com/tkrotoff/jquery-simplecolorpicker.git#~0.3.0",
-    "seiyria-bootstrap-slider": "https://github.com/seiyria/bootstrap-slider.git#~4.4.0",
+    "seiyria-bootstrap-slider": "https://github.com/seiyria/bootstrap-slider.git#~6.0.6",
     "less": "~2.2.0",
     "bootbox.js": "bootbox#~4.4.0",
     "bootstrap-switch": "~3.3.2",

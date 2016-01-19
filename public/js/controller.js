@@ -621,12 +621,13 @@ var editSpecificPattern = function(tiles) {
 			patternPreview(motif, originalTile.customTemplate);
 		};
 
-		var originalTile;
+		var originalTile, openingTime;
 
 		$("#patternDropdown").select2('destroy').select2({
 			minimumResultsForSearch: Infinity
 		})
 		.on("select2:open", function() {
+			openingTime = new Date();
 			$('body').on('mouseenter', '.select2-results__option', optionMouseenter);
 			originalTile = _.cloneDeep(patternEditSVGDrawer.getTile());
 		})
@@ -635,6 +636,13 @@ var editSpecificPattern = function(tiles) {
 			$('body').off('mouseenter', '.select2-results__option', optionMouseenter);
 			tiles[0] = originalTile;
 			patternUpdate();
+		})
+		.on("select2:closing", function(e) {
+			// on some browsers select2 will automatically close upon opening
+			// hack to prevent this if the dropdown has been open for <0.5 seconds
+			if (new Date() - openingTime < 500) {
+				e.preventDefault();
+			}
 		})
 		.on("select2:select", patternDropdownChange);
 

@@ -322,7 +322,7 @@ var draw = function(container, inputlist, options) {
 
 			var bBox = innerBtn[0][0].getBoundingClientRect();
 
-			fo.attr("height", bBox.height).attr("width", bBox.width)
+			fo.attr("height", bBox.height).attr("width", Math.max(bBox.width, 44))
 				.attr("y", - bBox.height / 2)
 				.attr("x", - bBox.width / 2);
 		});

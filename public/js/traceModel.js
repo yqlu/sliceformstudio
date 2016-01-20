@@ -611,6 +611,11 @@ var updateStripTable = function() {
 	update.filter(function(d) { return d.strips.length === 0; })
 	.remove();
 
+	// on Firefox the drag-update of a list item fires off mouseover and mouseout events
+	// on previously adjacent nodes. Use mostRecentDrag to only action mouseover and mouseout
+	// events that are > 100ms after the end of a drag update.
+	var mostRecentDrag = new Date(0);
+
 	update.html("").append("a")
 	.classed("pull-right btn btn-primary btn-xs", true).style("margin-right", "10px")
 	.on("click", function(d) {
@@ -661,9 +666,16 @@ var updateStripTable = function() {
 		});
 	})
 	.on("mouseover", function(d) {
-		emphasizeStrips(_.flatten(_.pluck(d.strips, "nodes")), d.color.hex);
+		if (new Date() - mostRecentDrag > 100) {
+			emphasizeStrips(_.flatten(_.pluck(d.strips, "nodes")), d.color.hex);
+		}
 	})
-	.on("mouseout", colorAllStrips);
+	.on("mouseout", function() {
+		if (new Date() - mostRecentDrag > 100) {
+			colorAllStrips();
+		}
+	});
+
 	var collapseDiv = update.append("div").style("display", function(d) {
 		return _.contains(collapsedColorSlots, d) ? "none" : "block";
 	}).attr("id", function(d) { return "collapse" + d.color.id; })
@@ -676,9 +688,15 @@ var updateStripTable = function() {
 		.html(function(d, i) { return "<a class='strip-table-x' href='#'><i class='fa fa-times'></i></a> Strip #" +
 			(d.nodes[0].__data__.id || d.nodes[1].__data__.id); })
 		.on("mouseover", function(d1) {
-			emphasizeStrips(d1.nodes, this.parentNode.__data__.color.hex);
+			if (new Date() - mostRecentDrag > 100) {
+				emphasizeStrips(d1.nodes, this.parentNode.__data__.color.hex);
+			}
 		})
-		.on("mouseout", colorAllStrips);
+		.on("mouseout", function() {
+			if (new Date() - mostRecentDrag > 100) {
+				colorAllStrips();
+			}
+		});
 
 		d3.select(this).selectAll("li").selectAll("a")
 		.on("click", function(d) {
@@ -715,6 +733,7 @@ var updateStripTable = function() {
 			d3.select(ui.startparent[0].parentNode.parentNode).select(".colorLabel")
 			.select("span").text(function(d) { return d.color.name + " (" + d.strips.length + ")"; });
 		}
+		mostRecentDrag = new Date();
 		emphasizeStrips(ui.item[0].__data__.nodes, ui.endparent[0].__data__.color.hex);
 	});
 };

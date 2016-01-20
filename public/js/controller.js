@@ -627,6 +627,7 @@ var editSpecificPattern = function(tiles) {
 			patternSelectize.setValue(defaultOption);
 			$("#patternDropdown").trigger("change");
 		}
+		patternEditSVGDrawer.draw();
 
 		var optionMouseenter = function(e){
 			var motif = _.find(patternOptions, function(o) {

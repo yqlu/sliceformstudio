@@ -439,7 +439,7 @@ var svgDrawer = function(container, options) {
 		},
 		replace: function(p) {
 			var index = _.findIndex(assembleSVGDrawer.get(),function(t) {
-				return t.polygonID === patternEditSVGDrawer.getTile().polygonID;
+				return t.polygonID === p.polygonID;
 			});
 			this.palettePolygons[index] = p;
 		},

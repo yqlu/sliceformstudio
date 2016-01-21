@@ -731,7 +731,7 @@ var patternOptions = [
 				}
 
 				// return all the templates mapped to their applicable edges to be drawn
-				return _.flatten(_.map(tile.customTemplate, function(t) {
+				return _.flatten(_.map(tile.customTemplate, function(t, tIdx) {
 
 					var correctionAngle = num.getAngle(num.vectorFromEnds(tile.edges[t.startEdge].ends));
 
@@ -749,6 +749,7 @@ var patternOptions = [
 
 					return _.map(t.applicableEdges, function(i) {
 						return {
+							customIndex: tIdx,
 							start: {
 								index: i[0],
 								proportion: i[2] ? 1 - t.startProportion: t.startProportion

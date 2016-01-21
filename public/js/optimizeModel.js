@@ -15,18 +15,75 @@ var drawIntersectedVertices = function() {
 };
 
 var makeSegment = function(groupIdx, tileIdx, patternIdx, v1, v2) {
-	return function() {
+	var getElement = function() {
 		var group = polylist[groupIdx];
 		var tile = group.tiles[tileIdx];
 		var pattern = tile.patterns[patternIdx];
-		if (_.all(_.slice(pattern.intersectedVertices, v1 + 1, v2), function(v) {
+		var isStraightSegment = (_.all(_.slice(pattern.intersectedVertices, v1 + 1, v2), function(v) {
 			return v.intersect;
-		})) {
-			var patternCoords = [pattern.intersectedVertices[v1].coords, pattern.intersectedVertices[v2].coords];
-			return num.matrixToCoords(num.dot(group.transform, num.dot(tile.transform, num.coordsToMatrix(patternCoords))));
-		} else {
+		}));
+		var isBounded = (v1 >= 0) && (v2 < pattern.intersectedVertices.length);
+		if (!isBounded) {
+			throw new Error("Vertex indices are invalid.");
+		} else if (!isStraightSegment) {
 			throw new Error("Segments must be straight lines.");
+		} else {
+			return {group: group, tile: tile, pattern: pattern};
 		}
+	};
+
+	// get pattern segment pointed to and retrieve global coords
+	var getCoords = function() {
+		var element = getElement();
+		var patternCoords = [element.pattern.intersectedVertices[v1].coords,
+			element.pattern.intersectedVertices[v2].coords];
+		return num.matrixToCoords(num.dot(element.group.transform, num.dot(element.tile.transform,
+			num.coordsToMatrix(element.patternCoords))));
+	};
+
+	// retrieve pattern handles (indexed from 0 to customTemplate[i].points.length - 1)
+	// responsible for the segment in question
+	var getPatternHandles = function() {
+		var element = getElement();
+		var ct = element.tile.customTemplate[element.pattern.customIndex];
+		var previousHandleIndexInIntersectedVertices = _.findLastIndex(
+			element.pattern.intersectedVertices, function(v,i) {
+			return i <= v1 && (!v.intersect || i === 0);
+		});
+		var nextHandleIndexInIntersectedVertices = _.findIndex(
+			element.pattern.intersectedVertices, function(v, i) {
+			return i >= v2 && (!v.intersect || i === element.pattern.intersectedVertices.length - 1);
+		});
+		var numOfHandlesUpTo = _.filter(element.pattern.intersectedVertices, function(v , i) {
+			return i < previousHandleIndexInIntersectedVertices && (!v.intersect || i === 0);
+		}).length;
+		var previousHandleIndexInCustomTemplate = numOfHandlesUpTo - 1;
+		var nextHandleIndexInCustomTemplate = numOfHandlesUpTo;
+
+		var handles = [previousHandleIndexInCustomTemplate, nextHandleIndexInCustomTemplate];
+		var numHandles = ct.points.length;
+		if (ct.symmetrySpec === "mirrorNoCrop") {
+			if (nextHandleIndexInCustomTemplate === numHandles) {
+				handles = [previousHandleIndexInCustomTemplate];
+			} else if (nextHandleIndexInCustomTemplate > numHandles) {
+				handles = [numHandles * 2 - 1 - nextHandleIndexInCustomTemplate,
+					numHandles * 2 - 1 - previousHandleIndexInCustomTemplate];
+			}
+		} else if (ct.symmetrySpec === "mirrorCrop") {
+			if (nextHandleIndexInCustomTemplate > numHandles - 1) {
+				handles = [numHandles * 2 - 2 - nextHandleIndexInCustomTemplate,
+					numHandles * 2 - 2 - previousHandleIndexInCustomTemplate];
+			}
+		}
+		return {
+			polygonID: element.tile.polygonID,
+			handles: _.filter(handles, function(i) { return i >= 0 && i < numHandles; })
+		};
+	};
+
+	return {
+		getCoords: getCoords,
+		getPatternHandles: getPatternHandles
 	};
 };
 
@@ -54,7 +111,7 @@ var createObjectives = function(objectives) {
 	};
 };
 
-var optimizer = function(objectives) {
+var optimizer = function(objectives, maxIterations) {
 	var customInterface = _.map(assembleSVGDrawer.get(), function(tile) {
 		return {
 			polygonID: tile.polygonID,
@@ -72,10 +129,12 @@ var optimizer = function(objectives) {
 		});
 	}));
 	var vectorToTemplateConverter = createVectorToTemplateConverter(customInterface);
+	var numIterations = 0;
 	var fnc = function(vector) {
-		console.log(_.map(vector, function(n, idx) {
-			return n - initialVector[idx];
-		}));
+		numIterations ++;
+		if (numIterations >= maxIterations) {
+			return 0;
+		}
 		var newTemplate = vectorToTemplateConverter(vector);
 		return updateCustomTemplates(newTemplate, objectives);
 	};
@@ -167,7 +226,7 @@ var updateCustomTemplates = function(newTiles, objectives) {
 		invalidateStripCache();
 
 		var value = objectives();
-		console.log(value);
+		// console.log(value);
 		return value;
 	} else {
 		return Infinity;

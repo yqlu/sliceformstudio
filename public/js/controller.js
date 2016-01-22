@@ -494,6 +494,7 @@ var updateTileWithPatternClick = function() {
 	};
 	assembleSVGDrawer.replace(newTile);
 	assembleSVGDrawer.draw();
+	$("#customPatternSelect").val(null);
 	$("#patternModal").modal('hide');
 
 	var tilesInCanvas = assembleCanvas.selectAll("g.tile").filter(function(d, i) { return d.polygonID === newTile.polygonID; });

@@ -15,7 +15,7 @@ var drawIntersectedVertices = function() {
 	});
 };
 
-var makeSegment = function(groupIdx, tileIdx, patternIdx, v1, v2) {
+var makeSegment = function(groupIdx, tileIdx, patternIdx, v1, v2, toChange) {
 	var getElement = function() {
 		var group = polylist[groupIdx];
 		var tile = group.tiles[tileIdx];
@@ -45,6 +45,7 @@ var makeSegment = function(groupIdx, tileIdx, patternIdx, v1, v2) {
 			num.coordsToMatrix(patternCoords))));
 	};
 
+	// if pattern is from a custom template,
 	// retrieve pattern handles (indexed from 0 to customTemplate[i].points.length - 1)
 	// responsible for the segment in question
 	var getPatternHandles = function() {
@@ -68,7 +69,7 @@ var makeSegment = function(groupIdx, tileIdx, patternIdx, v1, v2) {
 		var numHandles = ct.points.length;
 		if (ct.symmetrySpec === "mirrorNoCrop") {
 			if (nextHandleIndexInCustomTemplate === numHandles) {
-				handles = [previousHandleIndexInCustomTemplate];
+				handles = [previousHandleIndexInCustomTemplate, previousHandleIndexInCustomTemplate];
 			} else if (nextHandleIndexInCustomTemplate > numHandles) {
 				handles = [numHandles * 2 - 1 - nextHandleIndexInCustomTemplate,
 					numHandles * 2 - 1 - previousHandleIndexInCustomTemplate];
@@ -79,51 +80,79 @@ var makeSegment = function(groupIdx, tileIdx, patternIdx, v1, v2) {
 					numHandles * 2 - 2 - previousHandleIndexInCustomTemplate];
 			}
 		}
-		return {
-			polygonID: element.tile.polygonID,
-			handles: _.filter(handles, function(i) { return i >= 0 && i < numHandles; })
-		};
+		if (toChange === "first") {
+			handles = [handles[0]];
+		} else if (toChange === "second") {
+			handles = [handles[1]];
+		}
+		return _.map(_.filter(handles, function(i) { return i >= 0 && i < numHandles; }),
+			function(h) { return [element.pattern.customIndex, h]; });
 	};
 
-	var getPolygonID = function() {
-		return getElement().tile.polygonID;
-	};
-
-	var getTile = function() {
-		return getElement().tile;
+	var getInterface = function() {
+		var element = getElement();
+		var patternType = patternOptions[element.tile.patternParams.index].name;
+		if (patternType === "Custom") {
+			return _.map(getPatternHandles(), function(ph) {
+				return {
+					polygonID: element.tile.polygonID,
+					isCustom: true,
+					templateSpec: ph
+				};
+			});
+		} else if (["Star", "Rosette", "Extended Rosette"].indexOf(patternType) > -1) {
+			return [{
+				polygonID: element.tile.polygonID,
+				isCustom: false
+			}];
+		} else {
+			console.log(patternType);
+			throw new Error("Optimization is unsupported for this pattern type.");
+		}
 	};
 
 	return {
 		getElement: getElement,
 		getCoords: getCoords,
-		getPatternHandles: getPatternHandles
+		getInterface: getInterface
 	};
 };
 
-var enforceParallel = function(seg1, seg2) {
-	var evaluate = function() {
+var enforceConstructor = function(evaluateConstructor) {
+	return function(seg1, seg2, toChange) {
+		var evaluateFn = evaluateConstructor(seg1, seg2);
+		var segments;
+		if (toChange === "first") {
+			segments = [seg1];
+		} else if (toChange === "second") {
+			segments = [seg2];
+		} else {
+			// by default
+			segments = [seg1, seg2];
+		}
+		return {
+			evaluate: evaluateFn,
+			segments: segments
+		};
+	};
+};
+
+var enforceParallel = enforceConstructor(function(seg1, seg2) {
+	return function() {
 		var v1 = num.vectorFromEnds(seg1.getCoords());
 		var v2 = num.vectorFromEnds(seg2.getCoords());
 		var cosOfAngle = num.dot(v1,v2) / (num.norm2(v1) * num.norm2(v2));
-		return Math.acos(Math.abs(cosOfAngle));
+		return Math.acos(Math.abs(cosOfAngle)) * 180 / Math.PI;
 	};
-	return {
-		evaluate: evaluate,
-		segments: [seg1, seg2]
-	};
-};
+});
 
-var enforceEqualLength = function(seg1, seg2) {
-	var evaluate = function() {
+var enforceEqualLength = enforceConstructor(function(seg1, seg2) {
+	return function() {
 		var len1 = num.norm2(num.vectorFromEnds(seg1.getCoords()));
 		var len2 = num.norm2(num.vectorFromEnds(seg2.getCoords()));
 		return Math.abs(len1 - len2);
 	};
-	return {
-		evaluate: evaluate,
-		segments: [seg1, seg2]
-	};
-};
+});
 
 var createObjectives = function(objectives) {
 	var evaluate = function() {
@@ -132,23 +161,9 @@ var createObjectives = function(objectives) {
 	};
 	var getInterface = function() {
 		var segments = _.flatten(_.map(objectives, function(o) { return o.segments; }));
-		var tiles = _.uniq(_.map(segments, function(s) { return s.getElement().tile; }));
-		var customInterface = _.map(tiles, function(t) {
-			return {
-				polygonID: t.polygonID,
-				customTemplate: _.map(t.customTemplate, function(ct) {
-					return {optimizePts: []};
-				})
-			};
-		});
-		_.each(segments, function(s) {
-			var polyInterface = _.find(customInterface, function(ci) {
-				return ci.polygonID === s.getElement().tile.polygonID;
-			});
-			var customTemplate = polyInterface.customTemplate[s.getElement().pattern.customIndex];
-			customTemplate.optimizePts = _.uniq(customTemplate.optimizePts.concat(s.getPatternHandles().handles));
-		});
-		return customInterface;
+		var interfaces = _.flatten(_.map(segments, function(s) { return s.getInterface(); }));
+		// TODO: have a better uniqWith by updating to lodashv4
+		return _.uniq(interfaces, JSON.stringify);
 	};
 
 	return {
@@ -161,47 +176,41 @@ var createObjectives = function(objectives) {
 // var o = createObjectives([enforceEqualLength(makeSegment(0,1,0,0,1), makeSegment(0,0,0,0,1))])
 // optimizer(o,1000)
 
-var optimizer = function(objectives, maxIterations) {
+var optimizer = function(objectives) {
 	var customInterface = objectives.getInterface();
-	var initialVector = _.flattenDeep(_.map(customInterface, function(tile) {
-		var fullTile = _.find(assembleSVGDrawer.get(), function(t) {
-			return t.polygonID === tile.polygonID;
+	var initialVector = _.flatten(_.map(customInterface, function(i) {
+		var tile = _.find(assembleSVGDrawer.get(), function(t) {
+			return t.polygonID === i.polygonID;
 		});
-		return _.map(tile.customTemplate, function(ct, ctIdx) {
-			return _.map(ct.optimizePts, function(idx) {
-				return num.getTranslation(fullTile.customTemplate[ctIdx].points[idx].transform);
-			});
-		});
+		if (i.isCustom) {
+			return num.getTranslation(
+				tile.customTemplate[i.templateSpec[0]].points[i.templateSpec[1]].transform);
+		} else {
+			return tile.patternParams.param1;
+		}
 	}));
+
 	var numIterations = 0;
 	var fnc = function(vector) {
-		numIterations ++;
-		if (numIterations >= maxIterations) {
-			return 0;
-		}
 		return updateCustomTemplates(vector, customInterface, objectives);
 	};
 
 	var result = optimjs.minimize_Powell(fnc, initialVector);
 
+	assembleSVGDrawer.draw();
 	var tilesInCanvas = assembleCanvas.selectAll("g.tile");
 
 	tilesInCanvas.each(function(d, i) {
-		if (d.customTemplate) {
-			var modelTile = _.find(assembleSVGDrawer.get(), function(t) {
-				return t.polygonID === d.polygonID;
-			});
-			d3.select(this).selectAll("path.pattern").remove();
-			d.customTemplate = _.cloneDeep(modelTile.customTemplate);
-			d.patterns = modelTile.patterns;
-			console.log(d.customTemplate[0], d.patterns);
-			var patternFn = _.last(patternOptions).generator(d);
-			polygonAddPattern(d, makePatterns(patternFn));
-			console.log(d.customTemplate[0], d.patterns);
-			d.patternParams = _.cloneDeep(modelTile.patternParams);
-			polygonAddPatternMetadata(d);
-			drawPatterns(d3.select(this), {});
-		}
+		var modelTile = _.find(assembleSVGDrawer.get(), function(t) {
+			return t.polygonID === d.polygonID;
+		});
+		d3.select(this).selectAll("path.pattern").remove();
+		d.customTemplate = _.cloneDeep(modelTile.customTemplate);
+		d.patternParams = _.cloneDeep(modelTile.patternParams);
+		var patternFn = patternOptions[d.patternParams.index].generator(d, d.patternParams.param1, d.patternParams.param2);
+		polygonAddPattern(d, makePatterns(patternFn));
+		polygonAddPatternMetadata(d);
+		drawPatterns(d3.select(this), {});
 	});
 
 	invalidateStripCache();
@@ -210,35 +219,49 @@ var optimizer = function(objectives, maxIterations) {
 };
 
 var updateCustomTemplates = function(vector, customInterface, objectives) {
-	var coords = _.chunk(vector, 2);
-	if (_.all(customInterface, function(tileInterface) {
-		var tile = _.find(assembleSVGDrawer.get(), function(t) {
-			return t.polygonID === tileInterface.polygonID;
+	var vectorCopy = vector.slice();
+
+	var tiles = _.indexBy(_.uniq(_.map(customInterface, function(ci) {
+		return _.find(assembleSVGDrawer.get(), function(t) {
+			return t.polygonID === ci.polygonID;
 		});
-		if (tile.customTemplate.length !== tileInterface.customTemplate.length) {
-			console.error("Input custom template has a different number of custom patterns");
-			return false;
+	})), "polygonID");
+
+	var intersectedVertexInterfaces = _.indexBy(_.map(tiles, function(t) {
+		return {
+			polygonID: t.polygonID,
+			vertexInterface: _.map(t.patterns, function(p) {
+				return _.pluck(p.intersectedVertices, "intersect");
+			})
+		};
+	}), "polygonID");
+
+	_.each(customInterface, function(ci) {
+		if (ci.isCustom) {
+			tiles[ci.polygonID].customTemplate[ci.templateSpec[0]]
+			.points[ci.templateSpec[1]] = {
+				transform: num.translate.apply(null, vectorCopy.splice(0, 2))
+			};
+		} else {
+			tiles[ci.polygonID].patternParams.param1 = vectorCopy.splice(0, 1)[0];
 		}
-		var intersectedVertexInterface = _.map(tile.patterns, function(p) {
-			return _.pluck(p.intersectedVertices, "intersect");
-		});
-		_.each(tile.customTemplate, function(t, idx) {
-			_.each(tileInterface.customTemplate[idx].optimizePts, function(ptIdx) {
-				t.points[ptIdx] = {transform: num.translate.apply(null, coords.splice(0, 1))};
-			});
-		});
-		patternFn = makePatterns(_.last(patternOptions).generator(tile));
+	});
+
+	_.each(tiles, function(tile) {
+		var patternFn = makePatterns(patternOptions[tile.patternParams.index]
+			.generator(tile, tile.patternParams.param1, tile.patternParams.param2));
 		polygonAddPattern(tile, patternFn);
 		polygonAddPatternMetadata(tile);
+	});
 
-		// console.log(getRepulsionForce(tile));
-
-		// compare pattern intersections with the previous interface
-		// only proceed if it is the same
-		if (_.all(tile.patterns, function(p, idx) {
+	if (_.all(tiles, function(tile) {
+		if (patternOptions[tile.patternParams.index].name !== "Custom") {
+			assembleSVGDrawer.replace(tile);
+			return true;
+		} else if (_.all(tile.patterns, function(p, idx) {
 			var newIntersectData = _.pluck(p.intersectedVertices, "intersect");
 			var eq = _.isEqual(newIntersectData,
-				intersectedVertexInterface[idx]);
+				intersectedVertexInterfaces[tile.polygonID].vertexInterface[idx]);
 			return eq;
 		})) {
 			assembleSVGDrawer.replace(tile);
@@ -247,12 +270,10 @@ var updateCustomTemplates = function(vector, customInterface, objectives) {
 			return false;
 		}
 	})) {
-		assembleSVGDrawer.draw();
 		var value = objectives.evaluate() + _.sum(_.map(assembleSVGDrawer.get(), getRepulsionForce));
 		return value;
 	} else {
 		console.log("HERE");
-		assembleSVGDrawer.draw();
 		return Math.pow(10,10);
 	}
 };

@@ -15,7 +15,14 @@ var drawIntersectedVertices = function() {
 	});
 };
 
-var makeSegment = function(groupIdx, tileIdx, patternIdx, v1, v2, toChange) {
+var makeSegment = function(params) {
+	var groupIdx = params.groupIdx;
+	var tileIdx = params.tileIdx;
+	var patternIdx = params.patternIdx;
+	var v1 = params.vertices[0];
+	var v2 = params.vertices[1];
+	var fix = params.fix;
+
 	var getElement = function() {
 		var group = polylist[groupIdx];
 		var tile = group.tiles[tileIdx];
@@ -35,6 +42,62 @@ var makeSegment = function(groupIdx, tileIdx, patternIdx, v1, v2, toChange) {
 			return {group: group, tile: tile, pattern: pattern};
 		}
 	};
+
+	var draw = function(params) {
+		var element = getElement();
+		var pattern = element.tile.patterns[patternIdx];
+		if (element.tile.segments) {
+			element.tile.segments.push([pattern.intersectedVertices[v1], pattern.intersectedVertices[v2]]);
+		} else {
+			element.tile.segments = [[pattern.intersectedVertices[v1], pattern.intersectedVertices[v2]]];
+		}
+		var segmentGroup = d3.select(element.tile.this).selectAll(".segment")
+		.data(function(d) { return d.segments; })
+		.enter()
+		.append("g")
+		.classed("segment", true);
+
+		segmentGroup
+		.append("path")
+		.style("stroke", params.color || "blue")
+		.attr("d", function(d) {
+			return d3.svg.line()(_.pluck(d, "coords"));
+		});
+
+		if (params && params.highlightHandle) {
+			var previousHandleIndexInIntersectedVertices = _.findLast(
+				element.pattern.intersectedVertices, function(v,i) {
+				return i <= v1 && (!v.intersect || i === 0);
+			});
+			var nextHandleIndexInIntersectedVertices = _.find(
+				element.pattern.intersectedVertices, function(v, i) {
+				return i >= v2 && (!v.intersect || i === element.pattern.intersectedVertices.length - 1);
+			});
+			var handles = [previousHandleIndexInIntersectedVertices, nextHandleIndexInIntersectedVertices];
+			if (fix === "first") {
+				handles = [handles[1]];
+			} else if (fix === "second") {
+				handles = [handles[0]];
+			} else if (fix === "both") {
+				handles = [];
+			}
+
+			handles = _.filter(handles, function(h, idx) {
+				return h !== element.pattern.intersectedVertices[0] &&
+				h !== _.last(element.pattern.intersectedVertices);
+			});
+
+			segmentGroup
+			.selectAll(".segmentHandle").data(handles).enter()
+			.append("circle")
+			.attr("cx", function(d) { return d.coords[0]; })
+			.attr("cy", function(d) { return d.coords[1]; })
+			.attr("r", 3)
+			.attr("fill", "red");
+		}
+	};
+
+
 
 	// get pattern segment pointed to and retrieve global coords
 	var getCoords = function() {
@@ -80,10 +143,12 @@ var makeSegment = function(groupIdx, tileIdx, patternIdx, v1, v2, toChange) {
 					numHandles * 2 - 2 - previousHandleIndexInCustomTemplate];
 			}
 		}
-		if (toChange === "first") {
-			handles = [handles[0]];
-		} else if (toChange === "second") {
+		if (fix === "first") {
 			handles = [handles[1]];
+		} else if (fix === "second") {
+			handles = [handles[0]];
+		} else if (fix === "both") {
+			handles = [];
 		}
 		return _.map(_.filter(handles, function(i) { return i >= 0 && i < numHandles; }),
 			function(h) { return [element.pattern.customIndex, h]; });
@@ -106,12 +171,12 @@ var makeSegment = function(groupIdx, tileIdx, patternIdx, v1, v2, toChange) {
 				isCustom: false
 			}];
 		} else {
-			console.log(patternType);
 			throw new Error("Optimization is unsupported for this pattern type.");
 		}
 	};
 
 	return {
+		draw: draw,
 		getElement: getElement,
 		getCoords: getCoords,
 		getInterface: getInterface
@@ -119,20 +184,11 @@ var makeSegment = function(groupIdx, tileIdx, patternIdx, v1, v2, toChange) {
 };
 
 var enforceConstructor = function(evaluateConstructor) {
-	return function(seg1, seg2, toChange) {
+	return function(seg1, seg2) {
 		var evaluateFn = evaluateConstructor(seg1, seg2);
-		var segments;
-		if (toChange === "first") {
-			segments = [seg1];
-		} else if (toChange === "second") {
-			segments = [seg2];
-		} else {
-			// by default
-			segments = [seg1, seg2];
-		}
 		return {
 			evaluate: evaluateFn,
-			segments: segments
+			segments: [seg1, seg2],
 		};
 	};
 };
@@ -146,6 +202,30 @@ var enforceParallel = enforceConstructor(function(seg1, seg2) {
 	};
 });
 
+var enforceCollinear = enforceConstructor(function(seg1, seg2) {
+	return function() {
+		var seg1Coords = seg1.getCoords();
+		var seg2Coords = seg2.getCoords();
+
+		var v1 = num.vectorFromEnds(seg1Coords);
+		var v2 = num.vectorFromEnds(seg2Coords);
+		var v3 = num.vectorFromEnds([seg1Coords[0], seg2Coords[0]]);
+		var v4 = num.vectorFromEnds([seg1Coords[0], seg2Coords[1]]);
+
+		var n1 = num.norm2(v1);
+		var n2 = num.norm2(v2);
+		var n3 = num.norm2(v3);
+		var n4 = num.norm2(v4);
+
+		var angles = _.map([[v1,v3,n1,n3], [v1,v4,n1,n4]], function(params) {
+			var cosOfAngle = num.dot(params[0], params[1]) / (params[2] * params[3]);
+			return Math.acos(Math.abs(cosOfAngle)) * 180 / Math.PI;
+		});
+
+		return _.sum(angles);
+	};
+});
+
 var enforceEqualLength = enforceConstructor(function(seg1, seg2) {
 	return function() {
 		var len1 = num.norm2(num.vectorFromEnds(seg1.getCoords()));
@@ -155,7 +235,7 @@ var enforceEqualLength = enforceConstructor(function(seg1, seg2) {
 });
 
 var createObjectives = function(objectives) {
-	var evaluate = function() {
+	var evaluate = function(i) {
 		var evaluatedValues = _.map(objectives, function(f) { return f.evaluate(); });
 		return _.reduce(evaluatedValues,function(a,b) { return a + b; });
 	};
@@ -166,9 +246,27 @@ var createObjectives = function(objectives) {
 		return _.uniq(interfaces, JSON.stringify);
 	};
 
+	var draw = function() {
+		d3.selectAll(".tile").each(function(d) {
+			delete d.segments;
+		});
+		d3.selectAll(".segment").remove();
+		var includedSegments = _.flatten(_.map(objectives, function(o) { return o.segments; }));
+		var excludedSegments = _.flatten(_.map(objectives, function(o) { return _.difference(o.allSegments, o.segments); }));
+
+		_.each(excludedSegments, function(s, idx) {
+			s.draw({color: "darkblue", highlightHandle: false});
+		});
+
+		_.each(includedSegments, function(s, idx) {
+			s.draw({color: "blue", highlightHandle: true});
+		});
+	};
+
 	return {
 		evaluate: evaluate,
-		getInterface: getInterface
+		getInterface: getInterface,
+		draw: draw
 	};
 };
 
@@ -177,6 +275,8 @@ var createObjectives = function(objectives) {
 // optimizer(o,1000)
 
 var optimizer = function(objectives) {
+	objectives.draw();
+
 	var customInterface = objectives.getInterface();
 	var initialVector = _.flatten(_.map(customInterface, function(i) {
 		var tile = _.find(assembleSVGDrawer.get(), function(t) {
@@ -214,6 +314,7 @@ var optimizer = function(objectives) {
 	});
 
 	invalidateStripCache();
+	objectives.draw();
 
 	return result;
 };
@@ -270,7 +371,7 @@ var updateCustomTemplates = function(vector, customInterface, objectives) {
 			return false;
 		}
 	})) {
-		var value = objectives.evaluate() + _.sum(_.map(assembleSVGDrawer.get(), getRepulsionForce));
+		var value = objectives.evaluate() + _.sum(_.map(tiles, getRepulsionForce));
 		return value;
 	} else {
 		console.log("HERE");

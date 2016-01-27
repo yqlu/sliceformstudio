@@ -166,10 +166,14 @@ var makeSegment = function(params) {
 				};
 			});
 		} else if (["Star", "Rosette", "Extended Rosette"].indexOf(patternType) > -1) {
-			return [{
-				polygonID: element.tile.polygonID,
-				isCustom: false
-			}];
+			if (fix) {
+				return [];
+			} else {
+				return [{
+					polygonID: element.tile.polygonID,
+					isCustom: false
+				}];
+			}
 		} else {
 			throw new Error("Optimization is unsupported for this pattern type.");
 		}
@@ -295,7 +299,7 @@ var optimizer = function(objectives) {
 		return updateCustomTemplates(vector, customInterface, objectives);
 	};
 
-	var result = optimjs.minimize_Powell(fnc, initialVector);
+	result = powell(initialVector, fnc, 0.01);
 
 	assembleSVGDrawer.draw();
 	var tilesInCanvas = assembleCanvas.selectAll("g.tile");

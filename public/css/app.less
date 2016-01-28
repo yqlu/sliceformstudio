@@ -179,6 +179,9 @@ path.pattern {
   stroke: gainsboro;
   stroke-width: 3;
 }
+.bg path.pattern {
+  stroke-width: 5;
+}
 path.pattern.traced {
   stroke: silver;
   stroke-width: 4;
@@ -232,8 +235,11 @@ line.edge.hover {
 .display:not(.bg) line.edge.joined.hover {
   stroke: #f44336;
 }
-.bg line.edge.joined {
-  stroke: silver;
+.bg line.edge {
+  stroke: gainsboro;
+}
+.bg.optimize-bg line.edge {
+  stroke: none;
 }
 line.edgehandle {
   stroke: #f44336;
@@ -294,10 +300,14 @@ g.active.patternHelper path.patternHelperLine {
 circle.vertex.selectedGroup {
   fill: #2ebcfc;
 }
-
-.segment path {
-  stroke-width: 3px;
-  stroke-linecap: butt;
+path.pattern-segment {
+  stroke: #999999;
+  stroke-width: 10px;
+  opacity: 0;
+  stroke-linecap: round;
+}
+path.pattern-segment:hover {
+  opacity: 0.8;
 }
 
 .toolbar {
@@ -523,7 +533,7 @@ li.done a {
   margin-left: auto;
 }
 
-.stripTablePadded {
+.paletteTablePadded {
   padding: 15px;
 }
 

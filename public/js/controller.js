@@ -827,7 +827,7 @@ var cropDesignClick = function() {
 	d3.selectAll("#assembleSvgToolbar").transition().duration(1000)
 	.style("left", "5px");
 
-	setupOverlay();
+	setupCropOverlay();
 
 	d3.select("#assembleSvgContainer").select(".shadedOverlay").style("visibility",
 		(polylist.length === 0) ? "visible" : "hidden");
@@ -854,22 +854,93 @@ var exitCropView = function() {
 
 	d3.select("#assembleSvgContainer").select(".shadedOverlay").style("visibility", "hidden");
 
-	teardownOverlay();
+	teardownCropOverlay();
 };
+
+var optimizeDesignClick = function() {
+	keyboardJS.setContext("optimizeView");
+
+	assembleCanvas.classed("bg optimize-bg", true);
+	assemblePaletteContainer.style("display", "none");
+	assemblePaletteButtons.style("display", "none");
+
+	var paletteWidth = parseInt(assembleSvg.select(".palette-background").attr("width"),10);
+
+	optimizeTableFo.style("display", "block")
+	.attr("x", -config.stripTableWidth + (paletteWidth) / 2)
+	.transition()
+	.duration(1000)
+	.attr("x", -config.stripTableWidth/2);
+
+	assembleOptimizeCanvas
+	.each(function(d, i) {
+		d.transform = assembleCanvas.datum().transform;
+	})
+	.attr("transform", num.getTransform);
+
+	d3.select("#tileViewMenu").classed("hidden", true);
+	d3.select("#optimizeViewMenu").classed("hidden", false);
+
+	assemblePalette.each(function(d) {
+		d.transform = num.translate(config.stripTableWidth / 2, 0);
+	})
+	.transition()
+	.duration(1000)
+	.attr("transform", num.getTransform);
+
+	d3.selectAll("#assembleSvgToolbar").transition().duration(1000)
+	.style("left", (config.stripTableWidth + 5) + "px");
+
+	setupOptimizeOverlay();
+
+	// TODO:
+	// d3.select("#assembleSvgContainer").select(".shadedOverlay").style("visibility",
+	// 	(polylist.length === 0) ? "visible" : "hidden");
+};
+
+var exitOptimizeView = function() {
+	keyboardJS.setContext("tileView");
+	d3.select("#tileViewMenu").classed("hidden", false);
+	d3.select("#optimizeViewMenu").classed("hidden", true);
+
+	var paletteWidth = parseInt(assembleSvg.select(".palette-background").attr("width"),10);
+
+	assembleCanvas.classed("bg optimize-bg", false);
+	assemblePaletteContainer.style("display", "block");
+	assemblePaletteButtons.style("display", "block");
+	optimizeTableFo.style("display", "none");
+	assemblePalette.each(function(d) {
+		d.transform = num.translate(paletteWidth / 2, 0);
+	})
+	.transition()
+	.duration(1000)
+	.attr("transform", num.getTransform);
+
+	assembleSvg.select(".palette-background")
+	.attr("x", -config.stripTableWidth / 2)
+	.attr("width", config.stripTableWidth)
+	.transition()
+	.duration(1000)
+	.attr("x", -paletteWidth / 2)
+	.attr("width", paletteWidth);
+
+	d3.selectAll("#assembleSvgToolbar").transition().duration(1000)
+	.style("left", (paletteWidth + 5) + "px");
+
+	// d3.select("#assembleSvgContainer").select(".shadedOverlay").style("visibility", "hidden");
+
+	teardownOptimizeOverlay();
+};
+
 
 var tileViewClick = function() {
 	keyboardJS.setContext("tileView");
 
 	if (!tileView.classed("active")) {
-		assembleCanvas
+
+		d3.selectAll([assembleCanvas.node(), assembleCropCanvas.node(), assembleOptimizeCanvas.node()])
 		.each(function(d, i) {
 			d.transform = traceCanvas.datum().transform;
-		})
-		.attr("transform", num.getTransform);
-
-		assembleCropCanvas
-		.each(function(d, i) {
-			d.transform = assembleCanvas.datum().transform;
 		})
 		.attr("transform", num.getTransform);
 
@@ -880,18 +951,9 @@ var tileViewClick = function() {
 		d3.select("#traceTab").classed("active", false).classed("hidden", true);
 
 		if (d3.select("#cropViewMenu").classed("hidden")) {
-			teardownOverlay();
+			teardownCropOverlay();
 			assemblePalette.classed("hidden", false);
-
-			assemblePalette.each(function(d) {
-				var width = d3.select(this).select(".palette-background").attr("width");
-				d.transform = num.translate(width / 2, 0);
-			})
-			.transition()
-			.duration(1000)
-			.attr("transform", num.getTransform);
 		}
-
 	}
 };
 
@@ -917,7 +979,7 @@ var stripViewClick = function() {
 				})
 				.attr("transform", num.getTransform);
 			} else {
-				setupOverlay();
+				setupCropOverlay();
 
 				d3.selectAll("path.pattern")
 				.each(function(d) {
@@ -989,7 +1051,7 @@ var stripViewClick = function() {
 		// 	console.log(e);
 		// 	// undo UI changes gracefully if error is found
 		// 	tileViewClick();
-		// 	teardownOverlay();
+		// 	teardownCropOverlay();
 		// }
 	}
 };

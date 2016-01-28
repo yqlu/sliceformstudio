@@ -3,7 +3,7 @@ var cropData = {
 	hull: []
 };
 
-var setupOverlay = function() {
+var setupCropOverlay = function() {
 	assembleCropOverlay.style("visibility", "visible");
 	assembleCropCanvas.style("visibility", "visible");
 
@@ -69,7 +69,7 @@ var setupOverlay = function() {
 	vertices.exit().remove();
 };
 
-var teardownOverlay = function() {
+var teardownCropOverlay = function() {
 	assembleCropOverlay.style("visibility", "hidden");
 	assembleCropCanvas.style("visibility", "hidden");
 };

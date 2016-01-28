@@ -22,8 +22,9 @@
 					a#delete.btn.btn-primary #[i.fa.fa-trash] Delete
 					a#copy.btn.btn-primary #[i.fa.fa-files-o] Copy
 					a#clear.btn.btn-primary #[i.fa.fa-times-circle] Clear All
-				.btn-group.padded-btn-group#cropContainer.betaFeature.betaHidden
+				.btn-group.padded-btn-group#cropContainer
 					a#cropDesign.btn.btn-primary #[i.fa.fa-crop] Crop
+					a#optimizeDesign.btn.btn-primary #[i.fa.fa-crosshairs] Optimize
 				.btn-group.padded-btn-group#planarContainer.betaFeature.betaHidden
 					input#autoSnap(type="checkbox", checked="true", data-label-text="Planar ", data-label-width=80)
 				.btn-group.padded-btn-group#inferContainer.betaFeature.betaHidden
@@ -39,6 +40,26 @@
 					a#unselectAll.btn.btn-primary Reset
 				.btn-group.padded-btn-group.pull-right
 					a#exitCropView.btn.btn-default #[i.fa.fa-times] Exit Crop View
+			form#optimizeViewMenu.form-inline.hidden
+				.btn-group.padded-btn-group
+					span
+						b Define constraints and optimize them to clean up your pattern.
+				.btn-group.padded-btn-group
+					a.btn.btn-primary.dropdown-toggle(data-toggle="dropdown") #[i.fa.fa-caret-down] Add Constraint
+					ul.dropdown-menu
+						li
+							a(href="#") Parallel
+						li
+							a(href="#") Equal length
+						li
+							a(href="#") Collinear
+						li
+							a(href="#") Equal length
+				.btn-group.padded-btn-group
+					a.btn.btn-primary Select All
+					a.btn.btn-primary Reset
+				.btn-group.padded-btn-group.pull-right
+					a#exitOptimizeView.btn.btn-default #[i.fa.fa-times] Exit Optimize View
 		#assembleSvgContainer
 			#assembleSvg
 				.shadedOverlay(style="visibility: hidden;")

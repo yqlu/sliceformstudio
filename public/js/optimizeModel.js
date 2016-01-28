@@ -406,43 +406,50 @@ var getRepulsionForce = function(tile) {
 	return force;
 };
 
-// 		patternFn = makePatterns(_.last(patternOptions).generator(tile));
-// 		polygonAddPattern(tile, patternFn);
-// 		patternEditSVGDrawer.redrawPatterns(true);
+var setupOptimizeOverlay = function() {
+	assembleOptimizeOverlay.style("visibility", "visible");
+	assembleOptimizeCanvas.style("visibility", "visible");
+	optimizeTable.style("display", "block");
 
-// 	var tilesInCanvas = assembleCanvas.selectAll("g.tile").filter(function(d, i) { return d.polygonID === newTile.polygonID; });
+	var patternSegments = _.flattenDeep(_.map(polylist, function(group, groupIdx) {
+		return _.map(group.tiles, function(tile, tileIdx) {
+			return _.map(tile.patterns, function(p, patternIdx) {
+				var segments = [];
+				var transformedVertices = _.map(p.intersectedVertices, function(v) {
+					var coords = num.matrixToCoords(num.dot(group.transform,
+						num.dot(tile.transform, num.coordsToMatrix([v.coords]))))[0];
+					return {intersect: v.intersect, coords: coords};
+				});
+				var curSegment = {groupIdx: groupIdx, tileIdx: tileIdx, patternIdx: patternIdx, startIdx: 0, vertices: []};
+				for (var i = 0; i < transformedVertices.length; i++) {
+					var curVertex = transformedVertices[i];
+					curSegment.vertices.push(curVertex);
+					if ((!curVertex.intersect && i !== 0) || i === transformedVertices.length - 1) {
+						curSegment.endIdx = i;
+						segments.push(curSegment);
+						curSegment = {groupIdx: groupIdx, tileIdx: tileIdx, patternIdx: patternIdx, startIdx: i, vertices: [curVertex]};
+					}
+				}
+				return segments;
+			});
+		});
+	}));
 
-// 	tilesInCanvas.each(function(d, i) {
-// 		d3.select(this).selectAll("path.pattern").remove();
-// 		d.customTemplate = _.cloneDeep(newTile.customTemplate);
-// 		var patterns = motif.generator(d, patternSlider1.getValue(), patternSlider2.getValue());
-// 		polygonAddPattern(d, makePatterns(patterns));
-// 		d.patternParams = _.cloneDeep(newTile.patternParams);
-// 		polygonAddPatternMetadata(d);
-// 		drawPatterns(d3.select(this), {});
-// 	});
+	assembleOptimizeCanvas.selectAll(".pattern-segment").remove();
+	assembleOptimizeCanvas.selectAll(".pattern-segment").data(patternSegments)
+	.enter()
+	.append("path")
+	.classed("pattern-segment", true)
+	.attr("d", function(d) {
+		return d3.svg.line()(_.pluck(d.vertices, "coords"));
+	});
+};
 
-
-// input is:
-// 	{polygonID: [{
-// 		customTemplate: [
-// 			{points: [[11, 13], [-50,30]]},
-// 			{points: [[11, 13], [-50,30]]}
-// 		]
-// 	}]}
-
-
-
-// output is:
-// 	set new points in custom template
-// 	patternUpdate() <- remove reliance on patternEditSVGDrawer
-// 	updateTileWithPatternClick() <- for each tile
-// 	update canvas (optimize "tilesInCanvas")
-
-
-// // num.vectorFromEnds
-// // num.norm2
-// // num.getAngle.apply(null, )
+var teardownOptimizeOverlay = function() {
+	assembleOptimizeOverlay.style("visibility", "hidden");
+	assembleOptimizeCanvas.style("visibility", "hidden");
+	optimizeTable.style("display", "none");
+};
 
 // stay in custom land first
 // make pattern update pipeline completely functional under customTemplates

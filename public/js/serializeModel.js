@@ -184,7 +184,7 @@ var loadFromJson = function(loaded, callback) {
 		updateInferButton();
 
 		if (loaded.cropData) {
-			setupOverlay();
+			setupCropOverlay();
 			$("#cropMode").bootstrapSwitch('state', loaded.cropData.cropMode);
 
 			cropData.vertices = _.map(d3.selectAll(".crop-vertex").filter(function(d) {
@@ -196,7 +196,7 @@ var loadFromJson = function(loaded, callback) {
 			});
 			recomputeHull();
 
-			teardownOverlay();
+			teardownCropOverlay();
 		}
 		d3.select(".loading-overlay").classed("in", false);
 		invalidateStripCache();

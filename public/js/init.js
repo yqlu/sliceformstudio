@@ -72,6 +72,9 @@ var assembleCropCanvasPathOverlay = assembleCropCanvas.selectAll(".cropOverlayPa
 	.append("path")
 	.classed("cropOverlayPath", true);
 
+var assembleOptimizeOverlay = buildOverlay(assembleSvg, commonZoomHandler);
+var assembleOptimizeCanvas = buildDisplay(assembleSvg, num.id, true);
+
 var assemblePalette = buildDisplay(assembleSvg, num.translate(config.initSidebarWidth / 2, 0));
 var assemblePaletteBg = assemblePalette.append("rect")
 	.classed("palette-background", true)
@@ -96,6 +99,20 @@ var assemblePaletteContainer = assemblePalette.append("g")
 var assemblePaletteButtons = assemblePalette.append("g")
 	.classed("btn-container", true);
 
+var optimizeTableFo = assemblePalette.append("foreignObject")
+	.style("display", "none")
+	.attr("height", config.standardHeight)
+	.attr("width", config.stripTableWidth)
+	.attr("x", -config.stripTableWidth / 2)
+	.attr("y", 0);
+
+var optimizeTable = optimizeTableFo
+	.append("xhtml:body").classed("strip-table", true)
+	.attr("xmlns", "http://www.w3.org/1999/xhtml")
+	.append("div").classed("paletteTablePadded", true);
+
+optimizeTable.append("h4").text("blah blah blah");
+
 var assembleSVGDrawer = svgDrawer(assemblePaletteContainer, assemblePaletteOptions);
 var assembleDraggableEdge = drawSvgDraggableEdge(assembleSvg);
 var assembleSvgDimensions = drawSvgDimensionLabel(assembleSvg);
@@ -118,17 +135,17 @@ var tracePaletteBg = tracePalette.append("rect")
 var tracePaletteContainer = tracePalette.append("g")
 	.classed("palette-container", true);
 
-var fo = tracePaletteContainer.append("foreignObject")
+var traceFo = tracePaletteContainer.append("foreignObject")
 	.attr("height", config.standardHeight)
 	.attr("width", config.stripTableWidth)
 	.append("xhtml:body").classed("strip-table", true)
 	.attr("xmlns", "http://www.w3.org/1999/xhtml")
-	.append("div").classed("stripTablePadded", true);
+	.append("div").classed("paletteTablePadded", true);
 
-fo.append("h4")
+traceFo.append("h4")
 	.html("Export Strips <a href='/docs.html#exportStrip' target='_blank'><i class='fa fa-question-circle'></i></a>");
 
-var resetAllStrips = fo.append("span")
+var resetAllStrips = traceFo.append("span")
 	.append("div")
 	.attr("id", "resetAllStrips").style("margin-left", "10px").style("display", "none")
 	.html("<a href='#' class='strip-table-x'><i class='fa fa-times'></i></a> Reset all strips");
@@ -144,10 +161,10 @@ resetAllStrips.select("a")
 		noneSoFar.style("display", "block");
 	});
 
-var sidebarForm = fo
+var sidebarForm = traceFo
 	.append("form").classed("form-horizontal", true);
 
-var noneSoFar = fo
+var noneSoFar = traceFo
 	.append("div")
 	.attr("id", "noneSoFar")
 	.html("Strips you assign colors to will show up here!");
@@ -191,7 +208,6 @@ var addShapeTextButton = d3.select("#addShapeText")
 		$("#customShapeTextModal").modal();
 	});
 
-
 var deleteButton = d3.select("#delete")
 	.on("click", deleteHandler);
 
@@ -204,6 +220,11 @@ d3.select("#exitCropView").on("click", exitCropView);
 
 var cropDesign = d3.select("#cropDesign")
 	.on("click", cropDesignClick);
+
+var optimizeDesign = d3.select("#optimizeDesign")
+	.on("click", optimizeDesignClick);
+
+d3.select("#exitOptimizeView").on("click", exitOptimizeView);
 
 var tileOptions = {
 	basicTiles: [{

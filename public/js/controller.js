@@ -482,6 +482,10 @@ var addToLineupManualClick = function() {
 };
 
 var updateTileWithPatternClick = function() {
+
+	// deselect custom pattern multiselect to avoid changing existing patterns
+	$("#customPatternSelect").val(null);
+
 	var motifIndex = patternDropdown.node().value;
 	var motif = patternOptions[motifIndex];
 
@@ -544,6 +548,7 @@ var deleteCustomPatternClick = function() {
 	});
 	$("#customPatternSelect").val([]);
 	patternUpdate();
+	updateUIForCustomTemplate(tile.customTemplate[0], true);
 	patternMultiSelectUpdate(tile.customTemplate);
 };
 

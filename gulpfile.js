@@ -83,7 +83,7 @@ gulp.task('scripts', ['compile', 'css-preprocess'], function() {
 });
 
 gulp.task('sprite', ['compile'], function() {
-  var spriteFolders = ['gallery-thumbs', 'starter', 'index-steps', 'docs'];
+  var spriteFolders = ['gallery-thumbs', 'starter', 'index-steps', 'docs', 'tutorial'];
   var streams = _.map(spriteFolders, function(folder) {
     var spriteData =
       gulp.src(['./public/images/' + folder + '/*.jpg'])

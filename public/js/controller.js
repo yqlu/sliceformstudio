@@ -214,9 +214,9 @@ var resetCustomPatternUIValues = function() {
 	$("#customPatternSelect").val(0);
 	$(":radio[value=auto]").prop("checked", true);
 	$(":radio[value=mirrorCrop]").prop("checked", true);
-	$("#patternInterval").val(2);
+	$("#patternInterval").val(1);
 	$("#patternStart").val(0);
-	$("#patternDepth").val(2);
+	$("#patternDepth").val(1);
 	$("#manualEdges").val("");
 	startOffset.setValue(0);
 	endOffset.setValue(0);
@@ -520,7 +520,7 @@ var newCustomPatternClick = function() {
 	var newPattern = {
 		startEdge: 0,
 		patternDepth: 1,
-		patternInterval: 2,
+		patternInterval: 1,
 		startProportion: 0.5,
 		endProportion: 0.5,
 		isSymmetric: true,

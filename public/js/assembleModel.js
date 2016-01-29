@@ -136,7 +136,7 @@ var joinEdges = function(thisEdgeNode, selected) {
 		bootbox.alert("Error: cannot join unselected edges!");
 	} else if (thisEdgeNode.parentNode.parentNode === selected.groupNode) {
 		if (autoSnapMode) {
-			bootbox.alert("Error: cannot join edges from same group!");
+			bootbox.alert("Error: cannot join edges from two tiles which are already connected!");
 		} else {
 			joinNodes(thisEdgeNode, selected.edgeNode);
 			updateJoinedEdges(thisGroupNode.__data__);

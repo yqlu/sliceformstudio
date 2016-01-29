@@ -25,6 +25,10 @@ var drawGroups = function(canvas, inputlist, options) {
 		.on("click", groupClick);
 	}
 
+	if (options.paneZoomable) {
+		groups.style("cursor", "move").call(options.bgZoom);
+	}
+
 	return groups;
 };
 

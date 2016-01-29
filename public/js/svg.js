@@ -35,6 +35,7 @@ var fullOptions = {
 	groupDraggable: false,
 	interiorClickable: true,
 	paletteTransform: num.id,
+	paneZoomable: false,
 	autoresize: true
 };
 
@@ -106,10 +107,14 @@ var buildPalette = function(selector, options) {
 
 var buildPane = function(selector, options) {
 
+	var paneZoom = d3.behavior.zoom().on("zoom", zoomBehavior);
+
 	var svg = buildSvg(selector, config.editWidth, config.editHeight);
-	var bg = buildBg(svg, true, false, d3.behavior.zoom().on("zoom", zoomBehavior));
+	var bg = buildBg(svg, true, false, paneZoom);
 	var outerDisplay = buildDisplay(svg, num.id, true);
 	var innerDisplay = buildDisplay(outerDisplay, num.translate(0.5 * config.editWidth, 0.5 * config.editHeight));
+
+	options.bgZoom = paneZoom;
 
 	return svgDrawer(innerDisplay, options);
 };

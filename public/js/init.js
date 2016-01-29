@@ -40,7 +40,7 @@ var shapeEditPaletteOptions = {
 	visibleVertices: true,
 	visibleEdges: true,
 	displayInterior: true,
-	groupDraggable: true
+	paneZoomable: true
 };
 
 var patternEditPaletteOptions = {
@@ -48,7 +48,8 @@ var patternEditPaletteOptions = {
 	visibleVertices: true,
 	visibleEdges: true,
 	displayInterior: true,
-	draggablePatterns: true
+	draggablePatterns: true,
+	paneZoomable: true
 };
 
 // create the different SVG displays

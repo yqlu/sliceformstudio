@@ -245,7 +245,20 @@ var dragPatternHandleEdit = d3.behavior.drag()
 
 // zoom handler for canvas
 var zoomBehavior = function(d, i) {
-	d3.select(this.parentNode).selectAll(".canvas").each(function(d) {
+	// pick canvas depending on whether zoom is taking place on bg or on tile
+	var canvas = d3.select(this).classed("svg-background") ?
+		d3.select(this.parentNode).selectAll(".canvas") :
+		d3.select(this.parentNode.parentNode);
+	canvas.each(function(d) {
+		d.transform = num.matrixRound(num.translateBy(num.scaleBy(num.id, d3.event.scale), d3.event.translate[0], d3.event.translate[1]));
+	})
+	.attr("transform", num.getTransform);
+};
+
+// zoom handler for tiles
+var zoomTileBehavior = function(d, i) {
+	console.log(this, this.parentNode.parentNode, d3.select(this.parentNode.parentNode).selectAll(".canvas"));
+	d3.select(this.parentNode.parentNode).each(function(d) {
 		d.transform = num.matrixRound(num.translateBy(num.scaleBy(num.id, d3.event.scale), d3.event.translate[0], d3.event.translate[1]));
 	})
 	.attr("transform", num.getTransform);

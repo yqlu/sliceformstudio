@@ -322,14 +322,14 @@ var handleMouseover = function(edgeNode) {
 	if (hover && edgeNode !== hover.node && !d3.select(edgeNode).classed("joined")) {
 		candidate = edgeNode;
 	}
-	d3.selectAll([edgeNode, edgeNode.__data__.joinedTo]).classed('hover', true);
+	d3.selectAll([edgeNode, edgeNode.__data__.joinedTo && edgeNode.__data__.joinedTo.node]).classed('hover', true);
 };
 
 // mouseout handler for edge handle node
 var handleMouseout = function(edgeNode) {
 	candidate = null;
 	if (!hover || (edgeNode !== hover.node)) {
-		d3.selectAll([edgeNode, edgeNode.__data__.joinedTo]).classed('hover', false);
+		d3.selectAll([edgeNode, edgeNode.__data__.joinedTo && edgeNode.__data__.joinedTo.node]).classed('hover', false);
 	}
 };
 
@@ -661,6 +661,10 @@ var updateInferButton = function() {
 		return n.__data__.infer;
 	});
 	inferButton.classed("hidden", !shouldDisplayButton);
+	// on load, if there are infer tiles on screen, turn the beta switch on
+	if (shouldDisplayButton && !$("#patternInferSwitch").bootstrapSwitch('state')) {
+		$("#patternInferSwitch").bootstrapSwitch("state", true);
+	}
 };
 
 var inferHandler = function(d, i) {
@@ -674,7 +678,7 @@ var inferHandler = function(d, i) {
 		var allRays = [];
 		_.each(d.edges, function(edge, edgeIndex) {
 			if (edge.joinedTo) {
-				var otherEdge = edge.joinedTo.__data__;
+				var otherEdge = edge.joinedTo.node.__data__;
 				_.each(otherEdge.patterns, function(p) {
 					allRays.push(rotatedRay(p.angle - Math.PI / 2, p.proportion)(edge, edgeIndex));
 				});
@@ -763,7 +767,7 @@ var extensionSliderChange = function() {
 // toggle visibility of edges and vertices
 var shapeEditToggle = function() {
 	var s =	d3.select(shapeEditSVGDrawer.getTile().this).selectAll(".label")
-	.attr("visibility", $("#shapeEditToggle").prop("checked") ? "visible" : "hidden");
+	.attr("visibility", $("#shapeEditToggle").bootstrapSwitch("state") ? "visible" : "hidden");
 };
 
 var cropModeToggle = function(e, state) {
@@ -939,7 +943,7 @@ var stripViewClick = function() {
 						_.each(tile.patterns, function(pattern, patternIdx) {
 							pattern.assembleCounterpart = polylist[groupIdx].tiles[tileIdx].patterns[patternIdx];
 						});
-						if ($("#cropMode").prop("checked") && cropData.hull.length >= 3) {
+						if ($("#cropMode").bootstrapSwitch("state") && cropData.hull.length >= 3) {
 							cropPattern(tile, group);
 						}
 					});

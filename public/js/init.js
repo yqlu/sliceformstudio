@@ -633,7 +633,7 @@ var extensionSlider = new Slider("#extensionLength", {
 $("#patternInferSwitch").bootstrapSwitch({state: false})
 .on('switchChange.bootstrapSwitch', function() {
 	var inferPatternObject = _.find(patternOptions, function(opt) { return opt.name === "Infer"; });
-	if ($("#patternInferSwitch").prop("checked")) {
+	if ($("#patternInferSwitch").bootstrapSwitch("state")) {
 		inferPatternObject.betaHidden = false;
 		d3.selectAll("#inferContainer").classed("betaHidden", false);
 	} else {
@@ -651,12 +651,15 @@ $("#patternInferSwitch").bootstrapSwitch({state: false})
 
 $("#nonPlanarSwitch").bootstrapSwitch({state: false})
 .on('switchChange.bootstrapSwitch', function() {
-	if ($("#nonPlanarSwitch").prop("checked")) {
+	if ($("#nonPlanarSwitch").bootstrapSwitch("state")) {
 		// turn it on
 		d3.selectAll("#planarContainer").classed("betaHidden", false);
 	} else {
-		// todo: add check if non-planar edge joins exist
-		if (false) {
+		var nonPlanarEdgeJoinsExist = false;
+		d3.selectAll(".edge.joined").each(function(d) {
+			nonPlanarEdgeJoinsExist = nonPlanarEdgeJoinsExist || !d.joinedTo.isPlanar;
+		});
+		if (nonPlanarEdgeJoinsExist) {
 			// error
 			d3.select("#betaError").style("display", "block")
 			.html("<i class='fa fa-exclamation-triangle'></i> You cannot turn this feature off when there are still non-planar edge joins on the canvas!");
@@ -669,11 +672,11 @@ $("#nonPlanarSwitch").bootstrapSwitch({state: false})
 
 $("#patternCroppingSwitch").bootstrapSwitch({state: false})
 .on('switchChange.bootstrapSwitch', function() {
-	if ($("#patternCroppingSwitch").prop("checked")) {
+	if ($("#patternCroppingSwitch").bootstrapSwitch("state")) {
 		// turn it on
 		d3.selectAll("#cropContainer").classed("betaHidden", false);
 	} else {
-		if (cropData.hullEdges.length > 2 && $("#cropMode").prop("checked")) {
+		if (cropData.hullEdges.length > 2 && $("#cropMode").bootstrapSwitch("state")) {
 			// error
 			d3.select("#betaError").style("display", "block")
 			.html("<i class='fa fa-exclamation-triangle'></i> Turning off this feature will reset your existing cropping selection.");
@@ -684,8 +687,8 @@ $("#patternCroppingSwitch").bootstrapSwitch({state: false})
 
 $("#jsonStripGenSwitch").bootstrapSwitch({state: false})
 .on('switchChange.bootstrapSwitch', function() {
-	d3.selectAll("#customStripPanel").classed("betaHidden", !$("#jsonStripGenSwitch").prop("checked"));
-	if ($("#jsonStripGenSwitch").prop("checked")) {
+	d3.selectAll("#customStripPanel").classed("betaHidden", !$("#jsonStripGenSwitch").bootstrapSwitch("state"));
+	if ($("#jsonStripGenSwitch").bootstrapSwitch("state")) {
 		stripViewClick();
 		document.getElementById("customStripPanel").scrollIntoView();
 	}
@@ -694,7 +697,7 @@ $("#jsonStripGenSwitch").bootstrapSwitch({state: false})
 $("#outlineToggle").bootstrapSwitch()
 .on('switchChange.bootstrapSwitch', function() {
 	d3.selectAll("path.strip-outline")
-	.attr("visibility", $("#outlineToggle").prop("checked") ? "visible" : "hidden");
+	.attr("visibility", $("#outlineToggle").bootstrapSwitch("state") ? "visible" : "hidden");
 });
 
 $(".collapse").collapse({toggle: true});

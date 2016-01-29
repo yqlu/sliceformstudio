@@ -150,7 +150,6 @@ var loadFromJson = function(loaded, callback) {
 			});
 		}
 
-		// draw anything in local storage
 		resetAndDraw(assembleCanvas, polylist, assembleCanvasOptions);
 		assembleSVGDrawer.set(palette);
 		assembleSVGDrawer.draw();
@@ -197,7 +196,21 @@ var loadFromJson = function(loaded, callback) {
 			recomputeHull();
 
 			teardownOverlay();
+
+			if (cropData.hullEdges.length > 2 && $("#cropMode").bootstrapSwitch("state") &&
+				!$("#patternCroppingSwitch").bootstrapSwitch("state")) {
+				$("#patternCroppingSwitch").bootstrapSwitch("state", true);
+			}
 		}
+
+		var nonPlanarEdgeJoinsExist = false;
+		d3.selectAll(".edge.joined").each(function(d) {
+			nonPlanarEdgeJoinsExist = nonPlanarEdgeJoinsExist || !d.joinedTo.isPlanar;
+		});
+		if (nonPlanarEdgeJoinsExist && !$("#nonPlanarSwitch").bootstrapSwitch("state")) {
+			$("#nonPlanarSwitch").bootstrapSwitch("state", true);
+		}
+
 		d3.select(".loading-overlay").classed("in", false);
 		invalidateStripCache();
 
@@ -273,7 +286,7 @@ var saveToFileWithTitle = function(title) {
 		palette: nonCircularPalette,
 		cropData: {
 			vertices: cropVertices,
-			cropMode: $("#cropMode").prop("checked")
+			cropMode: $("#cropMode").bootstrapSwitch("state")
 		},
 		colorMap: abridgedColorMap,
 		canvasTransform: assembleCanvas.node().__data__.transform,
@@ -281,7 +294,7 @@ var saveToFileWithTitle = function(title) {
 		stripViewParams: {
 			thickness: thicknessSlider.getValue(),
 			extension: extensionSlider.getValue(),
-			outline: $("#outlineToggle").prop("checked"),
+			outline: $("#outlineToggle").bootstrapSwitch("state"),
 			stripHeight: stripHeight.getValue(),
 			widthFactor: widthFactor.getValue(),
 			interSpacing: interSpacing.getValue(),

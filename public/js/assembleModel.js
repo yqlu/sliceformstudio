@@ -1,7 +1,7 @@
 // activate separation of two edges
 var breakEdges = function(thisEdgeNode) {
 
-	var otherEdgeNode = thisEdgeNode.__data__.joinedTo;
+	var otherEdgeNode = thisEdgeNode.__data__.joinedTo.node;
 	var thisTileNode = thisEdgeNode.parentNode;
 	var otherTileNode = otherEdgeNode.parentNode;
 
@@ -117,8 +117,8 @@ var getSuccessors = function(thisTileNode, fromTileNode) {
 			return edgeNode.__data__.joinedTo;
 		}), function(edgeNode) {
 			return {
-				tile: edgeNode.__data__.joinedTo.parentNode,
-				edges: [edgeNode, edgeNode.__data__.joinedTo]
+				tile: edgeNode.__data__.joinedTo.node.parentNode,
+				edges: [edgeNode, edgeNode.__data__.joinedTo.node]
 			};
 		});
 };
@@ -127,7 +127,7 @@ var getSuccessors = function(thisTileNode, fromTileNode) {
 // activate joining of two edges
 // pass in an edge node and a selected object
 var joinEdges = function(thisEdgeNode, selected) {
-	var autoSnapMode = $("#autoSnap").prop("checked");
+	var autoSnapMode = $("#autoSnap").bootstrapSwitch("state");
 	var d = thisEdgeNode.__data__;
 	var thisTileNode = thisEdgeNode.parentNode;
 	var thisGroupNode = thisTileNode.parentNode;
@@ -138,7 +138,7 @@ var joinEdges = function(thisEdgeNode, selected) {
 		if (autoSnapMode) {
 			bootbox.alert("Error: cannot join edges from two tiles which are already connected!");
 		} else {
-			joinNodes(thisEdgeNode, selected.edgeNode);
+			joinNodes(thisEdgeNode, selected.edgeNode, {isPlanar: false});
 			updateJoinedEdges(thisGroupNode.__data__);
 			invalidateStripCache();
 		}
@@ -207,9 +207,9 @@ var joinEdges = function(thisEdgeNode, selected) {
 
 		setTimeout(function() {
 			if (autoSnapMode) {
-				detectJoins(theseEdges, otherEdges, false);
+				detectJoins(theseEdges, otherEdges, {reset: false});
 			} else {
-				joinNodes(thisEdgeNode, selected.edgeNode);
+				joinNodes(thisEdgeNode, selected.edgeNode, {isPlanar: false});
 			}
 			updateJoinedEdges(thisGroupNode.__data__);
 		}, 250);
@@ -218,10 +218,10 @@ var joinEdges = function(thisEdgeNode, selected) {
 
 // detect how edges should be joined
 // used during a join or a copy action
-var detectJoins = function(group1Edges, group2Edges, reset) {
+var detectJoins = function(group1Edges, group2Edges, options) {
 
 	// synchronize all edges to a common coordinate system
-	if (reset) {
+	if (options.reset) {
 		var allEdges = _.flatten(group1Edges.concat(group2Edges));
 		d3.selectAll(allEdges)
 		.classed("joined", false)
@@ -235,15 +235,15 @@ var detectJoins = function(group1Edges, group2Edges, reset) {
 		_.map(transformEdges(group2Edges), function(other) {
 			if (edge.node !== other.node && approxEqEdges(edge.ends, other.ends) &&
 				!(edge.node.__data__.joinedTo) && !(other.node.__data__.joinedTo)) {
-				joinNodes(edge.node, other.node);
+				joinNodes(edge.node, other.node, {isPlanar: true});
 			}
 		});
 	});
 };
 
-var joinNodes = function(node1, node2) {
-	node1.__data__.joinedTo = node2;
-	node2.__data__.joinedTo = node1;
+var joinNodes = function(node1, node2, options) {
+	node1.__data__.joinedTo = {node: node2, isPlanar: options.isPlanar};
+	node2.__data__.joinedTo = {node: node1, isPlanar: options.isPlanar};
 	d3.selectAll([node1, node2])
 	.classed("joined", true);
 };
@@ -258,15 +258,15 @@ var updateJoinedEdges = function(groupData) {
 	_.each(groupData.tiles, function(tile, tileIndex) {
 		_.each(tile.edges, function(edge, edgeIndex) {
 			if (edge.joinedTo !== null) {
-				otherEdge = edge.joinedTo.__data__;
+				otherEdge = edge.joinedTo.node.__data__;
 				groupData.joinedEdges.push([edge.id, otherEdge.id]);
 			}
 		});
 	});
 };
 
-var detectSelfJoins = function(group, reset) {
-	detectJoins(group, group, reset);
+var detectSelfJoins = function(group, options) {
+	detectJoins(group, group, options);
 };
 
 // activated upon dragging tile from palette to main canvas

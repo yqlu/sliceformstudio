@@ -1,20 +1,29 @@
 .padded
 	.row
 		.mailchimp.col-sm-4
-			| Mailchimp
+			#mc_embed_signup(style="padding-left: 30px")
+				form#mc-embedded-subscribe-form.validate(action='//sliceformstudio.us12.list-manage.com/subscribe/post?u=f8bb95640de1a1574e2dfb079&id=0c1e80d3f6', method='post', name='mc-embedded-subscribe-form', target='_blank', novalidate='')
+					#mc_embed_signup_scroll
+						span(for='mce-EMAIL', style="text-align: left; display: block; padding-bottom: 5px;") Subscribe to the mailing list:&nbsp;
+						div(style='position: absolute; left: -5000px;', aria-hidden='true')
+							input(type='text', name='b_f8bb95640de1a1574e2dfb079_0c1e80d3f6', tabindex='-1', value='', style="width: 100%")
+						.input-group
+							input.form-control#mce-EMAIL.email(type='email', value='', name='EMAIL', placeholder='email address', required='')
+							span.input-group-btn
+								input.btn.btn-secondary#mc-embedded-subscribe.button(type='submit', value='Subscribe', name='subscribe')
 		.contact.col-sm-4
-			.contact-header Get In Touch
-			div
-				a(href="mailto: info@sliceformstudio.com") info -at- sliceformstudio -dot- com
+				.contact-header Get In Touch
+				div
+						a(href="mailto: info@sliceformstudio.com") info -at- sliceformstudio -dot- com
 		.social.col-sm-4
-			span.social-header Follow
-			ul.list-inline.banner-social-buttons
-				span
-					a(href='https://github.com/yqlu/sliceformstudio')
-						i.fa.fa-lg.fa-github.fa-fw
-				span
-					a(href='https://www.facebook.com/sliceformstudio')
-						i.fa.fa-lg.fa-facebook.fa-fw
+				span.social-header Follow
+				ul.list-inline.banner-social-buttons
+						span
+								a(href='https://github.com/yqlu/sliceformstudio')
+										i.fa.fa-lg.fa-github.fa-fw
+						span
+								a(href='https://www.facebook.com/sliceformstudio')
+										i.fa.fa-lg.fa-facebook.fa-fw
 	.footer-copyright
 		| ©2015 Sliceform Studio.
 script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js')

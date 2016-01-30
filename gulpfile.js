@@ -117,7 +117,7 @@ gulp.task('images-bower', ['compile'], function () {
 
 gulp.task('images', ['images-bower', 'sprite'], function() {
   var img = './public/images';
-  return gulp.src([img + '/*.*', img + '/sprites/**/*.*', img + '/index/*', img + '/gallery/**/*', img + '/gallery-schematics/*', img + '/docs/*.gif'], {base: './public/images'})
+  return gulp.src([img + '/*.*', img + '/sprites/**/*.*', img + '/index/*', img + '/gallery/**/*', img + '/gallery-diagrams/*', img + '/tutorial/*', img + '/docs/*.gif'], {base: './public/images'})
     .pipe(imagemin({
       progressive: true,
       svgoPlugins: [{removeViewBox: false}],
@@ -128,7 +128,6 @@ gulp.task('images', ['images-bower', 'sprite'], function() {
 });
 
 gulp.task('post-build', ['scripts', 'images'], function(done) {
-  console.log("DELETING");
   exec('rm ./public/css/*.css', done);
 });
 

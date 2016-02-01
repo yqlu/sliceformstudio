@@ -158,7 +158,7 @@ var checkRep = function() {
 					"Error: edge object is out of sync with DOM pointer. \nEdge: %o %o",
 					edge, edge.this);
 					if (edge.joinedTo) {
-						console.assert(edge.joinedTo.__data__.joinedTo === edge.this,
+						console.assert(edge.joinedTo.node.__data__.joinedTo.node === edge.this,
 							"Error, edge linking information is out of sync. \nEdge: %o",
 							edge);
 					}

@@ -10,7 +10,7 @@ nav.navbar.navbar-custom.navbar-fixed-top(role='navigation')
     ul.nav.navbar-nav
       each term, i in public._data.contents
         li
-          a.nav(href="#{term.url}")(class= (i === 0) ? "active" : "")= term.label
+          a.nav(href="#{term.url}", class= (i === 0) ? "active" : "")= term.label
 // Intro Header
 header.intro
   .intro-body
@@ -18,32 +18,39 @@ header.intro
       h1.brand-heading Sliceform Studio
       p.intro-text.heavy
         | Design and create your own paper strip sliceforms.
-      a.intro-cta.impact.btn.btn-default.btn-lg(href="/app.html")
-        | Get started
+section.content-section
+  .container.text-center
+    h2 Use Sliceform Studio to...
+    .row
+      .col-md-6.bottom-padding
+        div.responsive-sprites
+          img(class="icon-paper-strips", src="/images/sprites/index-steps-sprite.jpg")
+        p.sub-heading generate paper templates and assemble sliceforms,
+      .col-md-6.bottom-padding
+        div.responsive-sprites
+          img(class="icon-festival-colored", src="/images/sprites/index-steps-sprite.jpg")
+        p.sub-heading or create designs and export them as images.
+.bg__1
 section.content-section.text-center
   .container
+    h2 The Workflow
     .row
-      .col-sm-6.col-md-3
+      .col-sm-4
         div.responsive-sprites.steps-image
           img(class="icon-step1", src="/images/sprites/index-steps-sprite.jpg")
         h4.valign Pick a base tiling
         p Select your set of tiles from over fifteen presets.
-      .col-sm-6.col-md-3
+      .col-sm-4
         div.responsive-sprites.steps-image
           img(class="icon-step2", src="/images/sprites/index-steps-sprite.jpg")
         h4.valign Inscribe patterns
-        p Generate common motifs for each tile, or design your own.
-      .col-sm-6.col-md-3
+        p Generate traditional motifs for each tile, or design your own.
+      .col-sm-4
         div.responsive-sprites.steps-image
           img(class="icon-step3", src="/images/sprites/index-steps-sprite.jpg")
         h4.valign Trace and color strips
         p Automatically convert your tiles to a set of strips and add some color.
-      .col-sm-6.col-md-3
-        div.responsive-sprites.steps-image
-          img(class="icon-step4", src="/images/sprites/index-steps-sprite.jpg")
-        h4.valign Export your design
-        p Save your creation as an image. Generate strip templates for easy paper assembly.
-.bg__1
+.bg__2
 section#contact.container.content-section.text-center
   .row
     .col-lg-8.col-lg-offset-2

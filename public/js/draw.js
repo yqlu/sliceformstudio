@@ -25,6 +25,10 @@ var drawGroups = function(canvas, inputlist, options) {
 		.on("click", groupClick);
 	}
 
+	if (options.paneZoomable) {
+		groups.style("cursor", "move").call(options.bgZoom);
+	}
+
 	return groups;
 };
 
@@ -269,7 +273,8 @@ var draw = function(container, inputlist, options) {
 		_.each(d.joinedEdges, function(pair) {
 			var edge1 = d.tiles[pair[0][0]].edges[pair[0][1]];
 			var edge2 = d.tiles[pair[1][0]].edges[pair[1][1]];
-			joinNodes(edge1.this, edge2.this);
+			var isPlanar = approxEqEdges(transformEdge(edge1.this), transformEdge(edge2.this));
+			joinNodes(edge1.this, edge2.this, {isPlanar: isPlanar});
 		});
 	});
 

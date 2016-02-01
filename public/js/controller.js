@@ -214,9 +214,9 @@ var resetCustomPatternUIValues = function() {
 	$("#customPatternSelect").val(0);
 	$(":radio[value=auto]").prop("checked", true);
 	$(":radio[value=mirrorCrop]").prop("checked", true);
-	$("#patternInterval").val(2);
+	$("#patternInterval").val(1);
 	$("#patternStart").val(0);
-	$("#patternDepth").val(2);
+	$("#patternDepth").val(1);
 	$("#manualEdges").val("");
 	startOffset.setValue(0);
 	endOffset.setValue(0);
@@ -245,7 +245,20 @@ var dragPatternHandleEdit = d3.behavior.drag()
 
 // zoom handler for canvas
 var zoomBehavior = function(d, i) {
-	d3.select(this.parentNode).selectAll(".canvas").each(function(d) {
+	// pick canvas depending on whether zoom is taking place on bg or on tile
+	var canvas = d3.select(this).classed("svg-background") ?
+		d3.select(this.parentNode).selectAll(".canvas") :
+		d3.select(this.parentNode.parentNode);
+	canvas.each(function(d) {
+		d.transform = num.matrixRound(num.translateBy(num.scaleBy(num.id, d3.event.scale), d3.event.translate[0], d3.event.translate[1]));
+	})
+	.attr("transform", num.getTransform);
+};
+
+// zoom handler for tiles
+var zoomTileBehavior = function(d, i) {
+	console.log(this, this.parentNode.parentNode, d3.select(this.parentNode.parentNode).selectAll(".canvas"));
+	d3.select(this.parentNode.parentNode).each(function(d) {
 		d.transform = num.matrixRound(num.translateBy(num.scaleBy(num.id, d3.event.scale), d3.event.translate[0], d3.event.translate[1]));
 	})
 	.attr("transform", num.getTransform);
@@ -322,14 +335,14 @@ var handleMouseover = function(edgeNode) {
 	if (hover && edgeNode !== hover.node && !d3.select(edgeNode).classed("joined")) {
 		candidate = edgeNode;
 	}
-	d3.selectAll([edgeNode, edgeNode.__data__.joinedTo]).classed('hover', true);
+	d3.selectAll([edgeNode, edgeNode.__data__.joinedTo && edgeNode.__data__.joinedTo.node]).classed('hover', true);
 };
 
 // mouseout handler for edge handle node
 var handleMouseout = function(edgeNode) {
 	candidate = null;
 	if (!hover || (edgeNode !== hover.node)) {
-		d3.selectAll([edgeNode, edgeNode.__data__.joinedTo]).classed('hover', false);
+		d3.selectAll([edgeNode, edgeNode.__data__.joinedTo && edgeNode.__data__.joinedTo.node]).classed('hover', false);
 	}
 };
 
@@ -482,6 +495,10 @@ var addToLineupManualClick = function() {
 };
 
 var updateTileWithPatternClick = function() {
+
+	// deselect custom pattern multiselect to avoid changing existing patterns
+	$("#customPatternSelect").val(null);
+
 	var motifIndex = patternDropdown.node().value;
 	var motif = patternOptions[motifIndex];
 
@@ -517,7 +534,7 @@ var newCustomPatternClick = function() {
 	var newPattern = {
 		startEdge: 0,
 		patternDepth: 1,
-		patternInterval: 2,
+		patternInterval: 1,
 		startProportion: 0.5,
 		endProportion: 0.5,
 		isSymmetric: true,
@@ -545,6 +562,7 @@ var deleteCustomPatternClick = function() {
 	});
 	$("#customPatternSelect").val([]);
 	patternUpdate();
+	updateUIForCustomTemplate(tile.customTemplate[0], true);
 	patternMultiSelectUpdate(tile.customTemplate);
 };
 
@@ -657,6 +675,10 @@ var updateInferButton = function() {
 		return n.__data__.infer;
 	});
 	inferButton.classed("hidden", !shouldDisplayButton);
+	// on load, if there are infer tiles on screen, turn the beta switch on
+	if (shouldDisplayButton && !$("#patternInferSwitch").bootstrapSwitch('state')) {
+		$("#patternInferSwitch").bootstrapSwitch("state", true);
+	}
 };
 
 var inferHandler = function(d, i) {
@@ -670,7 +692,7 @@ var inferHandler = function(d, i) {
 		var allRays = [];
 		_.each(d.edges, function(edge, edgeIndex) {
 			if (edge.joinedTo) {
-				var otherEdge = edge.joinedTo.__data__;
+				var otherEdge = edge.joinedTo.node.__data__;
 				_.each(otherEdge.patterns, function(p) {
 					allRays.push(rotatedRay(p.angle - Math.PI / 2, p.proportion)(edge, edgeIndex));
 				});
@@ -759,7 +781,7 @@ var extensionSliderChange = function() {
 // toggle visibility of edges and vertices
 var shapeEditToggle = function() {
 	var s =	d3.select(shapeEditSVGDrawer.getTile().this).selectAll(".label")
-	.attr("visibility", $("#shapeEditToggle").prop("checked") ? "visible" : "hidden");
+	.attr("visibility", $("#shapeEditToggle").bootstrapSwitch("state") ? "visible" : "hidden");
 };
 
 var cropModeToggle = function(e, state) {
@@ -997,7 +1019,7 @@ var stripViewClick = function() {
 						_.each(tile.patterns, function(pattern, patternIdx) {
 							pattern.assembleCounterpart = polylist[groupIdx].tiles[tileIdx].patterns[patternIdx];
 						});
-						if ($("#cropMode").prop("checked") && cropData.hull.length >= 3) {
+						if ($("#cropMode").bootstrapSwitch("state") && cropData.hull.length >= 3) {
 							cropPattern(tile, group);
 						}
 					});

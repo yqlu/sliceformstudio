@@ -1,141 +1,93 @@
 .container
-	.alert.alert-info(role='alert')
-		| #[h6.inline Note:] Sliceform Studio works best on Google Chrome; some unexpected behavior might arise on other browsers. If you are using Sliceform Studio on Google Chrome and have discovered a bug, please report it at bugs@(this-domain).
-	h4 In this tutorial, you will learn how to use the basic features of Sliceform Studio to create your own artwork.
-	.row
+	h2 In this tutorial, you will walk through the basic workflow of creating your own design in Sliceform Studio.
+	.row.step
 		.col-sm-5
-			p #[h6.inline Step 1.] The 'tiles' dropdown menu offers various pre-defined sets of polygons. Pick "Squares and octagons".
+			h4 Step 1: Starting options
+
+			p The various options in the starting modal allows you to play with many different tile configuration. For now, pick the fourth option, "Octagons and squares".
 		.col-sm-7
 			img(src='images/tutorial/step1.jpg')
 	hr
-	.row
+	.row.step
 		.col-sm-5
-			p #[h6.inline Step 2.] The orange panel is called the "palette"; the larger white area is called the "canvas". Drag a square and an octagon out from the palette onto the canvas.
+			h4 Step 2: Populating the canvas
+
+			p The blue panel on the right is called the "palette"; the larger white area is called the "canvas". Drag a square and an octagon out from the palette onto the canvas.
 		.col-sm-7
 			img(data-gifffer='images/tutorial/step2.gif')
 	hr
-	.row
+	.row.step
 		.col-sm-5
-			p #[h6.inline Step 3.] Drag the tiles to move them around the canvas. Drag vertices to rotate tiles on the canvas.
+			h4 Step 3: Joining tiles
+
+			p To join two tiles together, drag an edge from one tile over another. The edges should glow blue when you drag, and then turn green when they snap together.
+
+			p You can break edges apart again by clicking on them.
 		.col-sm-7
 			img(data-gifffer='images/tutorial/step3.gif')
 	hr
-	.row
+	.row.step
 		.col-sm-5
-			p #[h6.inline Step 4.] Drag and scroll on the canvas to pan and zoom.
+			h4 Step 4: Canvas control
+
+			p Drag the tiles to move them around the canvas; drag vertices to rotate them around.
+
+			p Pan and zoom by dragging and scrolling on the canvas respectively. You can also reset the zoom level via the #[i.fa.fa-fw.fa-arrows-alt] and 1:1 buttons on the bottom left corner of the canvas.
 		.col-sm-7
 			img(data-gifffer='images/tutorial/step4.gif')
 	hr
-	.row
+	.row.step
 		.col-sm-5
-			p #[h6.inline Step 5.] Drag edges onto each other to snap them together.
+			h4 Step 5: Editing patterns
+
+			p Every tile already has a pattern inscribed in it. Click the #[i.fa.fa-edit.fa-border] button beside each tile in the palette to launch the pattern editor.
+
+			p In the pattern editor, you can select different motifs and drag sliders to change the parameters of each motif.
 		.col-sm-7
-			img(data-gifffer='images/tutorial/step5.gif')
+			img(style="width: 100%", src='images/tutorial/step5.jpg')
 	hr
-	.row
+	.row.step
 		.col-sm-5
-			p #[h6.inline Step 6.] Click on a joined edge to snap the edges apart again.
+			h4 Step 6: Tracing strips
+
+			p Click on "Trace and export strips" on the top of the page. Note that Sliceform Studio magically traces the patterns through the tiles to create interlaced strips.
 		.col-sm-7
-			img(data-gifffer='images/tutorial/step6.gif')
+			img(src='images/tutorial/step6.jpg')
 	hr
-	.row
+	.row.step
 		.col-sm-5
-			p #[h6.inline Step 7.] Another way to snap shapes together is to click on two edges successively.
+			h4 Step 7: Assigning colors
+
+			p Use the color picker to pick out colors. "Paint" strips with the selected color by clicking on them.
 		.col-sm-7
-			img(data-gifffer='images/tutorial/step7.gif')
+			img(src='images/tutorial/step7.jpg')
 	hr
-	.row
+	.row.step
 		.col-sm-5
-			p #[h6.inline Step 8.] Drag out a second octagon from the palette by its edge, and join it to the existing group in one step. Note that Sliceform Studio automatically deduces that a third pair of edges should be joined together.
+			h4 Step 8: Export image
+
+			p You can export your digital design as a PNG or SVG image at the top right corner.
+
+			p If you are not interested in paper assembly, you can stop here!
 		.col-sm-7
-			img(data-gifffer='images/tutorial/step8.gif')
+			img(src='images/tutorial/step8.jpg')
 	hr
-	.row
+	.row.step
 		.col-sm-5
-			p #[h6.inline Step 9.] Select the group of tiles and click on #[i.fa.fa-files-o.fa-border] to duplicate them three times.
+			h4 Step 9: Exporting strip templates
+
+			p The strips you have painted show up in the "Export Strips" side panel on the left. Click on the #[i.fa.fa-download.fa-border] button to download templates of all the strips assigned that color.
+
+			p You can also drag them from a color category to another to reassign colors, or click on the #[i.fa.fa-times] icons to unassign colors.
 		.col-sm-7
-			img(data-gifffer='images/tutorial/step9.gif')
+			img(src='images/tutorial/step9.jpg')
 	hr
-	.row
+	.row.step
 		.col-sm-5
-			p #[h6.inline Step 10.] That was one too many times! Select one of the copies and click on #[i.fa.fa-trash.fa-border] to delete it.
+			h4 Step 10: Physical assembly
+
+			p These templates are optimized to be used for laser cutting or die cutting paper. The black lines are slits where two intersecting strips can be slotted together, while the red lines represent creases where the strip should be folded.
 		.col-sm-7
-			img(data-gifffer='images/tutorial/step10.gif')
+			img(style="width:100%", src='images/tutorial/step10.jpg')
 	hr
-	.row
-		.col-sm-5
-			p #[h6.inline Step 11.] Snap the copies together to create a repeating tessellation.
-		.col-sm-7
-			img(src='images/tutorial/step11.jpg')
-	hr
-	.row
-		.col-sm-5
-			p #[h6.inline Step 12.] Add two more octagons onto the end to round off the design.
-		.col-sm-7
-			img(src='images/tutorial/step12.jpg')
-	hr
-	.row
-		.col-sm-5
-			p #[h6.inline Step 13.] Now it's time to inscribe patterns into these tiles. Click on the octagon in the palette to select it and then the "Edit Pattern" button in the toolbar.
-		.col-sm-7
-			img(style="width: 100%", src='images/tutorial/step13.jpg')
-	hr
-	.row
-		.col-sm-5
-			p #[h6.inline Step 14.] The default pattern is a star with initial angle 78.8° and a depth of 2. That's fine; click confirm. All the octagons have been inscribed with this pattern.
-		.col-sm-7
-			img(src='images/tutorial/step14.jpg')
-	hr
-	.row
-		.col-sm-5
-			p #[h6.inline Step 15.] Do the same for the square, but adjust the slider from the default of 67.5° to 78.8° so that the two patterns will line up along the joined edges.
-		.col-sm-7
-			img(src='images/tutorial/step15.jpg')
-	hr
-	.row
-		.col-sm-5
-			p #[h6.inline Step 16.] Click on "Strip view" on the top of the page. Note that Sliceform Studio magically traces the patterns through the tiles to create corresponding interlaced strips.
-		.col-sm-7
-			img(src='images/tutorial/step16.jpg')
-	hr
-	.row
-		.col-sm-5
-			p #[h6.inline Step 17.] Adjust the "Strip width" slider below the canvas to 5px so that the strips are drawn slightly thicker.
-		.col-sm-7
-			img(src='images/tutorial/step17.jpg')
-	hr
-	.row
-		.col-sm-5
-			p #[h6.inline Step 18.] The color picker defaults to red. Hover over and click on the vertical and horizontal running strips to "paint" them red.
-		.col-sm-7
-			img(data-gifffer='images/tutorial/step18.gif')
-	hr
-	.row
-		.col-sm-5
-			p #[h6.inline Step 19.] Pick light blue in the color picker and paint the remaining strips.
-		.col-sm-7
-			img(data-gifffer='images/tutorial/step19.gif')
-	hr
-	.row
-		.col-sm-5
-			p #[h6.inline Step 20.] Export your design as a PNG using the #[i.fa.fa-download] PNG button in the top right corner.
-		.col-sm-7
-			img(src='images/tutorial/step20.jpg')
-	hr
-	.row
-		.col-sm-5
-			p #[h6.inline Step 21.] Scroll down to the "Color-coded SVG Files" panel below. Click "Generate SVG" to download a rendering of the strips assigned that color.
-		.col-sm-7
-			img(src='images/tutorial/step21.jpg')
-	hr
-	.row
-		.col-sm-5
-			p #[h6.inline Step 22.] These strips are optimized to be used for laser cutting or die cutting paper. The black lines are slits where two intersecting strips can be slotted together, while the red lines represent creases where the strip should be folded.
-		.col-sm-7
-			img(style="width:100%", src='images/tutorial/step22.jpg')
-	hr
-	.alert.alert-success #[h3.inline Congrats!] You have successfully completed the Sliceform Studio tutorial and know how to use the most essential features. Now go and play more with #[a(href="app.html") the app], read #[a(href="/docs.html") the docs] for a more in-depth discussion of Sliceform Studio's features, or visit #[a(href="/gallery") the gallery] for ideas! Have fun!
-	script(type='text/javascript').
-		$(document).ready(function() {
-			Gifffer();
-		});
+	.alert.alert-success.step #[h3.inline Congrats!] You have successfully completed the Sliceform Studio tutorial and know how to use the most essential features. Now go and play more with #[a(href="app.html") the app], read #[a(href="/docs.html") the docs] for a more in-depth discussion of the various features, or visit #[a(href="/gallery") the gallery] for ideas! Have fun!

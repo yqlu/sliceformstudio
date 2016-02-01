@@ -45,7 +45,7 @@ var patternUnidirectionalTrace = function(patternData, nextEdge) {
 			return p.pattern.this === currPattern.this;
 		});
 
-		var otherEdge = nextEdge.joinedTo.__data__;
+		var otherEdge = nextEdge.joinedTo.node.__data__;
 
 		// only original edges (not dummy cropped edges) have pattern interfaces
 		// but all edges we are tracing through .joinedTo are original edges

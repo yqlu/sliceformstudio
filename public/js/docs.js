@@ -5,4 +5,12 @@ $(document).ready(function() {
 	});
 
 	Gifffer();
+
+});
+
+$(window).on("load", function() {
+	// scroll to anchors only after images have loaded
+	if (window.location.hash) {
+		$('html,body').animate({scrollTop: $(window.location.hash).offset().top},'slow');
+	}
 });

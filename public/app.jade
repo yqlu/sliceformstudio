@@ -43,21 +43,28 @@
 			form#optimizeViewMenu.form-inline.hidden
 				.btn-group.padded-btn-group
 					span
-						b Define constraints and optimize them to clean up your pattern.
+						b Add Constraint:
 				.btn-group.padded-btn-group
-					a.btn.btn-primary.dropdown-toggle(data-toggle="dropdown") #[i.fa.fa-caret-down] Add Constraint
-					ul.dropdown-menu
-						li
-							a(href="#") Parallel
-						li
-							a(href="#") Equal length
-						li
-							a(href="#") Collinear
-						li
-							a(href="#") Equal length
-				.btn-group.padded-btn-group
-					a.btn.btn-primary Select All
-					a.btn.btn-primary Reset
+					a.btn.btn-primary#parallelConstraint Parallel
+					a.btn.btn-primary Perpendicular
+					a.btn.btn-primary Collinear
+					a.btn.btn-primary Equal length
+					.btn-group
+						a.btn.btn-primary.dropdown-toggle(data-toggle="dropdown") Others #[i.fa.fa-caret-down]
+						ul.dropdown-menu
+							li
+								a(href="#") Keep gradient constant
+							li
+								a(href="#") Keep meeting angle constant
+							li
+								a(href="#") Keep length constant
+							li.divider
+							li
+								a(href="#") Meet at angle of ...
+							li
+								a(href="#") Length in ratio of ...
+							li
+								a(href="#") Lengths differ by ...
 				.btn-group.padded-btn-group.pull-right
 					a#exitOptimizeView.btn.btn-default #[i.fa.fa-times] Exit Optimize View
 		#assembleSvgContainer

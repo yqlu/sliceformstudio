@@ -164,6 +164,7 @@ var dragSvgHandler = d3.behavior.drag()
 	.attr("y", newHeight - 20)
 	.text(existingWidth + "px x " + newHeight + "px");
 	d3.select('#traceSvg foreignObject').attr("height", newHeight + "px");
+	optimizeTableFo.attr("height", newHeight + "px");
 })
 .on('dragend', function(d, i) {
 	document.body.style.cursor = 'auto';
@@ -249,6 +250,7 @@ var zoomBehavior = function(d, i) {
 	var canvas = d3.select(this).classed("svg-background") ?
 		d3.select(this.parentNode).selectAll(".canvas") :
 		d3.select(this.parentNode.parentNode);
+	console.log(canvas, this, d3.select(this).classed("svg-background"));
 	canvas.each(function(d) {
 		d.transform = num.matrixRound(num.translateBy(num.scaleBy(num.id, d3.event.scale), d3.event.translate[0], d3.event.translate[1]));
 	})

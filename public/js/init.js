@@ -346,6 +346,8 @@ d3.selectAll("#assembleOrigZoom, #traceOrigZoom")
 d3.selectAll("#assembleZoomToFit, #traceZoomToFit")
 .on("click", zoomToFitHandler);
 
+d3.selectAll(".svg-toolbar").style("display", "block");
+
 $("#assembleOrigZoom, #traceOrigZoom, #assembleZoomToFit, #traceZoomToFit").tooltip({container: 'body#body'});
 
 shapeEditCustomDraw();

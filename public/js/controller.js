@@ -247,7 +247,7 @@ var dragPatternHandleEdit = d3.behavior.drag()
 // zoom handler for canvas
 var zoomBehavior = function(d, i) {
 	// pick canvas depending on whether zoom is taking place on bg or on tile
-	var canvas = d3.select(this).classed("svg-background") ?
+	var canvas = this.tagName === "rect" ?
 		d3.select(this.parentNode).selectAll(".canvas") :
 		d3.select(this.parentNode.parentNode);
 	console.log(canvas, this, d3.select(this).classed("svg-background"));

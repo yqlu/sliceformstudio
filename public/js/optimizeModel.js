@@ -697,7 +697,7 @@ var constraintHandler = function(constraintSpec) {
 };
 
 var exitConstraintSelection = function() {
-	assembleOptimizeCanvas.selectAll(".pattern-segment, .pattern-segment-endpoint").remove();
+	assembleOptimizeCanvas.selectAll(".pattern-segment, .pattern-segment-endpoint, .pattern-segment-fixable-point.clickable").remove();
 	d3.select(".svg-instruction-bar").classed("hidden", true);
 	d3.selectAll(".constraint-btns .btn").classed("disabled", false);
 };

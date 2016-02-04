@@ -145,6 +145,8 @@ var noConstraintsSoFar = optimizeTable
 
 var parallelConstraint = d3.select("#parallelConstraint")
 	.on("click", constraintHandler(enforceParallel));
+var perpendicularConstraint = d3.select("#perpendicularConstraint")
+	.on("click", constraintHandler(enforcePerpendicular));
 var collinearConstraint = d3.select("#collinearConstraint")
 	.on("click", constraintHandler(enforceCollinear));
 var equalLengthConstraint = d3.select("#equalLengthConstraint")

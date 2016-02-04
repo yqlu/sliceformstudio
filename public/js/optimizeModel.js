@@ -166,6 +166,23 @@ var enforceParallel = enforceConstructor({
 	instructionText: "Select two segments to make parallel."
 });
 
+var enforcePerpendicular = enforceConstructor({
+	constructor: function(segments) {
+		return function() {
+			var seg1 = segments[0];
+			var seg2 = segments[1];
+			var v1 = num.vectorFromEnds(seg1.getCoords());
+			var v2 = num.vectorFromEnds(seg2.getCoords());
+			var cosOfAngle = num.dot(v1,v2) / (num.norm2(v1) * num.norm2(v2));
+			return Math.abs(Math.acos(Math.abs(cosOfAngle)) - Math.PI / 2) * 180 / Math.PI;
+		};
+	},
+	displayName: "Perpendicular",
+	numSegments: 2,
+	instructionText: "Select two segments to make perpendicular."
+});
+
+
 var enforceCollinear = enforceConstructor({
 	constructor: function(segments) {
 		return function() {

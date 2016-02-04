@@ -44,62 +44,6 @@ var makeSegment = function(params) {
 		}
 	};
 
-	// var draw = function(params) {
-	// 	var element = getElement();
-	// 	var pattern = element.tile.patterns[patternIdx];
-	// 	if (element.tile.segments) {
-	// 		element.tile.segments.push([pattern.intersectedVertices[v1], pattern.intersectedVertices[v2]]);
-	// 	} else {
-	// 		element.tile.segments = [[pattern.intersectedVertices[v1], pattern.intersectedVertices[v2]]];
-	// 	}
-	// 	var segmentGroup = d3.select(element.tile.this).selectAll(".segment")
-	// 	.data(function(d) { return d.segments; })
-	// 	.enter()
-	// 	.append("g")
-	// 	.classed("segment", true);
-
-	// 	segmentGroup
-	// 	.append("path")
-	// 	.style("stroke", params.color || "blue")
-	// 	.attr("d", function(d) {
-	// 		return d3.svg.line()(_.pluck(d, "coords"));
-	// 	});
-
-	// 	if (params && params.highlightHandle) {
-	// 		var previousHandleIndexInIntersectedVertices = _.findLast(
-	// 			element.pattern.intersectedVertices, function(v,i) {
-	// 			return i <= v1 && (!v.intersect || i === 0);
-	// 		});
-	// 		var nextHandleIndexInIntersectedVertices = _.find(
-	// 			element.pattern.intersectedVertices, function(v, i) {
-	// 			return i >= v2 && (!v.intersect || i === element.pattern.intersectedVertices.length - 1);
-	// 		});
-	// 		var handles = [previousHandleIndexInIntersectedVertices, nextHandleIndexInIntersectedVertices];
-	// 		if (fix === "first") {
-	// 			handles = [handles[1]];
-	// 		} else if (fix === "second") {
-	// 			handles = [handles[0]];
-	// 		} else if (fix === "both") {
-	// 			handles = [];
-	// 		}
-
-	// 		handles = _.filter(handles, function(h, idx) {
-	// 			return h !== element.pattern.intersectedVertices[0] &&
-	// 			h !== _.last(element.pattern.intersectedVertices);
-	// 		});
-
-	// 		segmentGroup
-	// 		.selectAll(".segmentHandle").data(handles).enter()
-	// 		.append("circle")
-	// 		.attr("cx", function(d) { return d.coords[0]; })
-	// 		.attr("cy", function(d) { return d.coords[1]; })
-	// 		.attr("r", 3)
-	// 		.attr("fill", "red");
-	// 	}
-	// };
-
-
-
 	// get pattern segment pointed to and retrieve global coords
 	var getCoords = function() {
 		var element = getElement();
@@ -181,7 +125,6 @@ var makeSegment = function(params) {
 	};
 
 	return {
-		// draw: draw,
 		getElement: getElement,
 		getCoords: getCoords,
 		getInterface: getInterface,
@@ -189,57 +132,90 @@ var makeSegment = function(params) {
 	};
 };
 
-var enforceConstructor = function(evaluateConstructor, displayName) {
-	return function(seg1, seg2) {
-		var evaluateFn = evaluateConstructor(seg1, seg2);
-		return {
-			evaluate: evaluateFn,
-			segments: [seg1, seg2],
-			displayName: displayName
-		};
+var enforceConstructor = function(options) {
+	return {
+		numSegments: options.numSegments,
+		instructionText: options.instructionText,
+		constructor: function(segments) {
+			if (segments.length !== options.numSegments) {
+				throw new Error("Number of segments must be exactly " + options.numSegments);
+			}
+			var evaluateFn = options.constructor(segments);
+			return {
+				evaluate: evaluateFn,
+				segments: segments,
+				displayName: options.displayName,
+			};
+		}
 	};
 };
 
-var enforceParallel = enforceConstructor(function(seg1, seg2) {
-	return function() {
-		var v1 = num.vectorFromEnds(seg1.getCoords());
-		var v2 = num.vectorFromEnds(seg2.getCoords());
-		var cosOfAngle = num.dot(v1,v2) / (num.norm2(v1) * num.norm2(v2));
-		return Math.acos(Math.abs(cosOfAngle)) * 180 / Math.PI;
-	};
-}, "Parallel");
-
-var enforceCollinear = enforceConstructor(function(seg1, seg2) {
-	return function() {
-		var seg1Coords = seg1.getCoords();
-		var seg2Coords = seg2.getCoords();
-
-		var v1 = num.vectorFromEnds(seg1Coords);
-		var v2 = num.vectorFromEnds(seg2Coords);
-		var v3 = num.vectorFromEnds([seg1Coords[0], seg2Coords[0]]);
-		var v4 = num.vectorFromEnds([seg1Coords[0], seg2Coords[1]]);
-
-		var n1 = num.norm2(v1);
-		var n2 = num.norm2(v2);
-		var n3 = num.norm2(v3);
-		var n4 = num.norm2(v4);
-
-		var angles = _.map([[v1,v3,n1,n3], [v1,v4,n1,n4]], function(params) {
-			var cosOfAngle = num.dot(params[0], params[1]) / (params[2] * params[3]);
+var enforceParallel = enforceConstructor({
+	constructor: function(segments) {
+		return function() {
+			var seg1 = segments[0];
+			var seg2 = segments[1];
+			var v1 = num.vectorFromEnds(seg1.getCoords());
+			var v2 = num.vectorFromEnds(seg2.getCoords());
+			var cosOfAngle = num.dot(v1,v2) / (num.norm2(v1) * num.norm2(v2));
 			return Math.acos(Math.abs(cosOfAngle)) * 180 / Math.PI;
-		});
+		};
+	},
+	displayName: "Parallel",
+	numSegments: 2,
+	instructionText: "Select two segments to make parallel."
+});
 
-		return _.sum(angles);
-	};
-}, "Collinear");
+var enforceCollinear = enforceConstructor({
+	constructor: function(segments) {
+		return function() {
+			var seg1 = segments[0];
+			var seg2 = segments[1];
+			var seg1Coords = seg1.getCoords();
+			var seg2Coords = seg2.getCoords();
 
-var enforceEqualLength = enforceConstructor(function(seg1, seg2) {
-	return function() {
-		var len1 = num.norm2(num.vectorFromEnds(seg1.getCoords()));
-		var len2 = num.norm2(num.vectorFromEnds(seg2.getCoords()));
-		return Math.abs(len1 - len2);
-	};
-}, "Equal length");
+			var v1 = num.vectorFromEnds(seg1Coords);
+			var v2 = num.vectorFromEnds(seg2Coords);
+			var v3 = num.vectorFromEnds([seg1Coords[0], seg2Coords[0]]);
+			var v4 = num.vectorFromEnds([seg1Coords[0], seg2Coords[1]]);
+			var v5 = num.vectorFromEnds([seg1Coords[1], seg2Coords[0]]);
+			var v6 = num.vectorFromEnds([seg1Coords[1], seg2Coords[1]]);
+
+			var n1 = num.norm2(v1);
+			var n2 = num.norm2(v2);
+			var n3 = num.norm2(v3);
+			var n4 = num.norm2(v4);
+			var n5 = num.norm2(v5);
+			var n6 = num.norm2(v6);
+
+			var angles = _.map([[v1,v3,n1,n3], [v1,v4,n1,n4], [v1,v5,n1,n5], [v1,v6,n1,n6],
+				[v2,v3,n2,n3], [v2,v4,n2,n4], [v2,v5,n2,n5], [v2,v6,n2,n6]], function(params) {
+				var cosOfAngle = num.dot(params[0], params[1]) / (params[2] * params[3]);
+				return Math.acos(Math.abs(cosOfAngle)) * 180 / Math.PI;
+			});
+
+			return _.sum(angles);
+		};
+	},
+	displayName: "Collinear",
+	numSegments: 2,
+	instructionText: "Select two segments to make collinear."
+});
+
+var enforceEqualLength = enforceConstructor({
+	constructor: function(segments) {
+		return function() {
+			var seg1 = segments[0];
+			var seg2 = segments[1];
+			var len1 = num.norm2(num.vectorFromEnds(seg1.getCoords()));
+			var len2 = num.norm2(num.vectorFromEnds(seg2.getCoords()));
+			return Math.abs(len1 - len2);
+		};
+	},
+	displayName: "Equal length",
+	numSegments: 2,
+	instructionText: "Select two segments to make equal length."
+});
 
 var createObjectives = function(objectives) {
 	var evaluate = function() {
@@ -558,19 +534,19 @@ var bindToNextBtn = function(f) {
 	nextOptimizeBtn.on("click", f);
 };
 
-var constraintHandler = function(constraintConstructor) {
+var constraintHandler = function(constraintSpec) {
 	return function() {
 		setupOptimizeOverlay();
 		d3.select(".svg-instruction-bar").classed("hidden", false);
 		d3.selectAll(".constraint-btns .btn").classed("disabled", true);
 		d3.selectAll("path.pattern-segment").classed("selectable", true);
-		assembleSvgOptimizeLabel.text("Select two segments to make parallel.");
+		assembleSvgOptimizeLabel.text(constraintSpec.instructionText);
 		var selectedSegments = [];
 		bindToNextBtn(function() {
 			if (selectedSegments.length === 0) {
-				bootbox.alert("Please select two segments by clicking on them.");
-			} else if (selectedSegments.length !== 2) {
-				bootbox.alert("Please select exactly two segments.");
+				bootbox.alert("Please select " + constraintSpec.numSegments + " segments by clicking on them.");
+			} else if (selectedSegments.length !== constraintSpec.numSegments) {
+				bootbox.alert("Please select exactly " + constraintSpec.numSegments + " segments.");
 			} else {
 				d3.selectAll("path.pattern-segment").classed("selectable", false)
 				.on("click", null);
@@ -604,8 +580,8 @@ var constraintHandler = function(constraintConstructor) {
 							seg.fix = null;
 						}
 					});
-					console.log(segCopies);
-					optimizationConstraints.push(constraintConstructor.apply(constraintConstructor, _.map(segCopies, makeSegment)));
+					var constructor = constraintSpec.constructor;
+					optimizationConstraints.push(constructor(_.map(segCopies, makeSegment)));
 					redrawConstraintList();
 					bindToNextBtn(null);
 				});
@@ -622,8 +598,6 @@ var exitConstraintSelection = function() {
 	d3.selectAll(".constraint-btns .btn").classed("disabled", false);
 };
 
-var addParallelConstraint = function(segs) {
-};
 
 var optimizationConstraints = [];
 

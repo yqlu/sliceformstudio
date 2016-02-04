@@ -45,12 +45,12 @@
 					span
 						b Add Constraint:
 				.btn-group.padded-btn-group.constraint-btns
-					a.btn.btn-primary#parallelConstraint Parallel
-					a.btn.btn-primary#perpendicularConstraint Perpendicular
-					a.btn.btn-primary#collinearConstraint Collinear
-					a.btn.btn-primary#equalLengthConstraint Equal length
+					a.btn.btn-default#parallelConstraint Parallel
+					a.btn.btn-default#perpendicularConstraint Perpendicular
+					a.btn.btn-default#collinearConstraint Collinear
+					a.btn.btn-default#equalLengthConstraint Equal length
 					.btn-group
-						a.btn.btn-primary.dropdown-toggle(data-toggle="dropdown") Others #[i.fa.fa-caret-down]
+						a.btn.btn-default.dropdown-toggle(data-toggle="dropdown") Others #[i.fa.fa-caret-down]
 						ul.dropdown-menu
 							li
 								a(href="#") Hold gradient constant
@@ -79,9 +79,10 @@
 						a.btn.btn-default.btn-sm(title="Reset zoom level")#traceOrigZoom 1:1
 				.svg-instruction-bar#assembleSvgOptimizeBar.hidden
 					span.h4
-					.btn-group.pull-right.padded-btn-group
-						a.btn.btn-default(style="margin-right: 10px;")#cancelConstraintBtn Cancel
-						a.btn.btn-default#nextOptimizeBtn Next
+					.btn-group.pull-right.padded-btn-group#nextOptimizeBtnGroup
+						a.btn.btn-default.disabled#nextOptimizeBtn Next
+					.btn-group.pull-right
+						a.btn.btn-default#cancelConstraintBtn Cancel
 		div.pull-right
 			a.btn.btn-default#betaFeaturesBtn #[i.fa.fa-flask] Beta features
 	#traceTab.hidden

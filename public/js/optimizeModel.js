@@ -1,26 +1,11 @@
-var drawIntersectedVertices = function() {
-	assembleCanvas.selectAll(".tile")
-	.each(function(d) {
-		var tile = this;
-		d3.select(this).selectAll("circle.intersected")
-		.data(function(d) { return _.flatten(_.pluck(d.patterns, "intersectedVertices")); })
-		.enter()
-		.append("circle")
-		.each(function(d) { d.this = this; })
-		.attr("cx", function(d) { return d.coords[0]; })
-		.attr("cy", function(d) { return d.coords[1]; })
-		.classed("intersected", true)
-		.attr("r", 2)
-		.attr("color", "black");
-	});
-};
-
 var makeSegment = function(params) {
 	var groupIdx = params.groupIdx;
 	var tileIdx = params.tileIdx;
 	var patternIdx = params.patternIdx;
-	var v1 = params.vertices[0];
-	var v2 = params.vertices[1];
+	params.polygonID = polylist[groupIdx].tiles[tileIdx].polygonID;
+	params.customIdx = polylist[groupIdx].tiles[tileIdx].patterns[patternIdx].customIndex;
+	var v1 = params.vertexRange[0];
+	var v2 = params.vertexRange[1];
 	var fix = params.fix;
 	var segmentNode = params.this;
 
@@ -53,12 +38,8 @@ var makeSegment = function(params) {
 			num.coordsToMatrix(patternCoords))));
 	};
 
-	// if pattern is from a custom template,
-	// retrieve pattern handles (indexed from 0 to customTemplate[i].points.length - 1)
-	// responsible for the segment in question
-	var getPatternHandles = function() {
+	var getRawNeighboringHandlePoints = function() {
 		var element = getElement();
-		var ct = element.tile.customTemplate[element.pattern.customIndex];
 		var previousHandleIndexInIntersectedVertices = _.findLastIndex(
 			element.pattern.intersectedVertices, function(v,i) {
 			return i <= v1 && (!v.intersect || i === 0);
@@ -67,69 +48,119 @@ var makeSegment = function(params) {
 			element.pattern.intersectedVertices, function(v, i) {
 			return i >= v2 && (!v.intersect || i === element.pattern.intersectedVertices.length - 1);
 		});
-		var numOfHandlesUpTo = _.filter(element.pattern.intersectedVertices, function(v , i) {
-			return i < previousHandleIndexInIntersectedVertices && (!v.intersect || i === 0);
-		}).length;
-		var previousHandleIndexInCustomTemplate = numOfHandlesUpTo - 1;
-		var nextHandleIndexInCustomTemplate = numOfHandlesUpTo;
 
-		var handles = [previousHandleIndexInCustomTemplate, nextHandleIndexInCustomTemplate];
-		var numHandles = ct.points.length;
-		if (ct.symmetrySpec === "mirrorNoCrop") {
-			if (nextHandleIndexInCustomTemplate === numHandles) {
-				handles = [previousHandleIndexInCustomTemplate, previousHandleIndexInCustomTemplate];
-			} else if (nextHandleIndexInCustomTemplate > numHandles) {
-				handles = [numHandles * 2 - 1 - nextHandleIndexInCustomTemplate,
-					numHandles * 2 - 1 - previousHandleIndexInCustomTemplate];
-			}
-		} else if (ct.symmetrySpec === "mirrorCrop") {
-			if (nextHandleIndexInCustomTemplate > numHandles - 1) {
-				handles = [numHandles * 2 - 2 - nextHandleIndexInCustomTemplate,
-					numHandles * 2 - 2 - previousHandleIndexInCustomTemplate];
-			}
-		}
-		if (fix === "first") {
-			handles = [handles[1]];
-		} else if (fix === "second") {
-			handles = [handles[0]];
-		} else if (fix === "both") {
-			handles = [];
-		}
-		return _.map(_.filter(handles, function(i) { return i >= 0 && i < numHandles; }),
-			function(h) { return [element.pattern.customIndex, h]; });
+		return [previousHandleIndexInIntersectedVertices, nextHandleIndexInIntersectedVertices];
 	};
 
-	var getInterface = function() {
+	// compute pattern handles once
+	// clicking on them in the GUI mutates the "fix" parameter
+	// which gets passed to "getInterface"
+	var patternHandles = (function() {
+
 		var element = getElement();
 		var patternType = patternOptions[element.tile.patternParams.index].name;
+		var handles;
 		if (patternType === "Custom") {
-			return _.map(getPatternHandles(), function(ph) {
-				return {
-					polygonID: element.tile.polygonID,
-					isCustom: true,
-					templateSpec: ph
-				};
-			});
-		} else if (["Star", "Rosette", "Extended Rosette"].indexOf(patternType) > -1) {
-			if (fix) {
-				return [];
-			} else {
-				return [{
-					polygonID: element.tile.polygonID,
-					isCustom: false
-				}];
+
+			var ct = element.tile.customTemplate[element.pattern.customIndex];
+			var neighboringHandlePoints = getRawNeighboringHandlePoints();
+
+			var numOfHandlesUpTo = _.filter(element.pattern.intersectedVertices, function(v , i) {
+				return i < neighboringHandlePoints[0] && (!v.intersect || i === 0);
+			}).length;
+
+			handles = [{
+				polygonID: params.polygonID,
+				isCustom: true,
+				intersectingIdx: neighboringHandlePoints[0],
+				fix: true,
+				customIdx: params.customIdx,
+				customTemplateIdx: numOfHandlesUpTo - 1
+			}, {
+				polygonID: params.polygonID,
+				isCustom: true,
+				intersectingIdx: neighboringHandlePoints[1],
+				fix: true,
+				customIdx: params.customIdx,
+				customTemplateIdx: numOfHandlesUpTo
+			}];
+
+			var numHandles = ct.points.length;
+			if (ct.symmetrySpec === "mirrorNoCrop") {
+				if (numOfHandlesUpTo === numHandles) {
+					handles[1].customTemplateIdx = numOfHandlesUpTo - 1;
+				} else if (numOfHandlesUpTo > numHandles) {
+					handles[0].customTemplateIdx = numHandles * 2 - numOfHandlesUpTo;
+					handles[1].customTemplateIdx = numHandles * 2 - 1 - numOfHandlesUpTo;
+				}
+			} else if (ct.symmetrySpec === "mirrorCrop") {
+				if (numOfHandlesUpTo > numHandles - 1) {
+					handles[0].customTemplateIdx = numHandles * 2 - 1 - numOfHandlesUpTo;
+					handles[1].customTemplateIdx = numHandles * 2 - 2 - numOfHandlesUpTo;
+				}
 			}
+
+			handles = _.filter(handles, function(h) {
+				return h.customTemplateIdx >= 0 && h.customTemplateIdx < numHandles;
+			});
+
+		} else if (["Star", "Rosette", "Extended Rosette"].indexOf(patternType) > -1) {
+			var firstHandleIdx = _.findIndex(
+				element.pattern.intersectedVertices, function(v,i) {
+				return (!v.intersect && i > 0);
+			});
+			var lastHandleIndex = _.findLastIndex(
+				element.pattern.intersectedVertices, function(v, i) {
+				return (!v.intersect && i < element.pattern.intersectedVertices.length - 1);
+			});
+			var intersectingIdx = ((v1 + v2) / 2 - (firstHandleIdx + lastHandleIndex) / 2 < 0) ?
+				firstHandleIdx : lastHandleIndex;
+
+			handles = [{
+				polygonID: params.polygonID,
+				isCustom: false,
+				intersectingIdx: intersectingIdx,
+				fix: true
+			}];
 		} else {
 			throw new Error("Optimization is unsupported for this pattern type.");
 		}
+
+		var tileTransform = num.dot(element.group.transform, element.tile.transform);
+		_.each(handles, function(h) {
+			h.coords = num.matrixToCoords(num.dot(tileTransform,
+				num.coordsToMatrix([element.pattern.intersectedVertices[h.intersectingIdx].coords])))[0];
+		});
+
+		return handles;
+	})();
+
+	var getInterface = function() {
+		return _.filter(patternHandles, function(ph) {
+			return !ph.fix;
+		});
+	};
+
+	var setFixity = function(fixity) {
+		fix = fixity;
 	};
 
 	return {
+		originalParams: params,
+		patternHandles: patternHandles,
 		getElement: getElement,
 		getCoords: getCoords,
 		getInterface: getInterface,
-		getNode: segmentNode
+		getNode: segmentNode,
+		setFixity: setFixity
 	};
+};
+
+
+var patternHandleComparator = function(d1, d2) {
+	return (d1.polygonID === d2.polygonID &&
+		((!d1.isCustom && !d2.isCustom) ||
+		(d1.customIdx === d2.customIdx && d1.customTemplateIdx === d2.customTemplateIdx)));
 };
 
 var enforceConstructor = function(options) {
@@ -242,8 +273,18 @@ var createObjectives = function(objectives) {
 	var getInterface = function() {
 		var segments = _.flatten(_.map(objectives, function(o) { return o.segments; }));
 		var interfaces = _.flatten(_.map(segments, function(s) { return s.getInterface(); }));
-		// TODO: have a better uniqWith by updating to lodashv4
-		return _.uniq(interfaces, JSON.stringify);
+		// basic _.uniq function with custom comparator
+		var reduced = _.reduce(interfaces, function(acc, i) {
+			var findFn = function(i2) {
+				return patternHandleComparator(i, i2);
+			};
+			if (_.find(acc, findFn)) {
+				return acc;
+			} else {
+				return acc.concat(i);
+			}
+		}, []);
+		return reduced;
 	};
 	var optimize = function() {
 		var customInterface = this.getInterface();
@@ -253,7 +294,7 @@ var createObjectives = function(objectives) {
 			});
 			if (i.isCustom) {
 				return num.getTranslation(
-					tile.customTemplate[i.templateSpec[0]].points[i.templateSpec[1]].transform);
+					tile.customTemplate[i.customIdx].points[i.customTemplateIdx].transform);
 			} else {
 				return tile.patternParams.param1;
 			}
@@ -295,13 +336,13 @@ var createObjectives = function(objectives) {
 			var tile = group.tiles[d.tileIdx];
 			var pattern = tile.patterns[d.patternIdx];
 			var intersectedVertices = pattern.intersectedVertices;
-			var patternCoords = _.pluck(intersectedVertices.slice(d.vertices[0], d.vertices[1] + 1), "coords");
+			var patternCoords = _.pluck(intersectedVertices.slice(d.vertexRange[0], d.vertexRange[1] + 1), "coords");
 			var globalCoords = num.matrixToCoords(num.dot(group.transform,
 				num.dot(tile.transform, num.coordsToMatrix(patternCoords))));
 			d.globalCoords = globalCoords;
 			return d3.svg.line()(globalCoords);
 		});
-		updateFixedPatternSegmentHandlePositions(d3.selectAll(".pattern-segment-handle-fixed"));
+		updateFixedPatternSegmentHandlePositions(d3.selectAll(".pattern-segment-fixable-point"));
 	};
 
 	return {
@@ -333,8 +374,8 @@ var updateCustomTemplates = function(vector, customInterface, evaluator) {
 
 	_.each(customInterface, function(ci) {
 		if (ci.isCustom) {
-			tiles[ci.polygonID].customTemplate[ci.templateSpec[0]]
-			.points[ci.templateSpec[1]] = {
+			tiles[ci.polygonID].customTemplate[ci.customIdx]
+			.points[ci.customTemplateIdx] = {
 				transform: num.translate.apply(null, vectorCopy.splice(0, 2))
 			};
 		} else {
@@ -428,7 +469,7 @@ var setupOptimizeOverlay = function() {
 		});
 	}));
 
-	assembleOptimizeCanvas.selectAll(".pattern-segment, .pattern-segment-handle").remove();
+	assembleOptimizeCanvas.selectAll(".pattern-segment, .pattern-segment-endpoint").remove();
 	assembleOptimizeCanvas.selectAll(".pattern-segment").data(patternSegments)
 	.enter()
 	.append("path")
@@ -445,39 +486,33 @@ var teardownOptimizeOverlay = function() {
 	optimizeTable.style("display", "none");
 };
 
-var patternSelectHandler = function(list, limit, limitCallback) {
+var patternSelectHandler = function(list, limit) {
 	return function(d) {
 		if (list.indexOf(d) > -1) {
 			// remove it from the list
 			list.splice(list.indexOf(d), 1);
 			d3.select(this).classed("selected", false);
 		} else {
-			list.push(d);
-			d3.select(this).classed("selected", true);
+			if (list.length < limit) {
+				list.push(d);
+				d3.select(this).classed("selected", true);
+			}
 		}
-		drawPatternSegmentHandles(list);
+		d3.selectAll(".pattern-segment")
+		.filter(function(d) {
+			return !d3.select(this).classed("selected");
+		}).classed("selectable", list.length < limit);
+		drawPatternSegmentEndpoints(list);
+		var disableNext = !(list.length === limit || (list.length >= 3 && limit === Infinity));
+		d3.select("#nextOptimizeBtn")
+			.classed("disabled", disableNext);
+		$("#nextOptimizeBtnGroup").tooltip("destroy")
+			.tooltip({placement: "bottom", title: disableNext ?
+				"Select the required number of segments first." : ""});
 	};
 };
 
-var updateFixedPatternSegmentHandlePositions = function(sel) {
-	return sel
-	.attr("cx", function(d) {
-		if (d.isStart) {
-			return d.seg.globalCoords[0][0];
-		} else {
-			return _.last(d.seg.globalCoords)[0];
-		}
-	})
-	.attr("cy", function(d) {
-		if (d.isStart) {
-			return d.seg.globalCoords[0][1];
-		} else {
-			return _.last(d.seg.globalCoords)[1];
-		}
-	});
-};
-
-var updatePatternSegmentHandlePositions = function(sel) {
+var updatePatternSegmentEndpointPositions = function(sel) {
 	return sel
 	.attr("cx", function(d) {
 		if (d.isStart) {
@@ -493,6 +528,18 @@ var updatePatternSegmentHandlePositions = function(sel) {
 			return d.seg.vertices[d.seg.curRange[1].idx].coords[1];
 		}
 	});
+};
+
+var updateFixedPatternSegmentHandlePositions = function(sel) {
+	return sel
+	.each(function(d) {
+		var element = d.seg.getElement();
+		var tileTransform = num.dot(element.group.transform, element.tile.transform);
+		d.coords = num.matrixToCoords(num.dot(tileTransform,
+			num.coordsToMatrix([element.pattern.intersectedVertices[d.intersectingIdx].coords])))[0];
+	})
+	.attr("cx", function(d) { return d.coords[0]; })
+	.attr("cy", function(d) { return d.coords[1]; });
 };
 
 var patternSegmentDrag = d3.behavior.drag()
@@ -517,7 +564,7 @@ var patternSegmentDrag = d3.behavior.drag()
 			d.seg.curRange[1].idx = minDistIdx;
 		}
 		d.point.idx = minDistIdx;
-		updatePatternSegmentHandlePositions(d3.select(this));
+		updatePatternSegmentEndpointPositions(d3.select(this));
 
 		d3.select(d.seg.this)
 		.attr("d", function(d) {
@@ -526,25 +573,80 @@ var patternSegmentDrag = d3.behavior.drag()
 	}
 });
 
-var drawPatternSegmentHandles = function(segmentList) {
-	var handlesList = _.flatten(_.map(segmentList, function(seg) {
+var drawPatternSegmentEndpoints = function(segmentList) {
+	var endpointsList = _.flatten(_.map(segmentList, function(seg) {
 		return [{seg: seg, isStart: true, point: seg.curRange[0]}, {seg: seg, isStart: false, point: seg.curRange[seg.curRange.length - 1]}];
 	}));
-	assembleOptimizeCanvas.selectAll(".pattern-segment-handle").remove();
-	var handles = assembleOptimizeCanvas.selectAll(".pattern-segment-handle").data(handlesList)
+	assembleOptimizeCanvas.selectAll(".pattern-segment-endpoint").remove();
+	var endpoints = assembleOptimizeCanvas.selectAll(".pattern-segment-endpoint").data(endpointsList)
 	.enter()
 	.append("circle")
-	.classed("pattern-segment-handle clickable", true)
-	.attr("r", 5)
+	.classed("pattern-segment-endpoint clickable", true)
+	.attr("r", 4)
 	.on("mouseover", function(d) {
-		d3.select(this).attr("r", 6);
+		d3.select(this).attr("r", 5);
 	})
 	.on("mouseout", function(d) {
-		d3.select(this).attr("r", 5);
+		d3.select(this).attr("r", 4);
 	})
 	.call(patternSegmentDrag);
 
-	return updatePatternSegmentHandlePositions(handles);
+	return updatePatternSegmentEndpointPositions(endpoints);
+};
+
+var drawPatternSegmentCustomPoints = function(segmentList) {
+	var handlePoints = _.flatten(_.map(segmentList, function(seg) {
+		_.each(seg.patternHandles, function(ph) {
+			ph.seg = seg;
+		});
+		return seg.patternHandles;
+	}));
+
+	assembleOptimizeCanvas.selectAll(".pattern-segment-endpoint").remove();
+	var endpoints = assembleOptimizeCanvas.selectAll(".pattern-segment-endpoint").data(handlePoints)
+	.enter()
+	.append("circle")
+	.classed("pattern-segment-fixable-point clickable", true)
+	.classed("selected", function(d1) {
+		var isSelected = _.find(createObjectives(optimizationConstraints).getInterface(),
+			function(d2) { return patternHandleComparator(d1, d2); });
+		d1.fix = !isSelected;
+		return isSelected;
+	})
+	.attr("r", 3)
+	.attr("cx", function(d) { return d.coords[0]; })
+	.attr("cy", function(d) { return d.coords[1]; })
+	.on("mouseover", function(d) { d3.select(this).attr("r", 4); })
+	.on("mouseout", function(d) { d3.select(this).attr("r", 3); })
+	.on("click", function(d1) {
+		d1.fix = !d1.fix;
+		d3.selectAll(".pattern-segment-fixable-point")
+		.filter(function(d2) {
+			return patternHandleComparator(d1, d2);
+		})
+		.each(function(d2) {
+			d2.fix = d1.fix;
+		})
+		.classed("selected", !d1.fix);
+		var disableNext = _.all(d3.selectAll(".pattern-segment-fixable-point.clickable")[0], function(n) {
+			return n.__data__.fix;
+		});
+		d3.select("#nextOptimizeBtn")
+			.classed("disabled", disableNext);
+		$("#nextOptimizeBtnGroup").tooltip("destroy")
+			.tooltip({placement: "bottom", title: disableNext ?
+				"Select at least one point to vary." : ""});
+	});
+
+	var disableNext = _.all(d3.selectAll(".pattern-segment-fixable-point.clickable")[0],
+	function(n) {
+		return n.__data__.fix;
+	});
+	d3.select("#nextOptimizeBtn")
+	.classed("disabled", disableNext);
+	$("#nextOptimizeBtnGroup").tooltip("destroy")
+		.tooltip({placement: "bottom", title: disableNext ?
+			"Select at least one point to vary." : ""});
 };
 
 var bindToNextBtn = function(f) {
@@ -559,58 +661,43 @@ var constraintHandler = function(constraintSpec) {
 		d3.selectAll("path.pattern-segment").classed("selectable", true);
 		assembleSvgOptimizeLabel.text(constraintSpec.instructionText);
 		var selectedSegments = [];
+		$("#nextOptimizeBtnGroup").tooltip({
+			placement: "bottom",
+			title: "Select the required number of segments first."});
 		bindToNextBtn(function() {
-			if (selectedSegments.length === 0) {
-				bootbox.alert("Please select " + constraintSpec.numSegments + " segments by clicking on them.");
-			} else if (selectedSegments.length !== constraintSpec.numSegments) {
-				bootbox.alert("Please select exactly " + constraintSpec.numSegments + " segments.");
-			} else {
-				d3.selectAll("path.pattern-segment").classed("selectable", false)
-				.on("click", null);
-				assembleSvgOptimizeLabel.text("Select points to vary during optimization.");
-				var handles = assembleOptimizeCanvas.selectAll(".pattern-segment-handle")
-				.on(".drag", null)
-				.on("click", function(d) {
-					d.point.isActive = !d.point.isActive;
-					d3.select(this).classed("selected", d.point.isActive);
-				});
-				bindToNextBtn(function() {
-					assembleOptimizeCanvas.selectAll(".pattern-segment-handle")
-					.classed("clickable", false);
-					d3.selectAll(".pattern-segment.selected")
-					.classed("pattern-segment selected", false)
-					.classed("pattern-segment-fixed", true);
-					d3.selectAll(".pattern-segment-handle")
-					.classed("pattern-segment-handle", false)
-					.classed("pattern-segment-handle-fixed", true);
-					exitConstraintSelection();
-					var segCopies = _.clone(selectedSegments);
-					_.map(segCopies, function(seg) {
-						seg.vertices = [seg.startIdx + seg.curRange[0].idx, seg.startIdx + seg.curRange[1].idx];
-						if (!seg.curRange[0].isActive && !seg.curRange[1].isActive) {
-							seg.fix = "both";
-						} else if (!seg.curRange[0].isActive) {
-							seg.fix = "first";
-						} else if (!seg.curRange[1].isActive) {
-							seg.fix = "second";
-						} else {
-							seg.fix = null;
-						}
-					});
-					var constructor = constraintSpec.constructor;
-					optimizationConstraints.push(constructor(_.map(segCopies, makeSegment)));
-					redrawConstraintList();
-					bindToNextBtn(null);
-				});
-			}
+			d3.selectAll("path.pattern-segment").classed("selectable", false)
+			.on("click", null);
+			assembleSvgOptimizeLabel.text("Select points to vary during optimization.");
+			assembleOptimizeCanvas.selectAll(".pattern-segment-endpoint").remove();
+			var selectedSegmentObjects = _.map(selectedSegments, function(seg) {
+				seg.vertexRange = [seg.startIdx + seg.curRange[0].idx, seg.startIdx + seg.curRange[1].idx];
+				return makeSegment(seg);
+			});
+			drawPatternSegmentCustomPoints(selectedSegmentObjects);
+			bindToNextBtn(function() {
+				d3.selectAll(".pattern-segment.selected")
+				.classed("pattern-segment selected", false)
+				.classed("pattern-segment-fixed", true);
+				d3.selectAll(".pattern-segment-fixable-point")
+				.classed("clickable", false)
+				.on("click", null)
+				.filter(function(d) { return d.fix; })
+				.remove();
+
+				exitConstraintSelection();
+				var constructor = constraintSpec.constructor;
+				optimizationConstraints.push(constructor(selectedSegmentObjects));
+				redrawConstraintList();
+				bindToNextBtn(null);
+			});
 		});
 		assembleOptimizeCanvas.selectAll(".pattern-segment")
-		.on("click", patternSelectHandler(selectedSegments));
+		.on("click", patternSelectHandler(selectedSegments, constraintSpec.numSegments));
 	};
 };
 
 var exitConstraintSelection = function() {
-	assembleOptimizeCanvas.selectAll(".pattern-segment, .pattern-segment-handle").remove();
+	assembleOptimizeCanvas.selectAll(".pattern-segment, .pattern-segment-endpoint").remove();
 	d3.select(".svg-instruction-bar").classed("hidden", true);
 	d3.selectAll(".constraint-btns .btn").classed("disabled", false);
 };
@@ -619,25 +706,27 @@ var exitConstraintSelection = function() {
 var optimizationConstraints = [];
 
 var highlightNodes = function(nodes) {
-	d3.selectAll(".pattern-segment-fixed, .pattern-segment-handle-fixed")
-	.classed("highlighted", true)
-	.classed("hidden", function(d) {
-		return !(_.find(nodes, function(n) {
-			return n === (d.this || d.seg.this);
+	d3.selectAll(".pattern-segment-fixed, .pattern-segment-fixable-point")
+	.classed("highlighted", function(d) {
+		return (_.find(nodes, function(n) {
+			return n === (d.this || d.seg.getNode);
 		}));
+	})
+	.classed("translucent-segment", function(d) {
+		return !d3.select(this).classed("highlighted");
 	});
 };
 
 var resetHighlightNodes = function() {
-	d3.selectAll(".pattern-segment-fixed, .pattern-segment-handle-fixed")
-	.classed("hidden highlighted", false);
+	d3.selectAll(".pattern-segment-fixed, .pattern-segment-fixable-point")
+	.classed("translucent-segment highlighted", false);
 };
 
 var deleteNodes = function(nodes) {
-	d3.selectAll(".pattern-segment-fixed, .pattern-segment-handle-fixed")
+	d3.selectAll(".pattern-segment-fixed, .pattern-segment-fixable-point")
 	.filter(function(d) {
 		return (_.find(nodes, function(n) {
-			return n === (d.this || d.seg.this);
+			return n === (d.this || d.seg.getNode);
 		}));
 	})
 	.remove();
@@ -709,9 +798,3 @@ var redrawConstraintList = function() {
 	.on("mouseout", resetHighlightNodes);
 
 };
-// stay in custom land first
-// make pattern update pipeline completely functional under customTemplates
-// get objective function
-
-
-// convert star / rosette / extended / hankin -> equivalent custom pattern

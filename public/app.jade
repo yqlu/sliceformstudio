@@ -44,20 +44,20 @@
 				.btn-group.padded-btn-group
 					span
 						b Add Constraint:
-				.btn-group.padded-btn-group
+				.btn-group.padded-btn-group.constraint-btns
 					a.btn.btn-primary#parallelConstraint Parallel
 					a.btn.btn-primary Perpendicular
-					a.btn.btn-primary Collinear
-					a.btn.btn-primary Equal length
+					a.btn.btn-primary#collinearConstraint Collinear
+					a.btn.btn-primary#equalLengthConstraint Equal length
 					.btn-group
 						a.btn.btn-primary.dropdown-toggle(data-toggle="dropdown") Others #[i.fa.fa-caret-down]
 						ul.dropdown-menu
 							li
-								a(href="#") Keep gradient constant
+								a(href="#") Hold gradient constant
 							li
-								a(href="#") Keep meeting angle constant
+								a(href="#") Hold meeting angle constant
 							li
-								a(href="#") Keep length constant
+								a(href="#") Hold length constant
 							li.divider
 							li
 								a(href="#") Meet at angle of ...
@@ -77,6 +77,11 @@
 					.btn-group.padded-btn-group
 						a.btn.btn-default.btn-sm(title="Zoom to fit")#traceZoomToFit #[i.fa.fa-fw.fa-arrows-alt]
 						a.btn.btn-default.btn-sm(title="Reset zoom level")#traceOrigZoom 1:1
+				.svg-instruction-bar#assembleSvgOptimizeBar.hidden
+					span.h4
+					.btn-group.pull-right.padded-btn-group
+						a.btn.btn-default(style="margin-right: 10px;")#cancelConstraintBtn Cancel
+						a.btn.btn-default#nextOptimizeBtn Next
 		div.pull-right
 			a.btn.btn-default#betaFeaturesBtn #[i.fa.fa-flask] Beta features
 	#traceTab.hidden

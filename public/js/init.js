@@ -112,12 +112,55 @@ var optimizeTable = optimizeTableFo
 	.attr("xmlns", "http://www.w3.org/1999/xhtml")
 	.append("div").classed("paletteTablePadded", true);
 
-optimizeTable.append("h4").text("blah blah blah");
+optimizeTable.append("h4").text("Your constraints");
+
+var optimizeBtnDiv = optimizeTable.append("div")
+	.style("text-align", "center")
+	.style("margin-bottom", "10px")
+	.style("display", "none");
+
+var optimizeBtn = optimizeBtnDiv
+	.append("a").attr("id", "optimizeBtn")
+	.classed("btn btn-default", true)
+	.text("Optimize!")
+	.on("click", function() {
+		createObjectives(optimizationConstraints).optimize();
+	});
+
+var deleteAllConstraintsBtn = optimizeTable.append("span")
+	.append("div")
+	.attr("id", "resetAllConstraints").style("display", "none")
+	.html("<a href='#' class='strip-table-x'><i class='fa fa-times'></i></a> Delete all constraints");
+
+deleteAllConstraintsBtn.select("a")
+	.on("click", deleteAllConstraints);
+
+var sidebarConstraintForm = optimizeTable
+	.append("form").classed("form-horizontal", true);
+
+var noConstraintsSoFar = optimizeTable
+	.append("div")
+	.attr("id", "noConstraintsSoFar")
+	.html("Any constraints you add will show up here!");
+
+var parallelConstraint = d3.select("#parallelConstraint")
+	.on("click", constraintHandler(enforceParallel));
+var collinearConstraint = d3.select("#collinearConstraint")
+	.on("click", constraintHandler(enforceCollinear));
+var equalLengthConstraint = d3.select("#equalLengthConstraint")
+	.on("click", constraintHandler(enforceEqualLength));
 
 var assembleSVGDrawer = svgDrawer(assemblePaletteContainer, assemblePaletteOptions);
 var assembleDraggableEdge = drawSvgDraggableEdge(assembleSvg);
 var assembleSvgDimensions = drawSvgDimensionLabel(assembleSvg);
+d3.select("#assembleSvgOptimizeBar")
+	.style("left", config.stripTableWidth + "px")
+	.style("width", (assembleSvg.node().parentNode.clientWidth - config.stripTableWidth - 2) + "px");
 
+var assembleSvgOptimizeLabel = d3.select("#assembleSvgOptimizeBar .h4");
+var nextOptimizeBtn = d3.select("#nextOptimizeBtn");
+var cancelConstraintBtn = d3.select("#cancelConstraintBtn")
+.on("click", exitConstraintSelection);
 var traceSvg = buildSvg("#traceSvg", config.standardWidth, config.standardHeight);
 var traceBg = buildBg(traceSvg, true, true, commonZoomHandler);
 var traceCanvas = buildDisplay(traceSvg, assembleCanvas.datum().transform, true); // ensure they zoom the same amount

@@ -250,7 +250,6 @@ var zoomBehavior = function(d, i) {
 	var canvas = this.tagName === "rect" ?
 		d3.select(this.parentNode).selectAll(".canvas") :
 		d3.select(this.parentNode.parentNode);
-	console.log(canvas, this, d3.select(this).classed("svg-background"));
 	canvas.each(function(d) {
 		d.transform = num.matrixRound(num.translateBy(num.scaleBy(num.id, d3.event.scale), d3.event.translate[0], d3.event.translate[1]));
 	})
@@ -259,7 +258,6 @@ var zoomBehavior = function(d, i) {
 
 // zoom handler for tiles
 var zoomTileBehavior = function(d, i) {
-	console.log(this, this.parentNode.parentNode, d3.select(this.parentNode.parentNode).selectAll(".canvas"));
 	d3.select(this.parentNode.parentNode).each(function(d) {
 		d.transform = num.matrixRound(num.translateBy(num.scaleBy(num.id, d3.event.scale), d3.event.translate[0], d3.event.translate[1]));
 	})
@@ -916,10 +914,6 @@ var optimizeDesignClick = function() {
 	.style("left", (config.stripTableWidth + 5) + "px");
 
 	setupOptimizeOverlay();
-
-	// TODO:
-	// d3.select("#assembleSvgContainer").select(".shadedOverlay").style("visibility",
-	// 	(polylist.length === 0) ? "visible" : "hidden");
 };
 
 var exitOptimizeView = function() {
@@ -927,11 +921,16 @@ var exitOptimizeView = function() {
 	d3.select("#tileViewMenu").classed("hidden", false);
 	d3.select("#optimizeViewMenu").classed("hidden", true);
 
+	exitConstraintSelection();
+	deleteAllConstraints();
+
 	var paletteWidth = parseInt(assembleSvg.select(".palette-background").attr("width"),10);
 
 	assembleCanvas.classed("bg optimize-bg", false);
 	assemblePaletteContainer.style("display", "block");
 	assemblePaletteButtons.style("display", "block");
+	assembleSVGDrawer.draw();
+
 	optimizeTableFo.style("display", "none");
 	assemblePalette.each(function(d) {
 		d.transform = num.translate(paletteWidth / 2, 0);

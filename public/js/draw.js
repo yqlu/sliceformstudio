@@ -278,7 +278,7 @@ var draw = function(container, inputlist, options) {
 		});
 	});
 
-	if (options.autoresizeSidebar) {
+	if (options.autoresizeSidebar && container.style("display") !== "none") {
 
 		var newWidth = 0;
 		var scaleFactor = 1;
@@ -419,11 +419,31 @@ var drawSvgDraggableEdge = function(svg) {
 	return edge;
 };
 
+var drawSvgLabel = function(x, y) {
+	return function(svg) {
+		return svg.append("text")
+		.attr("x", x())
+		.attr("y", y())
+		.attr("text-anchor", "end")
+		.text("");
+	};
+};
+
 var drawSvgDimensionLabel = function(svg) {
 	return svg.append("text")
-	.attr("x", assembleSvg.node().getBBox().width - 20)
+	.attr("x", assembleSvg.node().clientWidth - 20)
 	.attr("y", config.standardHeight - 20)
 	.attr("text-anchor", "end")
+	.text("");
+};
+
+var drawSvgInstructionsLabel = function(svg) {
+	return svg.append("text")
+	.attr("x", config.stripTableWidth + 20)
+	.attr("y", 35)
+	.attr("text-anchor", "start")
+	.attr("font-weight", "bold")
+	.attr("font-size", 24)
 	.text("");
 };
 

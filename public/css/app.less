@@ -98,6 +98,20 @@ margin-top: -72px;
   position: absolute;
   bottom: 20px;
 }
+.svg-instruction-bar {
+  position: absolute;
+  top: 10px;
+  background: rgba(255,255,255,0.6);
+}
+.svg-instruction-bar .h4 {
+  position: absolute;
+  top: -2px;
+  left: 20px;
+}
+.svg-instruction-bar .btn.pull-right {
+  margin-right: 8px;
+}
+
 #traceSvgToolbar {
   left: 310px;
 }
@@ -303,16 +317,49 @@ g.active.patternHelper path.patternHelperLine {
 circle.vertex.selectedGroup {
   fill: #2ebcfc;
 }
-path.pattern-segment {
-  stroke: #999999;
+path.pattern-segment, path.pattern-segment-fixed {
   stroke-width: 10px;
-  opacity: 0;
   stroke-linecap: round;
 }
-path.pattern-segment:hover {
+path.pattern-segment {
+  stroke: #999999;
+  opacity: 0;
+}
+path.pattern-segment-fixed {
+  stroke: #87CEFA;
+}
+path.pattern-segment.selectable {
+  cursor: pointer;
+}
+path.pattern-segment.selectable:hover {
   opacity: 0.8;
 }
-
+path.pattern-segment.selected, path.pattern-segment-fixed.highlighted {
+  stroke: blue;
+  opacity: 0.8;
+}
+path.pattern-segment.selected.selectable:hover {
+  stroke: red;
+  opacity: 0.8;
+}
+circle.pattern-segment-handle.clickable {
+  cursor: pointer;
+}
+circle.pattern-segment-handle, circle.pattern-segment-handle-fixed.highlighted {
+  fill: black;
+}
+circle.pattern-segment-handle.selected, circle.pattern-segment-handle-fixed.highlighted.selected{
+  fill: red;
+}
+circle.pattern-segment-handle-fixed.selected {
+  fill: pink;
+}
+circle.pattern-segment-handle-fixed {
+  fill: grey;
+}
+.inline-title {
+  display: inline-block;
+}
 .toolbar {
   margin-bottom: 10px;
 }

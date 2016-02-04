@@ -37,6 +37,7 @@
     "html.sortable": "~0.3.1",
     "selectize": "~0.12.1",
     "optimization-js": "https://github.com/iaroslav-ai/optimization-js.git",
-    "js-lru": "https://github.com/rsms/js-lru.git"
+    "js-lru": "https://github.com/rsms/js-lru.git",
+    "bfgs-numericjs": "https://github.com/croquelois/bfgs-numericjs.git"
   }
 }

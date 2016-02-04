@@ -57,6 +57,40 @@ function memoize(fnc) {
 	};
 }
 
+var gradient_descent = function(x0, f, df, eps) {
+	var optimizeAlongLine = function(x0, f, d, eps) {
+		eps = eps * 0.1;
+		var unitD = num.normalize(d);
+		var transformedF = function(scalarX) {
+			var x = num.vecSum(x0, num.vecProd(unitD, scalarX));
+			return f(x);
+		};
+		var memoizedTransformedF = memoize(transformedF);
+		var interval = bracket(memoizedTransformedF, 0, eps);
+		var optValue = goldsec(interval, memoizedTransformedF, eps);
+		return num.vecSum(x0, num.vecProd(unitD, optValue));
+	};
+
+	var n = x0.length;
+	var x = x0.slice(0);
+	var delta = df(x);
+	var dir;
+	var ctr = 0;
+	var prev_x;
+
+	while (num.norm2(delta) >= eps && ctr <= 10) {
+		dir = num.normalize(delta);
+		prev_x = x;
+		x = optimizeAlongLine(x, f, dir, eps);
+		delta = df(x);
+		if (num.norm2(num.vecSub(prev_x, x)) < eps) {
+			break;
+		}
+		ctr += 1;
+	}
+	return x;
+};
+
 var powell = function(x0, f, eps) {
 	var mf = memoize(f);
 	var n = x0.length;

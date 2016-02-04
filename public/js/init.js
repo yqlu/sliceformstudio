@@ -113,26 +113,33 @@ var optimizeTable = optimizeTableFo
 	.append("div").classed("paletteTablePadded", true);
 
 optimizeTable.append("h4").text("Your constraints");
+var totalObjectiveLabel = optimizeTable.append("small").text("");
 
 var optimizeBtnDiv = optimizeTable.append("div")
 	.style("text-align", "center")
+	.style("margin-top", "20px")
 	.style("margin-bottom", "10px")
 	.style("display", "none");
 
 var optimizeBtn = optimizeBtnDiv
 	.append("a").attr("id", "optimizeBtn")
-	.classed("btn btn-default", true)
+	.classed("btn btn-primary", true)
+	.style("margin-right", "20px")
 	.text("Optimize!")
 	.on("click", function() {
-		createObjectives(optimizationConstraints).optimize();
+		d3.select(".loading-overlay").classed("in", true);
+		createObjectives(optimizationConstraints).optimize()
+		.then(function(val) {
+			d3.select(".loading-overlay").classed("in", false);
+
+			console.log(val);
+		});
 	});
 
-var deleteAllConstraintsBtn = optimizeTable.append("span")
-	.append("div")
-	.attr("id", "resetAllConstraints").style("display", "none")
-	.html("<a href='#' class='strip-table-x'><i class='fa fa-times'></i></a> Delete all constraints");
-
-deleteAllConstraintsBtn.select("a")
+var deleteAllConstraintsBtn = optimizeBtnDiv
+	.append("a").attr("id", "resetAllConstraints")
+	.classed("btn btn-default", true)
+	.text("Reset")
 	.on("click", deleteAllConstraints);
 
 var sidebarConstraintForm = optimizeTable

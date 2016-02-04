@@ -176,6 +176,8 @@ var enforceConstructor = function(options) {
 				evaluate: evaluateFn,
 				segments: segments,
 				displayName: options.displayName,
+				evaluateCache: [],
+				cached: false
 			};
 		}
 	};
@@ -236,13 +238,22 @@ var enforceCollinear = enforceConstructor({
 			var n5 = num.norm2(v5);
 			var n6 = num.norm2(v6);
 
-			var angles = _.map([[v1,v3,n1,n3], [v1,v4,n1,n4], [v1,v5,n1,n5], [v1,v6,n1,n6],
-				[v2,v3,n2,n3], [v2,v4,n2,n4], [v2,v5,n2,n5], [v2,v6,n2,n6]], function(params) {
+			var pairs;
+			if (seg1.getInterface().length === 0) {
+				pairs = [[v1,v3,n1,n3], [v1,v4,n1,n4], [v1,v5,n1,n5], [v1,v6,n1,n6]];
+			} else if (seg2.getInterface().length === 0) {
+				pairs = [[v2,v3,n2,n3], [v2,v4,n2,n4], [v2,v5,n2,n5], [v2,v6,n2,n6]];
+			} else {
+				pairs = [[v1,v3,n1,n3], [v1,v4,n1,n4], [v1,v5,n1,n5], [v1,v6,n1,n6],
+					[v2,v3,n2,n3], [v2,v4,n2,n4], [v2,v5,n2,n5], [v2,v6,n2,n6]];
+			}
+
+			var angles = _.map(pairs, function(params) {
 				var cosOfAngle = num.dot(params[0], params[1]) / (params[2] * params[3]);
 				return Math.acos(Math.abs(cosOfAngle)) * 180 / Math.PI;
 			});
 
-			return _.sum(angles);
+			return _.sum(angles) / pairs.length;
 		};
 	},
 	displayName: "Collinear",
@@ -302,31 +313,65 @@ var createObjectives = function(objectives) {
 
 		var numIterations = 0;
 		var fnc = function(vector) {
-			return updateCustomTemplates(vector, customInterface, evaluate);
+			var f = updateCustomTemplates(vector, customInterface, evaluate);
+			return f;
 		};
 
-		result = powell(initialVector, fnc, 0.01);
+		var dfnc = function(precision) {
+			return function(vector) {
+				var n = vector.length;
+				var dfvec = _.map(_.range(n), function(i) {
+					var diff = [];
+					_.each(_.range(n), function(j) {
+						if (i === j) {
+							diff.push(precision);
+						} else {
+							diff.push(0);
+						}
+					});
+					var v1 = num.vecSum(vector, diff);
+					var v2 = num.vecSub(vector, diff);
+					var fv1 = fnc(v1);
+					var fv2 = fnc(v2);
+					var df = (fnc(v1) - fnc(v2)) / (2 * precision);
+					return df;
+				});
+				return dfvec;
+			};
+		};
 
-		assembleSVGDrawer.draw();
-		var tilesInCanvas = assembleCanvas.selectAll("g.tile");
+		var optimizer = this;
+		return new Promise(function(resolve, reject) {
+			result = gradient_descent(initialVector, fnc, dfnc(0.001), 0.01);
+			console.log(result);
+			result = powell(initialVector, fnc, 0.01);
+			// result = bfgs(initialVector, {f:fnc, df: dfnc(0.0001)}, 1000, 0.1, {maxTry: 50});
+			// result = numeric.uncmin(fnc, initialVector);
 
-		tilesInCanvas.each(function(d, i) {
-			var modelTile = _.find(assembleSVGDrawer.get(), function(t) {
-				return t.polygonID === d.polygonID;
+			assembleSVGDrawer.draw();
+			var tilesInCanvas = assembleCanvas.selectAll("g.tile");
+
+			tilesInCanvas.each(function(d, i) {
+				var modelTile = _.find(assembleSVGDrawer.get(), function(t) {
+					return t.polygonID === d.polygonID;
+				});
+				d3.select(this).selectAll("path.pattern").remove();
+				d.customTemplate = _.cloneDeep(modelTile.customTemplate);
+				d.patternParams = _.cloneDeep(modelTile.patternParams);
+				var patternFn = patternOptions[d.patternParams.index].generator(d, d.patternParams.param1, d.patternParams.param2);
+				polygonAddPattern(d, makePatterns(patternFn));
+				polygonAddPatternMetadata(d);
+				drawPatterns(d3.select(this), {});
 			});
-			d3.select(this).selectAll("path.pattern").remove();
-			d.customTemplate = _.cloneDeep(modelTile.customTemplate);
-			d.patternParams = _.cloneDeep(modelTile.patternParams);
-			var patternFn = patternOptions[d.patternParams.index].generator(d, d.patternParams.param1, d.patternParams.param2);
-			polygonAddPattern(d, makePatterns(patternFn));
-			polygonAddPatternMetadata(d);
-			drawPatterns(d3.select(this), {});
+
+			invalidateStripCache();
+			_.each(objectives, function(o) {
+				o.cached = false;
+			});
+			optimizer.draw();
+			redrawConstraintList();
+			resolve(result);
 		});
-
-		invalidateStripCache();
-		this.draw();
-
-		return result;
 	};
 
 	var draw = function() {
@@ -396,9 +441,9 @@ var updateCustomTemplates = function(vector, customInterface, evaluator) {
 			return true;
 		} else if (_.all(tile.patterns, function(p, idx) {
 			var newIntersectData = _.pluck(p.intersectedVertices, "intersect");
-			var eq = _.isEqual(newIntersectData,
+			var intersectDataPreserved = _.isEqual(newIntersectData,
 				intersectedVertexInterfaces[tile.polygonID].vertexInterface[idx]);
-			return eq;
+			return intersectDataPreserved;
 		})) {
 			assembleSVGDrawer.replace(tile);
 			return true;
@@ -687,6 +732,10 @@ var constraintHandler = function(constraintSpec) {
 				exitConstraintSelection();
 				var constructor = constraintSpec.constructor;
 				optimizationConstraints.push(constructor(selectedSegmentObjects));
+				_.each(optimizationConstraints, function(o) {
+					// reset cache to only one element
+					o.evaluateCache.splice(0, o.evaluateCache.length - 1);
+				});
 				redrawConstraintList();
 				bindToNextBtn(null);
 			});
@@ -750,13 +799,12 @@ var redrawConstraintList = function() {
 	sidebarConstraintForm.selectAll(".constraint-row").remove();
 	if (optimizationConstraints.length === 0) {
 		optimizeBtnDiv.style("display", "none");
-		deleteAllConstraintsBtn.style("display", "none");
 		noConstraintsSoFar.style("display", "block");
+		totalObjectiveLabel.text("");
 		return;
 	}
 	// implicit else
 	optimizeBtnDiv.style("display", "block");
-	deleteAllConstraintsBtn.style("display", "block");
 	noConstraintsSoFar.style("display", "none");
 	var ctr = (function() {
 		var num = 0;
@@ -765,10 +813,41 @@ var redrawConstraintList = function() {
 			return num;
 		};
 	})();
+
+	_.each(optimizationConstraints, function(d) {
+		if (!d.cached) {
+			d.evaluateCache.push(d.evaluate());
+			if (d.evaluateCache.length > 2) {
+				d.evaluateCache.splice(0, d.evaluateCache.length - 2);
+			}
+			d.cached = true;
+		}
+	});
+
+	totalObjectiveLabel.text(function() {
+		var value = "";
+		var indices = (_.all(optimizationConstraints, function(d) {
+			return d.evaluateCache.length === 2;
+		})) ? [0,1] : [0];
+		return "Total objective value: " + _.map(indices, function(i) {
+			return parseFloat((_.sum(_.map(optimizationConstraints, function(o) {
+				return o.evaluateCache[i];
+			}))).toPrecision(3));
+		}).join("→");
+	});
+
 	var listRows = sidebarConstraintForm.selectAll(".constraint-row").data(optimizationConstraints)
 	.enter()
 	.append("div").classed("constraint-row", true)
-	.html(function(d) { return "<a class='strip-table-x' href='#'><i class='fa fa-times'></i></a> <h5 class='inline-title'>" + d.displayName + "</h5> (<span class='segments'></span>)"; });
+	.html(function(d) { return "<a class='strip-table-x' href='#'><i class='fa fa-times'></i></a> <h5 class='inline-title'>" + d.displayName + "</h5> (<span class='segments'></span>)<div class='objectiveLabel small'></div>"; });
+
+	listRows.selectAll(".objectiveLabel")
+	.html(function() {
+		var d = this.parentNode.__data__;
+		return "Objective value: " + _.map(d.evaluateCache, function(n) {
+			return parseFloat(n.toPrecision(3));
+		}).join("→");
+	});
 
 	listRows.select(".strip-table-x")
 	.on("click", function(d, i) {

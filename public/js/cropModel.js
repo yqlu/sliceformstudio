@@ -99,29 +99,6 @@ var insideBbox = function(bboxCorners, line) {
 			(bboxCorners[0].y < line[1][1] && line[1][1] < bboxCorners[2].y);
 };
 
-var generateInRegionPredicate = function(transform) {
-
-	var vs = num.matrixToCoords(num.dot(transform, num.coordsToMatrix(_.map(cropData.hull, function(v) {
-		return [v.x, v.y];
-	}))));
-
-	return function(point) {
-		var x = point[0], y = point[1];
-
-		var inside = false;
-		for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-			var xi = vs[i][0], yi = vs[i][1];
-			var xj = vs[j][0], yj = vs[j][1];
-
-			var intersect = ((yi > y) != (yj > y)) &&
-				(x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-			if (intersect) inside = !inside;
-		}
-
-		return inside;
-	};
-};
-
 var generateDummyEdge = function(dummyEdges, bboxCorners, bboxEdges, lineSegment) {
 
 	if (_.any(bboxEdges, function(edge) {
@@ -198,7 +175,7 @@ var cropPattern = function(tile, parentGroup) {
 		e.index = tile.edges.length + i;
 	});
 
-	var inRegion = generateInRegionPredicate(invTransform);
+	var inRegion = generateInRegionPredicate(cropData.hull, invTransform);
 
 	if (dummyEdges.length > 0) {
 		// for each pattern, crop with thresholds as necessary

@@ -342,11 +342,9 @@ var createObjectives = function(objectives) {
 
 		var optimizer = this;
 		return new Promise(function(resolve, reject) {
-			result = gradient_descent(initialVector, fnc, dfnc(0.001), 0.01);
-			console.log(result);
+			console.time("powell");
 			result = powell(initialVector, fnc, 0.01);
-			// result = bfgs(initialVector, {f:fnc, df: dfnc(0.0001)}, 1000, 0.1, {maxTry: 50});
-			// result = numeric.uncmin(fnc, initialVector);
+			console.timeEnd("powell");
 
 			assembleSVGDrawer.draw();
 			var tilesInCanvas = assembleCanvas.selectAll("g.tile");
@@ -469,17 +467,51 @@ var getRepulsionForce = function(tile) {
 			return !iv.intersect;
 		});
 	}));
-	var force = 0;
-	var factor = 100000;
+	var vertexRepulsion = 0;
+	var factor = 50000;
 	var exponent = -8;
 	for (var i = 0; i < interiorVertices.length; i++) {
 		for (var j = i + 1; j < interiorVertices.length; j++) {
 			var displacement = num.norm2(num.vectorFromEnds(
 				[interiorVertices[i].coords, interiorVertices[j].coords]));
-			force += factor * Math.pow(displacement, exponent);
+			vertexRepulsion += factor * Math.pow(displacement, exponent);
 		}
 	}
-	return force;
+
+	var vertexOutOfPolygonForce = 0;
+	if (tile.customTemplate) {
+		var inTilePredicate = generateInRegionPredicate(tile.vertices, num.id);
+
+		var interiorTemplateVertices = _.flatten(_.map(tile.customTemplate, function(ct) {
+			return _.map(ct.points, function(p) {
+				return {
+					coords: num.getTranslation(p.transform),
+					occurences: ct.applicableEdges.length
+				};
+			});
+		}));
+
+		// assumes that custom template is actually symmetrical
+		vertexOutOfPolygonForce = _.sum(_.map(interiorTemplateVertices, function(v) {
+			var distFromEdges = _.map(tile.edges, function(e) {
+				return num.distFromPtToLineSquared(v.coords, e.ends);
+			});
+			var distFromEdge = Math.min.apply(Math, distFromEdges);
+			var inPoly = inTilePredicate(v.coords);
+			var f = 0;
+			if (inPoly && distFromEdge < 5) {
+				// linear from 0 to 1
+				f = 1 - distFromEdge / 5;
+			} else if (!inPoly) {
+				// quadratic increase
+				f = 1 + Math.pow(distFromEdge, 2);
+			}
+
+			return f * v.occurences;
+		}));
+	}
+
+	return vertexRepulsion + vertexOutOfPolygonForce;
 };
 
 var setupOptimizeOverlay = function() {

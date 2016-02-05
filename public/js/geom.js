@@ -10,6 +10,7 @@ var num = {
 	dot: numeric.dot,
 	det: numeric.det,
 	norm2: numeric.norm2,
+	norm2Squared: numeric.norm2Squared,
 	id: (function() {
 		return [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
 	})(),
@@ -131,6 +132,18 @@ var num = {
 	},
 	polarToRect: function(r, theta) {
 		return [r * Math.cos(theta), r * Math.sin(theta)];
+	},
+	distFromPtToLineSquared: function(pt, lineEndpts) {
+		var l2 = num.norm2Squared(num.vectorFromEnds(lineEndpts));
+		if (l2 === 0) {
+			return num.norm2(num.vecSub(pt, lineEndpts[0]));
+		}
+		var v = lineEndpts[0];
+		var w = lineEndpts[1];
+		var t = ((pt[0] - v[0]) * (w[0] - v[0]) + (pt[1] - v[1]) * (w[1] - v[1])) / l2;
+		if (t < 0) return num.norm2(num.vecSub(pt, v));
+		if (t > 1) return num.norm2(num.vecSub(pt, w));
+		return num.norm2(num.vecSub(pt, [v[0] + t * (w[0] - v[0]), v[1] + t * (w[1] - v[1])]));
 	}
 };
 
@@ -301,7 +314,7 @@ var computeStripBbox = function(strips) {
 	}
 
 	return canvasBbox;
-}
+};
 
 // some math to ensure after transfer from palette to canvas
 // tiles stay in same position under the mouse but is appropriately scaled
@@ -314,4 +327,27 @@ var translateWithoutScale = function(group) {
 	var equivTrans = num.translate(num.vecDiv(num.vecSub(absTrans, canvasTrans), canvasFactor));
 
 	return num.dot(equivTrans, num.dot(num.getRotation(absCoords), num.scale(1 / paletteFactor)));
+};
+
+var generateInRegionPredicate = function(hull, transform) {
+
+	var vs = num.matrixToCoords(num.dot(transform, num.coordsToMatrix(_.map(hull, function(v) {
+		return [v.x, v.y];
+	}))));
+
+	return function(point) {
+		var x = point[0], y = point[1];
+
+		var inside = false;
+		for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+			var xi = vs[i][0], yi = vs[i][1];
+			var xj = vs[j][0], yj = vs[j][1];
+
+			var intersect = ((yi > y) != (yj > y)) &&
+				(x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+			if (intersect) inside = !inside;
+		}
+
+		return inside;
+	};
 };

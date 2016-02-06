@@ -124,14 +124,11 @@ var optimizeBtnDiv = optimizeTable.append("div")
 var optimizeBtn = optimizeBtnDiv
 	.append("a").attr("id", "optimizeBtn")
 	.classed("btn btn-primary", true)
-	.style("margin-right", "20px")
+	.style("margin-right", "10px")
 	.text("Optimize!")
 	.on("click", function() {
-		d3.select(".loading-overlay").classed("in", true);
 		createObjectives(optimizationConstraints).optimize()
 		.then(function(val) {
-			d3.select(".loading-overlay").classed("in", false);
-
 			console.log(val);
 		});
 	});
@@ -139,7 +136,7 @@ var optimizeBtn = optimizeBtnDiv
 var deleteAllConstraintsBtn = optimizeBtnDiv
 	.append("a").attr("id", "resetAllConstraints")
 	.classed("btn btn-default", true)
-	.text("Reset")
+	.text("Reset all")
 	.on("click", deleteAllConstraints);
 
 var sidebarConstraintForm = optimizeTable

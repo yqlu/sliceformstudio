@@ -512,32 +512,17 @@ var createObjectives = function(objectives) {
 		var optimizer = this;
 		return new Promise(function(resolve, reject) {
 			console.time("powell");
-			result = powell(initialVector, fnc, 0.01);
-			console.timeEnd("powell");
-
-			assembleSVGDrawer.draw();
-			var tilesInCanvas = assembleCanvas.selectAll("g.tile");
-
-			tilesInCanvas.each(function(d, i) {
-				var modelTile = _.find(assembleSVGDrawer.get(), function(t) {
-					return t.polygonID === d.polygonID;
+			powell(initialVector, fnc, 0.01, function(result) {
+				console.timeEnd("powell");
+				redrawTiles();
+				invalidateStripCache();
+				_.each(objectives, function(o) {
+					o.cached = false;
 				});
-				d3.select(this).selectAll("path.pattern").remove();
-				d.customTemplate = _.cloneDeep(modelTile.customTemplate);
-				d.patternParams = _.cloneDeep(modelTile.patternParams);
-				var patternFn = patternOptions[d.patternParams.index].generator(d, d.patternParams.param1, d.patternParams.param2);
-				polygonAddPattern(d, makePatterns(patternFn));
-				polygonAddPatternMetadata(d);
-				drawPatterns(d3.select(this), {});
+				optimizer.draw();
+				redrawConstraintList();
+				resolve(result);
 			});
-
-			invalidateStripCache();
-			_.each(objectives, function(o) {
-				o.cached = false;
-			});
-			optimizer.draw();
-			redrawConstraintList();
-			resolve(result);
 		});
 	};
 
@@ -563,6 +548,24 @@ var createObjectives = function(objectives) {
 		optimize: optimize,
 		draw: draw
 	};
+};
+
+var redrawTiles = function() {
+	assembleSVGDrawer.draw();
+
+	var tilesInCanvas = assembleCanvas.selectAll("g.tile");
+	tilesInCanvas.each(function(d, i) {
+		var modelTile = _.find(assembleSVGDrawer.get(), function(t) {
+			return t.polygonID === d.polygonID;
+		});
+		d3.select(this).selectAll("path.pattern").remove();
+		d.customTemplate = _.cloneDeep(modelTile.customTemplate);
+		d.patternParams = _.cloneDeep(modelTile.patternParams);
+		var patternFn = patternOptions[d.patternParams.index].generator(d, d.patternParams.param1, d.patternParams.param2);
+		polygonAddPattern(d, makePatterns(patternFn));
+		polygonAddPatternMetadata(d);
+		drawPatterns(d3.select(this), {});
+	});
 };
 
 
@@ -923,13 +926,15 @@ var finishSelection = function(constraintSpec, selectedSegmentObjects) {
 var constraintHandler = function(constraintSpec) {
 	return function() {
 		setupOptimizeOverlay();
-		d3.select("#nextOptimizeBtn").text("Next");
+		d3.select("#nextOptimizeBtn").text("Next").classed("disabled", true);
 		d3.select(".svg-instruction-bar").classed("hidden", false);
-		d3.selectAll(".constraint-btns .btn").classed("disabled", true);
+		d3.selectAll(".constraint-btns .btn")
+		.classed("btn-primary", false)
+		.classed("disabled btn-default", true);
 		d3.selectAll("path.pattern-segment").classed("selectable", true);
 		assembleSvgOptimizeLabel.text(constraintSpec.instructionText);
 		var selectedSegments = [];
-		$("#nextOptimizeBtnGroup").tooltip({
+		$("#nextOptimizeBtnGroup").tooltip('destroy').tooltip({
 			placement: "bottom",
 			title: "Select the required number of segments first."});
 		assembleOptimizeCanvas.selectAll(".pattern-segment")
@@ -960,7 +965,9 @@ var constraintHandler = function(constraintSpec) {
 var exitConstraintSelection = function() {
 	assembleOptimizeCanvas.selectAll(".pattern-segment, .pattern-segment-endpoint, .pattern-segment-fixable-point.clickable").remove();
 	d3.select(".svg-instruction-bar").classed("hidden", true);
-	d3.selectAll(".constraint-btns .btn").classed("disabled", false);
+	d3.selectAll(".constraint-btns .btn")
+	.classed("btn-primary", true)
+	.classed("disabled btn-default", false);
 };
 
 
@@ -1008,8 +1015,6 @@ var deleteAllConstraints = function() {
 };
 
 var updateObjectiveValues = function() {
-	console.log("UPDATING");
-
 	_.each(optimizationConstraints, function(d) {
 		if (!d.cached) {
 			d.evaluateCache.push(d.evaluate());
@@ -1069,7 +1074,8 @@ var redrawConstraintList = function() {
 		var displayName = "<h5 class='inline-title'>" + d.displayName + inputParams + "</h5>";
 		var segmentList = "(<span class='segments'></span>)";
 		var objective = "<div class='objectiveLabel small'></div>";
-		return deleteX + " " + displayName + " " + segmentList + objective;
+		var scaleFactor = "<div class='scaleLabel small'>Scaling factor: <input type='text' class='constraintScale'> x</div>";
+		return deleteX + " " + displayName + " " + segmentList + objective + scaleFactor;
 	}).each(function(d) {
 		if (d.withInput) {
 			d3.select(this).select(".constraintParam")

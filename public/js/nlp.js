@@ -91,52 +91,60 @@ var gradient_descent = function(x0, f, df, eps) {
 	return x;
 };
 
-var powell = function(x0, f, eps) {
-	var mf = memoize(f);
-	var n = x0.length;
-	var directions = _.map(_.range(n), function(i) {
-		var zeros = _.times(n, function() { return 0; });
-		zeros[i] = 1;
-		return zeros;
-	});
-	// xs[k][i] is value of x after k iterations and the i^th coordinated updated
-	var new_xs = [x0];
-	var all_xs = [new_xs];
-	var d, di;
+var powell = function(x0, f, eps, callback) {
+	return new Promise(function(resolve, reject) {
+		var mf = memoize(f);
+		var n = x0.length;
+		var directions = _.map(_.range(n), function(i) {
+			var zeros = _.times(n, function() { return 0; });
+			zeros[i] = 1;
+			return zeros;
+		});
+		// xs[k][i] is value of x after k iterations and the i^th coordinated updated
+		var new_xs = [x0];
+		var all_xs = [new_xs];
+		var d, di;
 
-	var optimizeAlongLine = function(x0, f, d, eps) {
-		eps = eps * 0.1;
-		var unitD = num.normalize(d);
-		var transformedF = function(scalarX) {
-			var x = num.vecSum(x0, num.vecProd(unitD, scalarX));
-			return f(x);
+		var optimizeAlongLine = function(x0, f, d, eps) {
+			eps = eps * 0.1;
+			var unitD = num.normalize(d);
+			var transformedF = function(scalarX) {
+				var x = num.vecSum(x0, num.vecProd(unitD, scalarX));
+				return f(x);
+			};
+			var memoizedTransformedF = memoize(transformedF);
+			var interval = bracket(memoizedTransformedF, 0, eps);
+			var optValue = goldsec(interval, memoizedTransformedF, eps);
+			return num.vecSum(x0, num.vecProd(unitD, optValue));
 		};
-		var memoizedTransformedF = memoize(transformedF);
-		var interval = bracket(memoizedTransformedF, 0, eps);
-		var optValue = goldsec(interval, memoizedTransformedF, eps);
-		return num.vecSum(x0, num.vecProd(unitD, optValue));
-	};
 
-	var ctr = 0;
+		var ctr = 0;
 
-	do {
-		ctr ++;
-		for (var i = 0; i < n; i++) {
-			di = directions[i];
-			new_xs.splice(0, 0, optimizeAlongLine(new_xs[0], f, di, eps));
-		}
-		d = num.vecSub(new_xs[0], new_xs[new_xs.length - 1]);
-		if (num.norm2(d) < eps) {
-			break;
-		}
-		new_xs = [optimizeAlongLine(new_xs[0], f, d, eps)];
-		all_xs.splice(0, 0, new_xs);
-		directions.splice(0, 1);
-		directions.push(d);
-		if (ctr > 10) {
-			break;
-		}
-		console.log(mf(all_xs[0][0]), all_xs[0][0]);
-	} while (Math.abs(mf(all_xs[0][0]) - mf(all_xs[1][0])) >= eps);
-	return all_xs[0][0];
+		var loopIteration = function() {
+			ctr ++;
+			for (var i = 0; i < n; i++) {
+				di = directions[i];
+				new_xs.splice(0, 0, optimizeAlongLine(new_xs[0], f, di, eps));
+			}
+			d = num.vecSub(new_xs[0], new_xs[new_xs.length - 1]);
+			if (num.norm2(d) < eps) {
+				// break
+				callback(all_xs[0][0]);
+			} else {
+				new_xs = [optimizeAlongLine(new_xs[0], f, d, eps)];
+				all_xs.splice(0, 0, new_xs);
+				directions.splice(0, 1);
+				directions.push(d);
+				console.log(mf(all_xs[0][0]), all_xs[0][0]);
+				if (Math.abs(mf(all_xs[0][0]) - mf(all_xs[1][0])) >= eps) {
+					// call loop iteration again
+					window.setTimeout(loopIteration, 0);
+				} else {
+					// break
+					callback(all_xs[0][0]);
+				}
+			}
+		};
+		loopIteration();
+	});
 };

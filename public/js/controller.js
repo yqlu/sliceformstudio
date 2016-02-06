@@ -640,12 +640,12 @@ var editSpecificPattern = function(tiles) {
 			$("#patternDropdown").trigger("change");
 			patternSlider1.setValue(params.param1);
 			patternSlider2.setValue(params.param2);
+			patternEditSVGDrawer.draw();
 		} else {
 			var defaultOption = isRegular ? "0" : "3";
 			patternSelectize.setValue(defaultOption);
 			$("#patternDropdown").trigger("change");
 		}
-		patternEditSVGDrawer.draw();
 
 		var optionMouseenter = function(e){
 			var motif = _.find(patternOptions, function(o) {

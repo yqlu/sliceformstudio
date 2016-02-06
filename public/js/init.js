@@ -158,6 +158,24 @@ var collinearConstraint = d3.select("#collinearConstraint")
 	.on("click", constraintHandler(enforceCollinear));
 var equalLengthConstraint = d3.select("#equalLengthConstraint")
 	.on("click", constraintHandler(enforceEqualLength));
+var bisectConstraint = d3.select("#bisectConstraint")
+	.on("click", constraintHandler(enforceBisection));
+var constantGradientConstraint = d3.select("#constantGradientConstraint")
+	.on("click", constraintHandler(enforceConstantGradient));
+var constantLengthConstraint = d3.select("#constantLengthConstraint")
+	.on("click", constraintHandler(enforceConstantLength));
+var constantAngleConstraint = d3.select("#constantAngleConstraint")
+	.on("click", constraintHandler(enforceConstantAngle));
+var specificAngleConstraint = d3.select("#specificAngleConstraint")
+	.on("click", constraintHandler(enforceSpecificAngle));
+var specificGradientConstraint = d3.select("#specificGradientConstraint")
+	.on("click", constraintHandler(enforceSpecificGradient));
+var specificLengthConstraint = d3.select("#specificLengthConstraint")
+	.on("click", constraintHandler(enforceSpecificLength));
+var lengthRatioConstraint = d3.select("#lengthRatioConstraint")
+	.on("click", constraintHandler(enforceLengthRatio));
+var lengthDiffConstraint = d3.select("#lengthDiffConstraint")
+	.on("click", constraintHandler(enforceLengthDifference));
 
 var assembleSVGDrawer = svgDrawer(assemblePaletteContainer, assemblePaletteOptions);
 var assembleDraggableEdge = drawSvgDraggableEdge(assembleSvg);

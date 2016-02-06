@@ -49,22 +49,27 @@
 					a.btn.btn-default#perpendicularConstraint Perpendicular
 					a.btn.btn-default#collinearConstraint Collinear
 					a.btn.btn-default#equalLengthConstraint Equal length
+					a.btn.btn-default#bisectConstraint Bisect
 					.btn-group
 						a.btn.btn-default.dropdown-toggle(data-toggle="dropdown") Others #[i.fa.fa-caret-down]
 						ul.dropdown-menu
 							li
-								a(href="#") Hold gradient constant
+								a(href="#")#constantGradientConstraint Hold gradient constant
 							li
-								a(href="#") Hold meeting angle constant
+								a(href="#")#constantAngleConstraint Hold meeting angle constant
 							li
-								a(href="#") Hold length constant
+								a(href="#")#bisectConstraint Hold length constant
 							li.divider
 							li
-								a(href="#") Meet at angle of ...
+								a(href="#")#specificGradientConstraint Segment with gradient of ...
 							li
-								a(href="#") Length in ratio of ...
+								a(href="#")#specificAngleConstraint Meet at angle of ...
 							li
-								a(href="#") Lengths differ by ...
+								a(href="#")#specificLengthConstraint Segment with length of ...
+							li
+								a(href="#")#lengthRatioConstraint Lengths in ratio of ...
+							li
+								a(href="#")#lengthDiffConstraint Lengths differ by ...
 				.btn-group.padded-btn-group.pull-right
 					a#exitOptimizeView.btn.btn-default #[i.fa.fa-times] Exit Optimize View
 		#assembleSvgContainer

@@ -1,3 +1,11 @@
+var optimizeConfig = {
+	constantConstraintFactor: 100,
+	repulsionPower1: -8,
+	repulsionFactor: 50000,
+	repulsionThreshold: 5,
+	repulsionPower2: 2
+};
+
 var makeSegment = function(params) {
 	var groupIdx = params.groupIdx;
 	var tileIdx = params.tileIdx;
@@ -163,10 +171,31 @@ var patternHandleComparator = function(d1, d2) {
 		(d1.customIdx === d2.customIdx && d1.customTemplateIdx === d2.customTemplateIdx)));
 };
 
+var constraintUtils = {
+	getAcuteAngleFromVectors: function(vectors) {
+		var v1 = vectors[0];
+		var v2 = vectors[1];
+		var cosOfAngle = num.dot(v1,v2) / (num.norm2(v1) * num.norm2(v2));
+		return Math.acos(Math.abs(cosOfAngle)) * 180 / Math.PI;
+	},
+	getAcuteAngleBetween: function(segments) {
+		return this.getAcuteAngleFromVectors(_.map(segments, function(s) {
+			return num.vectorFromEnds(s.getCoords());
+		}));
+	},
+	getAngleOf: function(seg) {
+		return this.getAcuteAngleFromVectors([num.vectorFromEnds(seg.getCoords()), [1, 0]]);
+	},
+	getLengthOf: function(seg) {
+		return num.norm2(num.vectorFromEnds(seg.getCoords()));
+	}
+};
+
 var enforceConstructor = function(options) {
 	return {
 		numSegments: options.numSegments,
 		instructionText: options.instructionText,
+		constantConstraint: options.constantConstraint,
 		constructor: function(segments) {
 			if (segments.length !== options.numSegments) {
 				throw new Error("Number of segments must be exactly " + options.numSegments);
@@ -177,7 +206,8 @@ var enforceConstructor = function(options) {
 				segments: segments,
 				displayName: options.displayName,
 				evaluateCache: [],
-				cached: false
+				cached: false,
+				withInput: options.withInput
 			};
 		}
 	};
@@ -186,35 +216,26 @@ var enforceConstructor = function(options) {
 var enforceParallel = enforceConstructor({
 	constructor: function(segments) {
 		return function() {
-			var seg1 = segments[0];
-			var seg2 = segments[1];
-			var v1 = num.vectorFromEnds(seg1.getCoords());
-			var v2 = num.vectorFromEnds(seg2.getCoords());
-			var cosOfAngle = num.dot(v1,v2) / (num.norm2(v1) * num.norm2(v2));
-			return Math.acos(Math.abs(cosOfAngle)) * 180 / Math.PI;
+			return constraintUtils.getAcuteAngleBetween(segments);
 		};
 	},
 	displayName: "Parallel",
 	numSegments: 2,
-	instructionText: "Select two segments to make parallel."
+	instructionText: "Select two segments to make parallel.",
+	constantConstraint: false
 });
 
 var enforcePerpendicular = enforceConstructor({
 	constructor: function(segments) {
 		return function() {
-			var seg1 = segments[0];
-			var seg2 = segments[1];
-			var v1 = num.vectorFromEnds(seg1.getCoords());
-			var v2 = num.vectorFromEnds(seg2.getCoords());
-			var cosOfAngle = num.dot(v1,v2) / (num.norm2(v1) * num.norm2(v2));
-			return Math.abs(Math.acos(Math.abs(cosOfAngle)) - Math.PI / 2) * 180 / Math.PI;
+			return Math.abs(constraintUtils.getAcuteAngleBetween(segments) - 90);
 		};
 	},
 	displayName: "Perpendicular",
 	numSegments: 2,
-	instructionText: "Select two segments to make perpendicular."
+	instructionText: "Select two segments to make perpendicular.",
+	constantConstraint: false
 });
-
 
 var enforceCollinear = enforceConstructor({
 	constructor: function(segments) {
@@ -258,22 +279,170 @@ var enforceCollinear = enforceConstructor({
 	},
 	displayName: "Collinear",
 	numSegments: 2,
-	instructionText: "Select two segments to make collinear."
+	instructionText: "Select two segments to make collinear.",
+	constantConstraint: false
 });
 
 var enforceEqualLength = enforceConstructor({
 	constructor: function(segments) {
 		return function() {
-			var seg1 = segments[0];
-			var seg2 = segments[1];
-			var len1 = num.norm2(num.vectorFromEnds(seg1.getCoords()));
-			var len2 = num.norm2(num.vectorFromEnds(seg2.getCoords()));
-			return Math.abs(len1 - len2);
+			return Math.abs(constraintUtils.getLengthOf(segments[0]) -
+				constraintUtils.getLengthOf(segments[1]));
 		};
 	},
 	displayName: "Equal length",
 	numSegments: 2,
-	instructionText: "Select two segments to make equal length."
+	instructionText: "Select two segments to make equal length.",
+	constantConstraint: false
+});
+
+var enforceBisection = enforceConstructor({
+	constructor: function(segments) {
+		return function() {
+			var aCoords = segments[0].getCoords();
+			var bCoords = segments[1].getCoords();
+			var a1 = {x: aCoords[0][0], y: aCoords[0][1]};
+			var a2 = {x: aCoords[1][0], y: aCoords[1][1]};
+			var b1 = {x: bCoords[0][0], y: bCoords[0][1]};
+			var b2 = {x: bCoords[1][0], y: bCoords[1][1]};
+			var intersect = Intersection.intersectLineLine(a1, a2, b1, b2);
+			if (intersect.status === "No Intersection") {
+				return Math.pow(10, 10);
+			}
+			return Math.abs(intersect.points[0].relative - 0.5) * constraintUtils.getLengthOf(segments[0]) +
+				Math.abs(intersect.points[0].relative2 - 0.5) * constraintUtils.getLengthOf(segments[1]);
+		};
+	},
+	displayName: "Bisect",
+	numSegments: 2,
+	instructionText: "Select two segments to bisect.",
+	constantConstraint: false
+});
+
+var enforceConstantGradient = enforceConstructor({
+	constructor: function(segments) {
+		var seg = segments[0];
+		var originalAngle = constraintUtils.getAngleOf(seg);
+		return function() {
+			return Math.abs(originalAngle - constraintUtils.getAngleOf(seg)) * 10;
+		};
+	},
+	displayName: "Const Gradient",
+	numSegments: 1,
+	instructionText: "Select a segment whose gradient to hold constant.",
+	constantConstraint: true
+});
+
+var enforceConstantLength = enforceConstructor({
+	constructor: function(segments) {
+		var seg = segments[0];
+		var originalLength = constraintUtils.getLengthOf(seg);
+		return function() {
+			return Math.abs(originalLength - constraintUtils.getLengthOf(seg)) * 1;
+		};
+	},
+	displayName: "Const Length",
+	numSegments: 1,
+	instructionText: "Select a segment whose length to hold constant.",
+	constantConstraint: true
+});
+
+var enforceConstantAngle = enforceConstructor({
+	constructor: function(segments) {
+		var originalAngle = constraintUtils.getAcuteAngleBetween(segments);
+		return function() {
+			return Math.abs(originalAngle - constraintUtils.getAcuteAngleBetween(segments)) * 10;
+		};
+	},
+	displayName: "Const Angle",
+	numSegments: 2,
+	instructionText: "Select two segments to hold meeting angle constant.",
+	constantConstraint: true
+});
+
+var enforceSpecificAngle = enforceConstructor({
+	constructor: function(segments) {
+		return function() {
+			var angle = constraintUtils.getAcuteAngleBetween(segments);
+			var inputValue = this.withInput.paramValue;
+			return Math.abs(angle - inputValue);
+		};
+	},
+	displayName: "Angle of ",
+	numSegments: 2,
+	instructionText: "Select two segments to meet at a particular angle.",
+	withInput: {
+		markup: "<input autocomplete='off' type='text' class='constraintParam'></input> °",
+		paramValue: 0
+	}
+});
+
+var enforceSpecificGradient = enforceConstructor({
+	constructor: function(segments) {
+		return function() {
+			var angle = constraintUtils.getAngleOf(segments[0]);
+			var inputValue = this.withInput.paramValue;
+			return Math.abs(angle - inputValue);
+		};
+	},
+	displayName: "Gradient of ",
+	numSegments: 1,
+	instructionText: "Select a segment which is to be a specific gradient.",
+	withInput: {
+		markup: "<input autocomplete='off' type='text' class='constraintParam'></input> °",
+		paramValue: 0
+	}
+});
+
+var enforceSpecificLength = enforceConstructor({
+	constructor: function(segments) {
+		return function() {
+			var length = constraintUtils.getLengthOf(segments[0]);
+			var inputValue = this.withInput.paramValue;
+			return Math.abs(length - inputValue);
+		};
+	},
+	displayName: "Length of ",
+	numSegments: 1,
+	instructionText: "Select a segment which is to be a specific length.",
+	withInput: {
+		markup: "<input autocomplete='off' type='text' class='constraintParam'></input> px",
+		paramValue: 50,
+	}
+});
+
+var enforceLengthRatio = enforceConstructor({
+	constructor: function(segments) {
+		return function() {
+			var lengths = _.map(segments, constraintUtils.getLengthOf);
+			var inputValue = this.withInput.paramValue;
+			return Math.abs(lengths[0] / lengths[1] - inputValue);
+		};
+	},
+	displayName: "Length ratio of ",
+	numSegments: 2,
+	instructionText: "Select two segments whose length ratio are to be constrained.",
+	withInput: {
+		markup: "<input autocomplete='off' type='text' class='constraintParam'></input>",
+		paramValue: 1,
+	}
+});
+
+var enforceLengthDifference = enforceConstructor({
+	constructor: function(segments) {
+		return function() {
+			var lengths = _.map(segments, constraintUtils.getLengthOf);
+			var inputValue = this.withInput.paramValue;
+			return Math.abs(Math.abs(lengths[0] - lengths[1]) - inputValue);
+		};
+	},
+	displayName: "Length diff of ",
+	numSegments: 2,
+	instructionText: "Select two segments whose length difference are to be constrained.",
+	withInput: {
+		markup: "<input autocomplete='off' type='text' class='constraintParam'></input> px",
+		paramValue: 0,
+	}
 });
 
 var createObjectives = function(objectives) {
@@ -468,13 +637,11 @@ var getRepulsionForce = function(tile) {
 		});
 	}));
 	var vertexRepulsion = 0;
-	var factor = 50000;
-	var exponent = -8;
 	for (var i = 0; i < interiorVertices.length; i++) {
 		for (var j = i + 1; j < interiorVertices.length; j++) {
 			var displacement = num.norm2(num.vectorFromEnds(
 				[interiorVertices[i].coords, interiorVertices[j].coords]));
-			vertexRepulsion += factor * Math.pow(displacement, exponent);
+			vertexRepulsion += optimizeConfig.repulsionFactor * Math.pow(displacement, optimizeConfig.repulsionPower1);
 		}
 	}
 
@@ -499,12 +666,12 @@ var getRepulsionForce = function(tile) {
 			var distFromEdge = Math.min.apply(Math, distFromEdges);
 			var inPoly = inTilePredicate(v.coords);
 			var f = 0;
-			if (inPoly && distFromEdge < 5) {
+			if (inPoly && distFromEdge < optimizeConfig.repulsionThreshold) {
 				// linear from 0 to 1
-				f = 1 - distFromEdge / 5;
+				f = 1 - distFromEdge / optimizeConfig.repulsionThreshold;
 			} else if (!inPoly) {
 				// quadratic increase
-				f = 1 + Math.pow(distFromEdge, 2);
+				f = 1 + Math.pow(distFromEdge, optimizeConfig.repulsionPower2);
 			}
 
 			return f * v.occurences;
@@ -730,9 +897,33 @@ var bindToNextBtn = function(f) {
 	nextOptimizeBtn.on("click", f);
 };
 
+var finishSelection = function(constraintSpec, selectedSegmentObjects) {
+	return function() {
+		d3.selectAll(".pattern-segment.selected")
+		.classed("pattern-segment selected", false)
+		.classed("pattern-segment-fixed", true);
+		d3.selectAll(".pattern-segment-fixable-point")
+		.classed("clickable", false)
+		.on("click", null)
+		.filter(function(d) { return d.fix; })
+		.remove();
+
+		exitConstraintSelection();
+		var constructor = constraintSpec.constructor;
+		optimizationConstraints.push(constructor(selectedSegmentObjects));
+		_.each(optimizationConstraints, function(o) {
+			// reset cache to only one element
+			o.evaluateCache.splice(0, o.evaluateCache.length - 1);
+		});
+		redrawConstraintList();
+		bindToNextBtn(null);
+	};
+};
+
 var constraintHandler = function(constraintSpec) {
 	return function() {
 		setupOptimizeOverlay();
+		d3.select("#nextOptimizeBtn").text("Next");
 		d3.select(".svg-instruction-bar").classed("hidden", false);
 		d3.selectAll(".constraint-btns .btn").classed("disabled", true);
 		d3.selectAll("path.pattern-segment").classed("selectable", true);
@@ -741,39 +932,28 @@ var constraintHandler = function(constraintSpec) {
 		$("#nextOptimizeBtnGroup").tooltip({
 			placement: "bottom",
 			title: "Select the required number of segments first."});
+		assembleOptimizeCanvas.selectAll(".pattern-segment")
+		.on("click", patternSelectHandler(selectedSegments, constraintSpec.numSegments));
+		if (constraintSpec.constantConstraint) {
+			d3.select("#nextOptimizeBtn").text("Finish");
+		}
 		bindToNextBtn(function() {
 			d3.selectAll("path.pattern-segment").classed("selectable", false)
 			.on("click", null);
-			assembleSvgOptimizeLabel.text("Select points to vary during optimization.");
 			assembleOptimizeCanvas.selectAll(".pattern-segment-endpoint").remove();
 			var selectedSegmentObjects = _.map(selectedSegments, function(seg) {
 				seg.vertexRange = [seg.startIdx + seg.curRange[0].idx, seg.startIdx + seg.curRange[1].idx];
 				return makeSegment(seg);
 			});
-			drawPatternSegmentCustomPoints(selectedSegmentObjects);
-			bindToNextBtn(function() {
-				d3.selectAll(".pattern-segment.selected")
-				.classed("pattern-segment selected", false)
-				.classed("pattern-segment-fixed", true);
-				d3.selectAll(".pattern-segment-fixable-point")
-				.classed("clickable", false)
-				.on("click", null)
-				.filter(function(d) { return d.fix; })
-				.remove();
-
-				exitConstraintSelection();
-				var constructor = constraintSpec.constructor;
-				optimizationConstraints.push(constructor(selectedSegmentObjects));
-				_.each(optimizationConstraints, function(o) {
-					// reset cache to only one element
-					o.evaluateCache.splice(0, o.evaluateCache.length - 1);
-				});
-				redrawConstraintList();
-				bindToNextBtn(null);
-			});
+			if (constraintSpec.constantConstraint) {
+				finishSelection(constraintSpec, selectedSegmentObjects)();
+			} else {
+				assembleSvgOptimizeLabel.text("Select points to vary during optimization.");
+				drawPatternSegmentCustomPoints(selectedSegmentObjects);
+				d3.select("#nextOptimizeBtn").text("Finish");
+				bindToNextBtn(finishSelection(constraintSpec, selectedSegmentObjects));
+			}
 		});
-		assembleOptimizeCanvas.selectAll(".pattern-segment")
-		.on("click", patternSelectHandler(selectedSegments, constraintSpec.numSegments));
 	};
 };
 
@@ -827,24 +1007,8 @@ var deleteAllConstraints = function() {
 	redrawConstraintList();
 };
 
-var redrawConstraintList = function() {
-	sidebarConstraintForm.selectAll(".constraint-row").remove();
-	if (optimizationConstraints.length === 0) {
-		optimizeBtnDiv.style("display", "none");
-		noConstraintsSoFar.style("display", "block");
-		totalObjectiveLabel.text("");
-		return;
-	}
-	// implicit else
-	optimizeBtnDiv.style("display", "block");
-	noConstraintsSoFar.style("display", "none");
-	var ctr = (function() {
-		var num = 0;
-		return function() {
-			num += 1;
-			return num;
-		};
-	})();
+var updateObjectiveValues = function() {
+	console.log("UPDATING");
 
 	_.each(optimizationConstraints, function(d) {
 		if (!d.cached) {
@@ -868,18 +1032,62 @@ var redrawConstraintList = function() {
 		}).join("→");
 	});
 
-	var listRows = sidebarConstraintForm.selectAll(".constraint-row").data(optimizationConstraints)
-	.enter()
-	.append("div").classed("constraint-row", true)
-	.html(function(d) { return "<a class='strip-table-x' href='#'><i class='fa fa-times'></i></a> <h5 class='inline-title'>" + d.displayName + "</h5> (<span class='segments'></span>)<div class='objectiveLabel small'></div>"; });
-
-	listRows.selectAll(".objectiveLabel")
+	sidebarConstraintForm.selectAll(".constraint-row").selectAll(".objectiveLabel")
 	.html(function() {
 		var d = this.parentNode.__data__;
 		return "Objective value: " + _.map(d.evaluateCache, function(n) {
 			return parseFloat(n.toPrecision(3));
 		}).join("→");
 	});
+};
+
+var redrawConstraintList = function() {
+	sidebarConstraintForm.selectAll(".constraint-row").remove();
+	if (optimizationConstraints.length === 0) {
+		optimizeBtnDiv.style("display", "none");
+		noConstraintsSoFar.style("display", "block");
+		totalObjectiveLabel.text("");
+		return;
+	}
+	// implicit else
+	optimizeBtnDiv.style("display", "block");
+	noConstraintsSoFar.style("display", "none");
+	var ctr = (function() {
+		var num = 0;
+		return function() {
+			num += 1;
+			return num;
+		};
+	})();
+
+	var listRows = sidebarConstraintForm.selectAll(".constraint-row").data(optimizationConstraints)
+	.enter()
+	.append("div").classed("constraint-row", true)
+	.html(function(d) {
+		var deleteX = "<a class='strip-table-x' href='#'><i class='fa fa-times'></i></a>";
+		var inputParams = d.withInput ? (" " + d.withInput.markup) : "";
+		var displayName = "<h5 class='inline-title'>" + d.displayName + inputParams + "</h5>";
+		var segmentList = "(<span class='segments'></span>)";
+		var objective = "<div class='objectiveLabel small'></div>";
+		return deleteX + " " + displayName + " " + segmentList + objective;
+	}).each(function(d) {
+		if (d.withInput) {
+			d3.select(this).select(".constraintParam")
+			.attr("value", function() {
+				var d = this.parentNode.parentNode.__data__;
+				return d.withInput.paramValue;
+			})
+			.on("blur", function() {
+				var d = this.parentNode.parentNode.__data__;
+				d.withInput.paramValue = parseFloat($(this).val(), 10);
+				d.cached = false;
+				d.evaluateCache.splice(d.evaluateCache.length - 1, 1);
+				updateObjectiveValues();
+			});
+		}
+	});
+
+	updateObjectiveValues();
 
 	listRows.select(".strip-table-x")
 	.on("click", function(d, i) {

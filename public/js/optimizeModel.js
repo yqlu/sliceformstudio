@@ -112,7 +112,7 @@ var makeSegment = function(params) {
 				return h.customTemplateIdx >= 0 && h.customTemplateIdx < numHandles;
 			});
 
-		} else if (["Star", "Rosette", "Extended Rosette"].indexOf(patternType) > -1) {
+		} else if (["Star", "Rosette", "Extended Rosette", "Hankin"].indexOf(patternType) > -1) {
 			var firstHandleIdx = _.findIndex(
 				element.pattern.intersectedVertices, function(v,i) {
 				return (!v.intersect && i > 0);
@@ -205,6 +205,8 @@ var enforceConstructor = function(options) {
 				evaluate: evaluateFn,
 				segments: segments,
 				displayName: options.displayName,
+				evaluateUnit: options.evaluateUnit,
+				factor: options.factor || 1,
 				evaluateCache: [],
 				cached: false,
 				withInput: options.withInput
@@ -222,7 +224,8 @@ var enforceParallel = enforceConstructor({
 	displayName: "Parallel",
 	numSegments: 2,
 	instructionText: "Select two segments to make parallel.",
-	constantConstraint: false
+	constantConstraint: false,
+	evaluateUnit: "°"
 });
 
 var enforcePerpendicular = enforceConstructor({
@@ -234,7 +237,8 @@ var enforcePerpendicular = enforceConstructor({
 	displayName: "Perpendicular",
 	numSegments: 2,
 	instructionText: "Select two segments to make perpendicular.",
-	constantConstraint: false
+	constantConstraint: false,
+	evaluateUnit: "°"
 });
 
 var enforceCollinear = enforceConstructor({
@@ -280,7 +284,8 @@ var enforceCollinear = enforceConstructor({
 	displayName: "Collinear",
 	numSegments: 2,
 	instructionText: "Select two segments to make collinear.",
-	constantConstraint: false
+	constantConstraint: false,
+	evaluateUnit: "°"
 });
 
 var enforceEqualLength = enforceConstructor({
@@ -293,7 +298,8 @@ var enforceEqualLength = enforceConstructor({
 	displayName: "Equal length",
 	numSegments: 2,
 	instructionText: "Select two segments to make equal length.",
-	constantConstraint: false
+	constantConstraint: false,
+	evaluateUnit: "px"
 });
 
 var enforceBisection = enforceConstructor({
@@ -316,7 +322,8 @@ var enforceBisection = enforceConstructor({
 	displayName: "Bisect",
 	numSegments: 2,
 	instructionText: "Select two segments to bisect.",
-	constantConstraint: false
+	constantConstraint: false,
+	evaluateUnit: "px"
 });
 
 var enforceConstantGradient = enforceConstructor({
@@ -330,7 +337,9 @@ var enforceConstantGradient = enforceConstructor({
 	displayName: "Const Gradient",
 	numSegments: 1,
 	instructionText: "Select a segment whose gradient to hold constant.",
-	constantConstraint: true
+	constantConstraint: true,
+	evaluateUnit: "°",
+	factor: 10
 });
 
 var enforceConstantLength = enforceConstructor({
@@ -338,26 +347,29 @@ var enforceConstantLength = enforceConstructor({
 		var seg = segments[0];
 		var originalLength = constraintUtils.getLengthOf(seg);
 		return function() {
-			return Math.abs(originalLength - constraintUtils.getLengthOf(seg)) * 1;
+			return Math.abs(originalLength - constraintUtils.getLengthOf(seg));
 		};
 	},
 	displayName: "Const Length",
 	numSegments: 1,
 	instructionText: "Select a segment whose length to hold constant.",
-	constantConstraint: true
+	constantConstraint: true,
+	evaluateUnit: "px"
 });
 
 var enforceConstantAngle = enforceConstructor({
 	constructor: function(segments) {
 		var originalAngle = constraintUtils.getAcuteAngleBetween(segments);
 		return function() {
-			return Math.abs(originalAngle - constraintUtils.getAcuteAngleBetween(segments)) * 10;
+			return Math.abs(originalAngle - constraintUtils.getAcuteAngleBetween(segments));
 		};
 	},
 	displayName: "Const Angle",
 	numSegments: 2,
 	instructionText: "Select two segments to hold meeting angle constant.",
-	constantConstraint: true
+	constantConstraint: true,
+	evaluateUnit: "°",
+	factor: 10
 });
 
 var enforceSpecificAngle = enforceConstructor({
@@ -374,7 +386,8 @@ var enforceSpecificAngle = enforceConstructor({
 	withInput: {
 		markup: "<input autocomplete='off' type='text' class='constraintParam'></input> °",
 		paramValue: 0
-	}
+	},
+	evaluateUnit: "°"
 });
 
 var enforceSpecificGradient = enforceConstructor({
@@ -391,7 +404,8 @@ var enforceSpecificGradient = enforceConstructor({
 	withInput: {
 		markup: "<input autocomplete='off' type='text' class='constraintParam'></input> °",
 		paramValue: 0
-	}
+	},
+	evaluateUnit: "°"
 });
 
 var enforceSpecificLength = enforceConstructor({
@@ -406,9 +420,10 @@ var enforceSpecificLength = enforceConstructor({
 	numSegments: 1,
 	instructionText: "Select a segment which is to be a specific length.",
 	withInput: {
-		markup: "<input autocomplete='off' type='text' class='constraintParam'></input> px",
+		markup: "<input autocomplete='off' type='text' class='constraintParam'></input>px",
 		paramValue: 50,
-	}
+	},
+	evaluateUnit: "px"
 });
 
 var enforceLengthRatio = enforceConstructor({
@@ -425,7 +440,8 @@ var enforceLengthRatio = enforceConstructor({
 	withInput: {
 		markup: "<input autocomplete='off' type='text' class='constraintParam'></input>",
 		paramValue: 1,
-	}
+	},
+	evaluateUnit: ""
 });
 
 var enforceLengthDifference = enforceConstructor({
@@ -440,9 +456,10 @@ var enforceLengthDifference = enforceConstructor({
 	numSegments: 2,
 	instructionText: "Select two segments whose length difference are to be constrained.",
 	withInput: {
-		markup: "<input autocomplete='off' type='text' class='constraintParam'></input> px",
+		markup: "<input autocomplete='off' type='text' class='constraintParam'></input>px",
 		paramValue: 0,
-	}
+	},
+	evaluateUnit: "px"
 });
 
 var createObjectives = function(objectives) {
@@ -1030,9 +1047,9 @@ var updateObjectiveValues = function() {
 		var indices = (_.all(optimizationConstraints, function(d) {
 			return d.evaluateCache.length === 2;
 		})) ? [0,1] : [0];
-		return "Total objective value: " + _.map(indices, function(i) {
+		return "Sum of objectives: " + _.map(indices, function(i) {
 			return parseFloat((_.sum(_.map(optimizationConstraints, function(o) {
-				return o.evaluateCache[i];
+				return o.evaluateCache[i] * o.factor;
 			}))).toPrecision(3));
 		}).join("→");
 	});
@@ -1041,7 +1058,7 @@ var updateObjectiveValues = function() {
 	.html(function() {
 		var d = this.parentNode.__data__;
 		return "Objective value: " + _.map(d.evaluateCache, function(n) {
-			return parseFloat(n.toPrecision(3));
+			return parseFloat(n.toPrecision(3)) + d.evaluateUnit;
 		}).join("→");
 	});
 };
@@ -1077,6 +1094,17 @@ var redrawConstraintList = function() {
 		var scaleFactor = "<div class='scaleLabel small'>Scaling factor: <input type='text' class='constraintScale'> x</div>";
 		return deleteX + " " + displayName + " " + segmentList + objective + scaleFactor;
 	}).each(function(d) {
+		d3.select(this).select(".constraintScale")
+		.attr("value", function() {
+			var d = this.parentNode.parentNode.__data__;
+			return d.factor;
+		})
+		.on("blur", function() {
+			var d = this.parentNode.parentNode.__data__;
+			d.factor = parseFloat($(this).val(), 10);
+			updateObjectiveValues();
+		});
+
 		if (d.withInput) {
 			d3.select(this).select(".constraintParam")
 			.attr("value", function() {

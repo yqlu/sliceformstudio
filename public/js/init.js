@@ -843,6 +843,9 @@ $(document).ready(function() {
 
 	var loadOrNewFile = function() {
 		var params = getUrlVars();
+		if (params.optimize) {
+			d3.select("#cropContainer").classed("betaHidden", false);
+		}
 		if (params.template) {
 			if (params.template.search(/^\w+$/) >= 0) {
 				d3.select(".loading-overlay").classed("in", true);

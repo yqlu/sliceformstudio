@@ -648,11 +648,7 @@ var updateCustomTemplates = function(vector, customInterface, evaluator) {
 
 var getRepulsionForce = function(tile) {
 	var interiorVertices = _.flatten(_.map(tile.patterns, function(p) {
-		return _.filter(_.map(p.intersectedVertices, function(iv, idx) {
-			iv.idx = idx;
-			iv.p = p;
-			return iv;
-		}), function(iv) {
+		return _.filter(p.intersectedVertices, function(iv) {
 			return !iv.intersect;
 		});
 	}));

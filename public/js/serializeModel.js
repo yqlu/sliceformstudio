@@ -80,6 +80,10 @@ var reduceCircularity = function(tile) {
 	_.each(tileCopy.patterns, function(p, index) {
 		p.end.edge = p.end.edge.index; // replace reference with id
 		p.start.edge = p.start.edge.index;
+		p.index = index;
+		_.each(p.intersectedVertices, function(iv) {
+			delete iv.p;
+		});
 	});
 
 	_.each(tileCopy.edges, function(e) {
@@ -158,9 +162,12 @@ var loadFromJson = function(loaded, callback) {
 			colorMap = loaded.colorMap;
 			_.each(colorMap, function(c) {
 				_.each(c.strips, function(s) {
-					s.patternList = _.map(s.patternList, function(p) {
-						return {assembleCounterpart: polylist[p[0]].tiles[p[1]].patterns[p[2]]};
-					});
+					s.patternList = _.omit(_.map(s.patternList, function(p) {
+						if (p) {
+							return {assembleCounterpart: polylist[p[0]].tiles[p[1]].patterns[p[2]]};
+						}
+						return null;
+					}), function(p) { return p === null; });
 				});
 			});
 		}

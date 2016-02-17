@@ -1049,7 +1049,7 @@ var stripViewClick = function() {
 				_.each(oldColorMap, function(c) {
 					_.each(c.strips, function(s) {
 						_.each(s.patternList, function(p) {
-							if (p.assembleCounterpart.isStripAssigned && !p.assembleCounterpart.isStripAssigned()) {
+							if (p && p.assembleCounterpart && p.assembleCounterpart.isStripAssigned && !p.assembleCounterpart.isStripAssigned()) {
 								p.assembleCounterpart.assignStripColor(c.color.hex);
 							}
 						});

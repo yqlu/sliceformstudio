@@ -648,6 +648,18 @@ var editSpecificPattern = function(tiles) {
 		}
 		patternEditSVGDrawer.draw();
 
+		var dim = tiles[0].dimensions;
+		if (dim.width > 0.9 * config.editWidth || dim.height > 0.9 * config.editHeight) {
+			var scale = 0.9 / Math.max(dim.width / config.editWidth, dim.height / config.editHeight);
+			patternEditSVGDrawer.container.each(function(d) {
+				d.transform = num.scaleBy(d.transform, scale);
+			}).attr("transform", num.getTransform);
+		} else {
+			patternEditSVGDrawer.container.each(function(d) {
+				d.transform = _.cloneDeep(d.origTransform);
+			}).attr("transform", num.getTransform);
+		}
+
 		var optionMouseenter = function(e){
 			var motif = _.find(patternOptions, function(o) {
 				return o.name === e.currentTarget.innerHTML;

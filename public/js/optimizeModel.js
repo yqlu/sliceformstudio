@@ -70,6 +70,7 @@ var makeSegment = function(params) {
 		var handles;
 		if (patternType === "Custom") {
 
+			console.assert(typeof element.pattern.customIndex !== "undefined", "Custom index does not exist.");
 			var ct = element.tile.customTemplate[element.pattern.customIndex];
 			var neighboringHandlePoints = getRawNeighboringHandlePoints();
 
@@ -575,13 +576,17 @@ var redrawTiles = function() {
 		var modelTile = _.find(assembleSVGDrawer.get(), function(t) {
 			return t.polygonID === d.polygonID;
 		});
-		d3.select(this).selectAll("path.pattern").remove();
-		d.customTemplate = _.cloneDeep(modelTile.customTemplate);
-		d.patternParams = _.cloneDeep(modelTile.patternParams);
-		var patternFn = patternOptions[d.patternParams.index].generator(d, d.patternParams.param1, d.patternParams.param2);
-		polygonAddPattern(d, makePatterns(patternFn));
-		polygonAddPatternMetadata(d);
-		drawPatterns(d3.select(this), {});
+		if (modelTile.patternParams) {
+			// if model tile has a pattern, redraw patterns in d
+			d3.select(this).selectAll("path.pattern").remove();
+			d.customTemplate = _.cloneDeep(modelTile.customTemplate);
+			d.patternParams = _.cloneDeep(modelTile.patternParams);
+			var patternFn = patternOptions[d.patternParams.index].generator(d, d.patternParams.param1, d.patternParams.param2);
+			polygonAddPattern(d, makePatterns(patternFn));
+			polygonAddPatternMetadata(d);
+			drawPatterns(d3.select(this), {});
+
+		}
 	});
 };
 

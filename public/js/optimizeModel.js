@@ -244,49 +244,84 @@ var enforcePerpendicular = enforceConstructor({
 
 var enforceCollinear = enforceConstructor({
 	constructor: function(segments) {
+
+		var distToSegment = function(p, comparisonLine) {
+			var v = comparisonLine[0];
+			var w = comparisonLine[1];
+
+			var l2 = num.norm2(num.vectorFromEnds([v, w]));
+			if (l2 === 0) {
+				return num.norm2(num.vectorFromEnds([p, v]));
+			}
+			var t = ((p[0] - v[0]) * (w[0] - v[0]) + (p[1] - v[1]) * (w[1] - v[1])) / (l2 * l2);
+			return num.norm2(num.vectorFromEnds([p, [v[0] + t * (w[0] - v[0]),
+				v[1] + t * (w[1] - v[1])]]));
+		};
+
 		return function() {
 			var seg1 = segments[0];
 			var seg2 = segments[1];
 			var seg1Coords = seg1.getCoords();
 			var seg2Coords = seg2.getCoords();
 
-			var v1 = num.vectorFromEnds(seg1Coords);
-			var v2 = num.vectorFromEnds(seg2Coords);
-			var v3 = num.vectorFromEnds([seg1Coords[0], seg2Coords[0]]);
-			var v4 = num.vectorFromEnds([seg1Coords[0], seg2Coords[1]]);
-			var v5 = num.vectorFromEnds([seg1Coords[1], seg2Coords[0]]);
-			var v6 = num.vectorFromEnds([seg1Coords[1], seg2Coords[1]]);
-
-			var n1 = num.norm2(v1);
-			var n2 = num.norm2(v2);
-			var n3 = num.norm2(v3);
-			var n4 = num.norm2(v4);
-			var n5 = num.norm2(v5);
-			var n6 = num.norm2(v6);
-
-			var pairs;
+			var comparisonLine;
 			if (seg1.getInterface().length === 0) {
-				pairs = [[v1,v3,n1,n3], [v1,v4,n1,n4], [v1,v5,n1,n5], [v1,v6,n1,n6]];
+				var comparisonLine = seg1Coords;
 			} else if (seg2.getInterface().length === 0) {
-				pairs = [[v2,v3,n2,n3], [v2,v4,n2,n4], [v2,v5,n2,n5], [v2,v6,n2,n6]];
+				var comparisonLine = seg2Coords;
 			} else {
-				pairs = [[v1,v3,n1,n3], [v1,v4,n1,n4], [v1,v5,n1,n5], [v1,v6,n1,n6],
-					[v2,v3,n2,n3], [v2,v4,n2,n4], [v2,v5,n2,n5], [v2,v6,n2,n6]];
+				var seg1Midpt = [(seg1Coords[0][0] + seg1Coords[1][0])/2,
+					(seg1Coords[0][1] + seg1Coords[1][1])/2];
+				var seg2Midpt = [(seg2Coords[0][0] + seg2Coords[1][0])/2,
+					(seg2Coords[0][1] + seg2Coords[1][1])/2];
+
+				comparisonLine = [seg1Midpt, seg2Midpt];
 			}
 
-			var angles = _.map(pairs, function(params) {
-				var cosOfAngle = num.dot(params[0], params[1]) / (params[2] * params[3]);
-				return Math.acos(Math.abs(cosOfAngle)) * 180 / Math.PI;
-			});
+			return _.sum(_.map(seg1Coords.concat(seg2Coords), function(c) {
+				return distToSegment(c, comparisonLine);
+			}));
 
-			return _.sum(angles) / pairs.length;
+			// comment out old implementation for now
+
+			// var v1 = num.vectorFromEnds(seg1Coords);
+			// var v2 = num.vectorFromEnds(seg2Coords);
+			// var v3 = num.vectorFromEnds([seg1Coords[0], seg2Coords[0]]);
+			// var v4 = num.vectorFromEnds([seg1Coords[0], seg2Coords[1]]);
+			// var v5 = num.vectorFromEnds([seg1Coords[1], seg2Coords[0]]);
+			// var v6 = num.vectorFromEnds([seg1Coords[1], seg2Coords[1]]);
+
+			// var n1 = num.norm2(v1);
+			// var n2 = num.norm2(v2);
+			// var n3 = num.norm2(v3);
+			// var n4 = num.norm2(v4);
+			// var n5 = num.norm2(v5);
+			// var n6 = num.norm2(v6);
+
+			// var pairs;
+
+			// if (seg1.getInterface().length === 0) {
+			// 	pairs = [[v1,v3,n1,n3], [v1,v4,n1,n4], [v1,v5,n1,n5], [v1,v6,n1,n6]];
+			// } else if (seg2.getInterface().length === 0) {
+			// 	pairs = [[v2,v3,n2,n3], [v2,v4,n2,n4], [v2,v5,n2,n5], [v2,v6,n2,n6]];
+			// } else {
+			// 	pairs = [[v1,v3,n1,n3], [v1,v4,n1,n4], [v1,v5,n1,n5], [v1,v6,n1,n6],
+			// 		[v2,v3,n2,n3], [v2,v4,n2,n4], [v2,v5,n2,n5], [v2,v6,n2,n6]];
+			// }
+
+			// var angles = _.map(pairs, function(params) {
+			// 	var cosOfAngle = num.dot(params[0], params[1]) / (params[2] * params[3]);
+			// 	return Math.acos(Math.abs(cosOfAngle)) * 180 / Math.PI;
+			// });
+
+			// return _.sum(angles) / pairs.length;
 		};
 	},
 	displayName: "Collinear",
 	numSegments: 2,
 	instructionText: "Select two segments to make collinear.",
 	constantConstraint: false,
-	evaluateUnit: "°"
+	evaluateUnit: "px"
 });
 
 var enforceEqualLength = enforceConstructor({

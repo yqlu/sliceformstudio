@@ -455,6 +455,7 @@ var patternUpdate = function() {
 	}
 	polygonAddPattern(tile, patternFn);
 	patternEditSVGDrawer.redrawPatterns();
+
 };
 
 var patternPreview = function(motif, customTemplate) {
@@ -641,12 +642,13 @@ var editSpecificPattern = function(tiles) {
 			$("#patternDropdown").trigger("change");
 			patternSlider1.setValue(params.param1);
 			patternSlider2.setValue(params.param2);
+			patternEditSVGDrawer.draw();
 		} else {
 			var defaultOption = isRegular ? "0" : "3";
 			patternSelectize.setValue(defaultOption);
+			patternEditSVGDrawer.draw();
 			$("#patternDropdown").trigger("change");
 		}
-		patternEditSVGDrawer.draw();
 
 		var dim = tiles[0].dimensions;
 		if (dim.width > 0.9 * config.editWidth || dim.height > 0.9 * config.editHeight) {
@@ -1002,7 +1004,7 @@ var stripViewClick = function() {
 	keyboardJS.setContext("stripView");
 
 	if (!stripView.classed("active")) {
-		// try {
+		try {
 			if (stripViewCached) {
 				traceCanvas.each(function(d, i) {
 					d.transform = assembleCanvas.datum().transform;
@@ -1082,12 +1084,12 @@ var stripViewClick = function() {
 			d3.select("#traceTab").classed("active", true).classed("hidden", false);
 
 			stripViewCached = true;
-		// } catch(e) {
-		// 	console.log(e);
-		// 	// undo UI changes gracefully if error is found
-		// 	tileViewClick();
-		// 	teardownCropOverlay();
-		// }
+		} catch(e) {
+			console.log(e);
+			// undo UI changes gracefully if error is found
+			tileViewClick();
+			teardownCropOverlay();
+		}
 	}
 };
 

@@ -42,6 +42,12 @@
 				"year": 2010,
 				"description": "12-gons and 9-gons",
 				"slfm": "garden"
+			}, {
+				"filename": "hibiscus",
+				"title": "Hibiscus",
+				"year": 2016,
+				"description": "Girih tiles",
+				"slfm": "hibiscus"
 			}]
 		}, {
 			"title": "Intermediate",
@@ -76,6 +82,12 @@
 				"description": "12-gons, hexagons and squares",
 				"slfm": "undergrowth"
 			}, {
+				"filename": "royalty",
+				"title": "Royalty",
+				"year": 2016,
+				"description": "12-gons",
+				"slfm": "royalty"
+			}, {
 				"filename": "rampart",
 				"title": "Rampart",
 				"year": 2015,
@@ -96,6 +108,12 @@
 				"year": 2015,
 				"description": "12-gons and 9-gons",
 				"slfm": "vineyard"
+			}, {
+				"filename": "altair",
+				"title": "Altair",
+				"year": 2016,
+				"description": "Altair tiles",
+				"slfm": "altair"
 			}, {
 				"filename": "girih_i",
 				"title": "Girih I",

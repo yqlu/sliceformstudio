@@ -335,6 +335,7 @@ var greedyInference = function(rays) {
 
 					if (ua > 0 && ub > 0) {
 						var angle = num.angleBetweenEnds(ray1.ends, ray2.ends);
+						console.log(angle);
 						allPairs.push({
 							angle: parseFloat((angle).toFixed(1)),
 							rays: [ray1, ray2],

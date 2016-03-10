@@ -37,7 +37,6 @@ var deepCustomizer = function(includeVertices) {
 					clone[prop] = _.map(val[prop], function(p) {
 						return _.cloneDeep(p, function(val, id, obj) {
 							if (id === "pattern") {
-								console.log(val, id, obj);
 								return val.index;
 							}
 						});

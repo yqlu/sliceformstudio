@@ -1085,7 +1085,7 @@ var stripViewClick = function() {
 
 			stripViewCached = true;
 		} catch(e) {
-			console.log(e);
+			console.error(e);
 			// undo UI changes gracefully if error is found
 			tileViewClick();
 			teardownCropOverlay();

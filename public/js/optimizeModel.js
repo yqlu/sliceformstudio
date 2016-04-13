@@ -663,10 +663,7 @@ var updateCustomTemplates = function(vector, customInterface, evaluator) {
 	});
 
 	if (_.all(tiles, function(tile) {
-		if (patternOptions[tile.patternParams.index].name !== "Custom") {
-			assembleSVGDrawer.replace(tile);
-			return true;
-		} else if (_.all(tile.patterns, function(p, idx) {
+		if (_.all(tile.patterns, function(p, idx) {
 			var newIntersectData = _.pluck(p.intersectedVertices, "intersect");
 			var intersectDataPreserved = _.isEqual(newIntersectData,
 				intersectedVertexInterfaces[tile.polygonID].vertexInterface[idx]);

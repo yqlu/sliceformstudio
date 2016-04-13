@@ -335,7 +335,6 @@ var greedyInference = function(rays) {
 
 					if (ua > 0 && ub > 0) {
 						var angle = num.angleBetweenEnds(ray1.ends, ray2.ends);
-						console.log(angle);
 						allPairs.push({
 							angle: parseFloat((angle).toFixed(1)),
 							rays: [ray1, ray2],
@@ -367,6 +366,59 @@ var greedyInference = function(rays) {
 	}
 
 	return greedy;
+};
+
+// this is called when tiles are converted to strips
+// consecutive segments which are parallel are merged
+// i.e. unnecessary creases are eliminated
+// but the underlying topology of the template tiles in the palette stay the same
+// which is important for optimization, etc.
+var mergeParallelSegmentsOnCanvas = function() {
+	_.each(assembleSVGDrawer.get(), function(t) {
+		if (!t.infer) {
+			var toModify = [];
+			_.each(t.patterns, function(p, pidx) {
+				var vectors = _.map(_.range(p.allVertices.length - 1), function(i) {
+					return [p.allVertices[i+1][0] - p.allVertices[i][0],
+						p.allVertices[i+1][1] - p.allVertices[i][1]];
+				});
+				var toRemove = [];
+				_.each(_.range(vectors.length - 1), function(i) {
+					var v1 = vectors[i];
+					var v2 = vectors[i+1];
+					if (Math.abs(Math.atan2(v1[1],v1[0]) - Math.atan2(v2[1],v2[0])) <
+						Math.PI/45) {
+						// if difference in angles is less than 4 degrees
+						toRemove.push(i);
+					}
+				});
+
+				if (toRemove.length > 0) {
+					toModify.push({pidx: pidx, toRemove: toRemove});
+					p.internalVertices = _.filter(p.internalVertices, function(v, i) {
+						return !_.contains(toRemove, i);
+					});
+					computePatternDataFromInternalVertices(p);
+				}
+			});
+
+			if (toModify.length > 0) {
+				var tilesInCanvas = assembleCanvas.selectAll("g.tile").filter(
+					function(d, i) { return d.polygonID === t.polygonID; });
+
+				tilesInCanvas.each(function(d, i) {
+					_.each(toModify, function(m) {
+						var p = d.patterns[m.pidx];
+						p.internalVertices = _.filter(p.internalVertices, function(v, i) {
+							return !_.contains(m.toRemove, i);
+						});
+						computePatternDataFromInternalVertices(p);
+					});
+					polygonAddPatternMetadata(d);
+				});
+			}
+		}
+	});
 };
 
 // helper function for generating rotated rays for Hankin inference algorithm

@@ -764,12 +764,14 @@ var generateCustomStrip = function() {
 		});
 
 		var svg = d3.select("#tmpSvg").select("svg").node();
+		console.log(svg);
 		var serializer = new XMLSerializer();
 		var pom = document.createElement('a');
 		pom.setAttribute('href', 'data:image/xvg+xml;charset=utf-8,' + serializer.serializeToString(svg));
 		pom.setAttribute('download', "custom.svg");
 		pom.click();
 		d3.select(svg).remove();
+		console.log("got here");
 	} else {
 		console.error("Invalid strip format: ", stripData);
 		bootbox.alert({

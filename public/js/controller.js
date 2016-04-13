@@ -516,7 +516,6 @@ var updateTileWithPatternClick = function() {
 	$("#patternModal").modal('hide');
 
 	var tilesInCanvas = assembleCanvas.selectAll("g.tile").filter(function(d, i) { return d.polygonID === newTile.polygonID; });
-
 	tilesInCanvas.each(function(d, i) {
 		d3.select(this).selectAll("path.pattern").remove();
 		d.customTemplate = _.cloneDeep(newTile.customTemplate);
@@ -1023,6 +1022,8 @@ var stripViewClick = function() {
 					delete d.isStripAssigned;
 					delete d.assignStripColor;
 				});
+
+				mergeParallelSegmentsOnCanvas();
 
 				traceCanvas.selectAll("path").remove();
 				var clone = _.cloneDeep(polylist, deepCustomizer(false));

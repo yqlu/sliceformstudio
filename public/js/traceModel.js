@@ -344,7 +344,6 @@ var groupPattern = function(patternData, strictMode) {
 	var groupNode = patternData.this.parentNode.parentNode;
 
 	var rawSegments = _.map(patternList, function(p, index) {
-
 		var transform = p.pattern.this.parentNode.__data__.transform;
 
 		var transformedVertices = _.map(p.pattern.intersectedVertices, function(obj) {

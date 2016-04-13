@@ -407,6 +407,7 @@ var mergeParallelSegmentsOnCanvas = function() {
 					function(d, i) { return d.polygonID === t.polygonID; });
 
 				tilesInCanvas.each(function(d, i) {
+					canvasCircularize(d);
 					_.each(toModify, function(m) {
 						var p = d.patterns[m.pidx];
 						p.internalVertices = _.filter(p.internalVertices, function(v, i) {

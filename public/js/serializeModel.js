@@ -111,6 +111,23 @@ var circularize = function(tile) {
 	return tile;
 };
 
+// used for circularizing tiles on the canvas, which have been flattened
+// via deepCopy
+var canvasCircularize = function(tile) {
+
+	_.each(tile.patterns, function(p, index) {
+		p.end.edge = tile.edges[p.end.edge.index]; // dereference index
+		p.start.edge = tile.edges[p.start.edge.index];
+	});
+
+	_.each(tile.edges, function(e) {
+		_.each(e.patterns, function(p) {
+			p.pattern = tile.patterns[p.pattern.index];
+		});
+	});
+
+	return tile;
+};
 
 var loadFromJson = function(loaded, callback) {
 	if (loaded.version >= minSupportedVersion) {

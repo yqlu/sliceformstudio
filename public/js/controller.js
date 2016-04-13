@@ -1003,7 +1003,7 @@ var stripViewClick = function() {
 	keyboardJS.setContext("stripView");
 
 	if (!stripView.classed("active")) {
-		try {
+		// try {
 			if (stripViewCached) {
 				traceCanvas.each(function(d, i) {
 					d.transform = assembleCanvas.datum().transform;
@@ -1085,12 +1085,12 @@ var stripViewClick = function() {
 			d3.select("#traceTab").classed("active", true).classed("hidden", false);
 
 			stripViewCached = true;
-		} catch(e) {
-			console.error(e);
-			// undo UI changes gracefully if error is found
-			tileViewClick();
-			teardownCropOverlay();
-		}
+		// } catch(e) {
+		// 	console.error(e);
+		// 	// undo UI changes gracefully if error is found
+		// 	tileViewClick();
+		// 	teardownCropOverlay();
+		// }
 	}
 };
 

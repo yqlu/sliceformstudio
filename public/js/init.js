@@ -617,12 +617,26 @@ var stylesheet = newStylesheet();
 
 // initialize advanced SVG generation options UI elements
 
-var stripParametersBtn = d3.select("#stripParametersBtn")
+var toggleStripSettingsBtn = d3.select("#toggleStripSettings")
 .on("click", function() {
-	$('#stripParametersModal').modal();
-	// recompute widthFactor
-	widthFactor.setValue(widthFactor.getValue());
+	d3.select("#stripSettings").classed("hidden", false);
+	$("#toggleStripSettings").text(d3.select("#stripSettings").classed("in") ? "Show settings" : "Hide settings");
+	$("#stripSettings").collapse('toggle');
 });
+
+var stripSvgInput = [];
+var stripSvgSliderChange = function() {
+	genSVG(stripSvgInput, {
+		selector: "#stripCutSvg",
+		stripHeight: stripHeight.getValue(),
+		widthFactor: widthFactor.getValue(),
+		interSpacing: interSpacing.getValue(),
+		printWidth: printWidth.getValue(),
+		printHeight: printHeight.getValue(),
+		resetTransform: false,
+		forDisplay: true
+	});
+};
 
 var stripHeight = new Slider("#stripHeight", {
 	min: 10,
@@ -633,7 +647,7 @@ var stripHeight = new Slider("#stripHeight", {
 		var mm = Math.round(value / config.pixelToMm * 10) / 10;
 		return value + " px = " + mm + " mm";
 	}
-});
+}).on("change", stripSvgSliderChange);
 
 var widthFactor = new Slider("#widthFactor", {
 	min: 0.1,
@@ -664,7 +678,7 @@ var widthFactor = new Slider("#widthFactor", {
 			'Longest strip: ' + longestPx + ' px = ' + longestMm + ' mm\n' +
 			'Shortest segment: ' + shortestPx + ' px = ' + shortestMm + ' mm';
 	}
-});
+}).on("change", stripSvgSliderChange);
 
 var interSpacing = new Slider("#interSpacing", {
 	min: 0,
@@ -675,7 +689,7 @@ var interSpacing = new Slider("#interSpacing", {
 		var mm = Math.round(value / config.pixelToMm * 10) / 10;
 		return value + " px = " + mm + " mm";
 	}
-});
+}).on("change", stripSvgSliderChange);
 
 var printHeight = new Slider("#printHeight", {
 	min: 0,
@@ -686,7 +700,7 @@ var printHeight = new Slider("#printHeight", {
 		var mm = Math.round(value / config.pixelToMm * 10) / 10;
 		return value + " px = " + mm + " mm";
 	}
-});
+}).on("change", stripSvgSliderChange);
 
 var printWidth = new Slider("#printWidth", {
 	min: 0,
@@ -697,7 +711,7 @@ var printWidth = new Slider("#printWidth", {
 		var mm = Math.round(value / config.pixelToMm * 10) / 10;
 		return value + " px = " + mm + " mm";
 	}
-});
+}).on("change", stripSvgSliderChange);
 
 var thicknessSlider = new Slider("#thickness", {
 	min: 0,

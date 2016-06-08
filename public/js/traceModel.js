@@ -591,6 +591,49 @@ var colorAllStrips = function() {
 	d3.selectAll(".strip-outline").style("stroke-width", thicknessSlider.getValue() + 1);
 };
 
+var downloadStripsClick = function(d, filename) {
+	stripSvgInput = _.pluck(d.strips, "lengths");
+	$("#stripFilename").val(filename || currentFilename + "_" + d.color.id + ".svg").focus();
+	console.log(filename || currentFilename + "_" + d.color.id + ".svg");
+	genSVG(stripSvgInput, {
+		selector: "#stripCutSvg",
+		stripHeight: stripHeight.getValue(),
+		widthFactor: widthFactor.getValue(),
+		interSpacing: interSpacing.getValue(),
+		printWidth: printWidth.getValue(),
+		printHeight: printHeight.getValue(),
+		resetTransform: true,
+		forDisplay: true
+	});
+	// recompute widthFactor
+	widthFactor.setValue(widthFactor.getValue());
+	$("#downloadStripModal").modal("show");
+	d3.select("#downloadStripConfirm")
+	.on("click", function() {
+		var xmlPrefix = "<?xml version='1.0' encoding='utf-8'?>";
+		genSVG(stripSvgInput, {
+			selector: "#tmpSvg",
+			stripHeight: stripHeight.getValue(),
+			widthFactor: widthFactor.getValue(),
+			interSpacing: interSpacing.getValue(),
+			printWidth: printWidth.getValue(),
+			printHeight: printHeight.getValue(),
+			resetTransform: true,
+			forDisplay: false
+		});
+		var svg = d3.select("#tmpSvg").select("svg").node();
+		var serializer = new XMLSerializer();
+		var pom = d3.select("#downloadLink").node();
+		var bb = new Blob([xmlPrefix + serializer.serializeToString(svg)], {type: "image/svg+xml"});
+		pom.download = $("#stripFilename").val();
+		pom.href = window.URL.createObjectURL(bb);
+		pom.dataset.downloadurl = ["image/svg+xml", pom.download, pom.href].join(':');
+		pom.click();
+		d3.select(svg).remove();
+		$("#downloadStripModal").modal("hide");
+	});
+};
+
 // update display for strip table
 var updateStripTable = function() {
 	var collapsedColorSlots = _.filter(colorMap, function(c) {
@@ -618,32 +661,9 @@ var updateStripTable = function() {
 	update.html("").append("a")
 	.classed("pull-right btn btn-primary btn-xs", true).style("margin-right", "10px")
 	.on("click", function(d) {
-		bootbox.prompt({
-			title: "Save SVG of strips as:",
-			value: currentFilename + "_" + d.color.id + ".svg",
-			callback: function(result) {
-				if (result !== null) {
-					var xmlPrefix = "<?xml version='1.0' encoding='utf-8'?>";
-					genSVG(_.pluck(d.strips, "lengths"), {
-						stripHeight: stripHeight.getValue(),
-						widthFactor: widthFactor.getValue(),
-						interSpacing: interSpacing.getValue(),
-						printWidth: printWidth.getValue(),
-						printHeight: printHeight.getValue()
-					});
-					var svg = d3.select("#tmpSvg").select("svg").node();
-					var serializer = new XMLSerializer();
-					var pom = d3.select("#downloadLink").node();
-					var bb = new Blob([xmlPrefix + serializer.serializeToString(svg)], {type: "image/svg+xml"});
-					pom.download = result;
-					pom.href = window.URL.createObjectURL(bb);
-					pom.dataset.downloadurl = ["image/svg+xml", pom.download, pom.href].join(':');
-					pom.click();
-					d3.select(svg).remove();
-				}
-			}
-		});
-	}).append("i").classed("fa fa-download fa-fw", true);
+		downloadStripsClick(d);
+	})
+	.append("i").classed("fa fa-download fa-fw", true);
 	update.append("h5").classed("colorLabel", true)
 	.attr("id", function(d) { return "collapser" + d.color.id; })
 	.html(function(d) {
@@ -754,23 +774,8 @@ var validateStripFormat = function(strips) {
 var generateCustomStrip = function() {
 	var stripData = JSON.parse(d3.select("#customStripJson").node().value);
 	if (validateStripFormat(stripData)) {
-		genSVG(stripData, {
-			stripHeight: stripHeight.getValue(),
-			widthFactor: widthFactor.getValue(),
-			interSpacing: interSpacing.getValue(),
-			printWidth: printWidth.getValue(),
-			printHeight: printHeight.getValue()
-		});
-
-		var svg = d3.select("#tmpSvg").select("svg").node();
-		var serializer = new XMLSerializer();
-		var pom = document.createElement('a');
-		document.body.appendChild(pom);
-		pom.setAttribute('href', 'data:image/xvg+xml;charset=utf-8,' + serializer.serializeToString(svg));
-		pom.setAttribute('download', "custom.svg");
-		pom.click();
-		d3.select(svg).remove();
-		d3.select(pom).remove();
+		stripSvgInput = stripData;
+		downloadStripsClick({strips: _.map(stripData, function(d) { return {lengths: d}; })}, "custom.svg");
 	} else {
 		console.error("Invalid strip format: ", stripData);
 		bootbox.alert({

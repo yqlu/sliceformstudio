@@ -1,6 +1,9 @@
 var thickSvgMode = false;
 
 var genSVG = function(strips, options) {
+	var transform = options.resetTransform ? num.id :
+		((d3.select(options.selector + " .canvas").node() && d3.select(options.selector + " .canvas").node().__data__.transform) || num.id);
+
 	var xOffset = 5;
 	var yOffset = 5;
 	var size = [options.printWidth, options.printHeight];
@@ -12,14 +15,23 @@ var genSVG = function(strips, options) {
 	var cutstyle = "stroke:" + colors[1] + ";" + style;
 	var stripstyle = "stroke:" + colors[2] + ";" + style;
 
-	d3.select("#tmpSvg").selectAll("svg").remove();
-	var tmpSvg = d3.select("#tmpSvg").append("svg")
+	d3.select(options.selector).selectAll("svg").remove();
+	var svg = d3.select(options.selector).append("svg")
 		.attr("width", size[0])
 		.attr("height", size[1])
 		.attr("version", 1.1);
 
-	tmpSvg.node().setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.w3.org/2000/svg");
-	tmpSvg.node().setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink");
+	var canvas;
+
+	if (options.forDisplay) {
+		var bg = buildBg(svg, true, false, d3.behavior.zoom().on("zoom", zoomBehavior));
+		canvas = buildDisplay(svg, transform, true);
+	} else {
+		canvas = svg;
+	}
+
+	svg.node().setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.w3.org/2000/svg");
+	svg.node().setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink");
 
 	_.each(strips, function(strip) {
 		var width = 0;
@@ -39,7 +51,7 @@ var genSVG = function(strips, options) {
 					var style = cutstyle;
 					var thickLineOffset = 0.54;
 					if (thickSvgMode) {
-						tmpSvg.append("line")
+						canvas.append("line")
 						.attr({
 							x1: function(d) {return xOffset + width - thickLineOffset;},
 							y1: function(d) {return height1;},
@@ -47,7 +59,7 @@ var genSVG = function(strips, options) {
 							y2: function(d) {return height2;}
 						})
 						.attr("style", cutstyle);
-						tmpSvg.append("line")
+						canvas.append("line")
 						.attr({
 							x1: function(d) {return xOffset + width + thickLineOffset;},
 							y1: function(d) {return height1;},
@@ -56,7 +68,7 @@ var genSVG = function(strips, options) {
 						})
 						.attr("style", cutstyle);
 					}
-					tmpSvg.append("line")
+					canvas.append("line")
 					.attr({
 						x1: function(d) {return xOffset + width;},
 						y1: function(d) {return height1;},
@@ -68,7 +80,7 @@ var genSVG = function(strips, options) {
 			});
 			if (idx !== strip.length - 1) {
 				// score full lines
-				tmpSvg.append("line")
+				canvas.append("line")
 				.attr({
 					x1: function(d) {return xOffset + width;},
 					y1: function(d) {return full[0];},
@@ -86,7 +98,7 @@ var genSVG = function(strips, options) {
 			[[xOffset, yOffset+hole], [xOffset, yOffset+height]],
 			[[xOffset+width, yOffset], [xOffset+width, yOffset+height-hole]]];
 		_.each(stripEdges, function(edge) {
-			tmpSvg.append("line")
+			canvas.append("line")
 			.attr({
 				x1: function(d) {return edge[0][0];},
 				y1: function(d) {return edge[0][1];},

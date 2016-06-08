@@ -124,8 +124,6 @@
 						label.control-label.col-xs-2 Extension length
 						.col-xs-4
 							input#extensionLength(type='text')
-						a#stripParametersBtn.btn.btn-primary #[i.fa.fa-cog] Strip parameters
-
 		#customStripPanel.toolbar.betaFeature.betaHidden
 			.panel.panel-default
 				.panel-heading
@@ -138,38 +136,49 @@
 							textarea#customStripJson.col-xs-10(rows='4')
 						.form-group
 							a#generateCustomStripBtn.btn.btn-default Generate!
-		#tmpSvg.hidden
 		a.hidden#downloadLink
-#stripParametersModal.modal.fade(tabindex='-1', role='dialog')
+		#tmpSvg.hidden
+#downloadStripModal.modal.fade(tabindex='-1', role='dialog')
 	.modal-dialog.modal-lg
 		.modal-content
 			.modal-header
 				button.close(type='button', data-dismiss='modal', aria-label='Close')
 					span(aria-hidden='true') ×
-				h4.modal-title Strip generation parameters
-			.modal-body
-				p
-					| Specify parameters for the generated paper strip SVG files here. The defaults work well for generic laser cutters, but you can tweak them to your own preferences.
+				h4.modal-title Download SVG of strips as:
+			.modal-body.scrolled-modal-with-footer
 				form.form-horizontal
 					.form-group
-						label.control-label.col-md-2 Strip height
-						.col-md-3
-							input#stripHeight(type='text')
-						label.control-label.col-md-3 Printbed width
-						.col-md-3
-							input#printWidth(type='text')
-					.form-group
-						label.control-label.col-md-2 Width factor
-						.col-md-3#widthFactorDiv
-							input#widthFactor(type='text')
-						label.control-label.col-md-3 Printbed height
-						.col-md-3
-							input#printHeight(type='text')
-					.form-group
-						label.control-label.col-md-2 Inter-strip spacing
-						.col-md-3
-							input#interSpacing(type='text')
+						label.control-label.col-md-2 Save file as:
+						.col-md-6
+							input#stripFilename(type='text')
+						.col-md-4
+							a.pull-right.btn.btn-default#toggleStripSettings Show settings
+				.panel.panel-default.hidden#stripSettings
+					.panel-body
+						p
+							| Specify parameters for the generated paper strip SVG files here. The defaults work well for generic laser cutters, but you can tweak them to your own preferences.
+						form.form-horizontal
+							.form-group
+								label.control-label.col-md-2 Strip height
+								.col-md-3
+									input#stripHeight(type='text')
+								label.control-label.col-md-3 Printbed width
+								.col-md-3
+									input#printWidth(type='text')
+							.form-group
+								label.control-label.col-md-2 Width factor
+								.col-md-3#widthFactorDiv
+									input#widthFactor(type='text')
+								label.control-label.col-md-3 Printbed height
+								.col-md-3
+									input#printHeight(type='text')
+							.form-group
+								label.control-label.col-md-2 Inter-strip spacing
+								.col-md-3
+									input#interSpacing(type='text')
+				#stripCutSvg
 			.modal-footer
+				a#downloadStripConfirm.btn.btn-primary Download
 				button.btn.btn-default(type='button', data-dismiss='modal') Close
 #betaFeaturesModal.modal.fade(tabindex='-1', role='dialog')
 	.modal-dialog.modal-lg

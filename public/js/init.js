@@ -620,7 +620,7 @@ var stylesheet = newStylesheet();
 var toggleStripSettingsBtn = d3.select("#toggleStripSettings")
 .on("click", function() {
 	d3.select("#stripSettings").classed("hidden", false);
-	$("#toggleStripSettings").text(d3.select("#stripSettings").classed("in") ? "Show settings" : "Hide settings");
+	$("#toggleStripSettings").text(d3.select("#stripSettings").classed("in") ? "Show parameters" : "Hide parameters");
 	$("#stripSettings").collapse('toggle');
 });
 

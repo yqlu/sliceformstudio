@@ -431,7 +431,7 @@ var drawSvgLabel = function(x, y) {
 
 var drawSvgDimensionLabel = function(svg) {
 	return svg.append("text")
-	.attr("x", assembleSvg.node().clientWidth - 20)
+	.attr("x", assembleSvg.node().getBoundingClientRect().width - 20)
 	.attr("y", config.standardHeight - 20)
 	.attr("text-anchor", "end")
 	.text("");

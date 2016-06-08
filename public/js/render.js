@@ -1,3 +1,5 @@
+var thickSvgMode = false;
+
 var genSVG = function(strips, options) {
 	var xOffset = 5;
 	var yOffset = 5;
@@ -35,6 +37,25 @@ var genSVG = function(strips, options) {
 					var height2 = parity ? topHalf[1] : bottomHalf[1];
 					parity = !parity;
 					var style = cutstyle;
+					var thickLineOffset = 0.54;
+					if (thickSvgMode) {
+						tmpSvg.append("line")
+						.attr({
+							x1: function(d) {return xOffset + width - thickLineOffset;},
+							y1: function(d) {return height1;},
+							x2: function(d) {return xOffset + width - thickLineOffset;},
+							y2: function(d) {return height2;}
+						})
+						.attr("style", cutstyle);
+						tmpSvg.append("line")
+						.attr({
+							x1: function(d) {return xOffset + width + thickLineOffset;},
+							y1: function(d) {return height1;},
+							x2: function(d) {return xOffset + width + thickLineOffset;},
+							y2: function(d) {return height2;}
+						})
+						.attr("style", cutstyle);
+					}
 					tmpSvg.append("line")
 					.attr({
 						x1: function(d) {return xOffset + width;},

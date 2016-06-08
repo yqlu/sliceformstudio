@@ -31,6 +31,12 @@
 		"categories": [{
 			"title": "Beginner",
 			"items": [{
+				"filename": "medallion",
+				"title": "Medallion",
+				"year": 2012,
+				"description": "Octagons",
+				"slfm": "medallion"
+			}, {
 				"filename": "pentille",
 				"title": "Pentille",
 				"year": 2015,
@@ -82,6 +88,12 @@
 				"description": "12-gons, hexagons and squares",
 				"slfm": "undergrowth"
 			}, {
+				"filename": "estuary",
+				"title": "Estuary",
+				"year": 2016,
+				"description": "12-gons, hexagons and squares",
+				"slfm": "estuary"
+			}, {
 				"filename": "royalty",
 				"title": "Royalty",
 				"year": 2016,
@@ -127,6 +139,12 @@
 				"description": "Girih tiles",
 				"slfm": "girih_ii"
 			}, {
+				"filename": "whirlpool",
+				"title": "Whirlpool",
+				"year": 2016,
+				"description": "16-gons and fillers",
+				"slfm": "whirlpool"
+			}, {
 				"filename": "brimstone",
 				"title": "Brimstone",
 				"year": 2015,
@@ -136,11 +154,6 @@
 		}, {
 			"title": "Designs without diagrams",
 			"items": [{
-				"filename": "psychedelica",
-				"title": "Psychedelica",
-				"year": 2012,
-				"description": "Octagons"
-			}, {
 				"filename": "pleiades",
 				"title": "Pleiades",
 				"year": 2015,

@@ -722,8 +722,8 @@ var updateStripTable = function() {
 	}).bind('sortupdate', function(e, ui) {
 		var startParentArray = ui.startparent[0].__data__.strips;
 		var endParentArray = ui.endparent[0].__data__.strips;
-		startParentArray.splice(ui.oldindex, 1);
-		endParentArray.splice(ui.index, 0, ui.item[0].__data__);
+		startParentArray.splice(ui.oldElementIndex, 1);
+		endParentArray.splice(ui.elementIndex, 0, ui.item[0].__data__);
 		d3.select(ui.endparent[0].parentNode.parentNode).select(".colorLabel")
 		.select("span").text(function(d) { return d.color.name + " (" + d.strips.length + ")"; });
 		if (ui.startparent[0].__data__.strips.length === 0) {
@@ -763,19 +763,19 @@ var generateCustomStrip = function() {
 		});
 
 		var svg = d3.select("#tmpSvg").select("svg").node();
-		console.log(svg);
 		var serializer = new XMLSerializer();
 		var pom = document.createElement('a');
+		document.body.appendChild(pom);
 		pom.setAttribute('href', 'data:image/xvg+xml;charset=utf-8,' + serializer.serializeToString(svg));
 		pom.setAttribute('download', "custom.svg");
 		pom.click();
 		d3.select(svg).remove();
-		console.log("got here");
+		d3.select(pom).remove();
 	} else {
 		console.error("Invalid strip format: ", stripData);
 		bootbox.alert({
 			title: "Error",
-			message: "<p>Unable to parse input as strip:</p><pre>" + d3.select("#customStripJson").node().value + "</pre>"
+			message: "<p>Unable to parse input as strip:</p><pre>" + d3.select("#customStripJson").node().value + "</pre><p>Please see <a href='docs.html#jsonStripGen' target='_blank'>the docs</a> for more details on the format required.</p>"
 		});
 	}
 };

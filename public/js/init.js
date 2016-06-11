@@ -625,18 +625,6 @@ var toggleStripSettingsBtn = d3.select("#toggleStripSettings")
 });
 
 var stripSvgInput = [];
-var stripSvgSliderChange = function() {
-	genSVG(stripSvgInput, {
-		selector: "#stripCutSvg",
-		stripHeight: stripHeight.getValue(),
-		widthFactor: widthFactor.getValue(),
-		interSpacing: interSpacing.getValue(),
-		printWidth: printWidth.getValue(),
-		printHeight: printHeight.getValue(),
-		resetTransform: false,
-		forDisplay: true
-	});
-};
 
 var stripHeight = new Slider("#stripHeight", {
 	min: 10,

@@ -591,45 +591,51 @@ var colorAllStrips = function() {
 	d3.selectAll(".strip-outline").style("stroke-width", thicknessSlider.getValue() + 1);
 };
 
-var downloadStripsClick = function(d, filename) {
-	stripSvgInput = _.pluck(d.strips, "lengths");
-	$("#stripFilename").val(filename || currentFilename + "_" + d.color.id + ".svg").focus();
-	console.log(filename || currentFilename + "_" + d.color.id + ".svg");
-	genSVG(stripSvgInput, {
-		selector: "#stripCutSvg",
+var getStripParameters = function() {
+	return {
 		stripHeight: stripHeight.getValue(),
 		widthFactor: widthFactor.getValue(),
 		interSpacing: interSpacing.getValue(),
 		printWidth: printWidth.getValue(),
-		printHeight: printHeight.getValue(),
+		printHeight: printHeight.getValue()
+	};
+};
+
+var getSvgBlob = function() {
+	var xmlPrefix = "<?xml version='1.0' encoding='utf-8'?>";
+	genSVG(stripSvgInput, _.merge(getStripParameters(), {
+		selector: "#tmpSvg",
+		resetTransform: true,
+		forDisplay: false
+	}));
+	var svg = d3.select("#tmpSvg").select("svg").node();
+	var serializer = new XMLSerializer();
+	return new Blob([xmlPrefix + serializer.serializeToString(svg)], {type: "image/svg+xml"});
+};
+
+var stripSvgSliderChange = function() {
+	genSVG(stripSvgInput, _.merge(getStripParameters(), {
+		selector: "#stripCutSvg",
+		resetTransform: false,
+		forDisplay: true
+	}));
+};
+
+
+var downloadStripsClick = function(d, filename) {
+	stripSvgInput = _.pluck(d.strips, "lengths");
+	$("#stripFilename").val(filename || currentFilename + "_" + d.color.id + ".svg").focus();
+	genSVG(stripSvgInput, _.merge(getStripParameters(), {
+		selector: "#stripCutSvg",
 		resetTransform: true,
 		forDisplay: true
-	});
+	}));
 	// recompute widthFactor
 	widthFactor.setValue(widthFactor.getValue());
 	$("#downloadStripModal").modal("show");
 	d3.select("#downloadStripConfirm")
 	.on("click", function() {
-		var xmlPrefix = "<?xml version='1.0' encoding='utf-8'?>";
-		genSVG(stripSvgInput, {
-			selector: "#tmpSvg",
-			stripHeight: stripHeight.getValue(),
-			widthFactor: widthFactor.getValue(),
-			interSpacing: interSpacing.getValue(),
-			printWidth: printWidth.getValue(),
-			printHeight: printHeight.getValue(),
-			resetTransform: true,
-			forDisplay: false
-		});
-		var svg = d3.select("#tmpSvg").select("svg").node();
-		var serializer = new XMLSerializer();
-		var pom = d3.select("#downloadLink").node();
-		var bb = new Blob([xmlPrefix + serializer.serializeToString(svg)], {type: "image/svg+xml"});
-		pom.download = $("#stripFilename").val();
-		pom.href = window.URL.createObjectURL(bb);
-		pom.dataset.downloadurl = ["image/svg+xml", pom.download, pom.href].join(':');
-		pom.click();
-		d3.select(svg).remove();
+		saveAs(getSvgBlob(), $("#stripFilename").val());
 		$("#downloadStripModal").modal("hide");
 	});
 };

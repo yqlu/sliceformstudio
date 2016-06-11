@@ -38,6 +38,7 @@
     "selectize": "~0.12.1",
     "optimization-js": "https://github.com/iaroslav-ai/optimization-js.git",
     "js-lru": "https://github.com/rsms/js-lru.git",
-    "bfgs-numericjs": "https://github.com/croquelois/bfgs-numericjs.git"
+    "bfgs-numericjs": "https://github.com/croquelois/bfgs-numericjs.git",
+    "file-saver": "~1.3.1"
   }
 }

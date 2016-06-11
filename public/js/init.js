@@ -8,15 +8,11 @@ var polylist = [];
 
 if (!document.implementation.hasFeature('http://www.w3.org/TR/SVG11/feature#Extensibility','1.1')) {
 	// does not support ForeignObject
-	window.setTimeout(function() {
-		bootbox.alert({
-			title: "Browser not supported",
-			message: "Error: your browser is not supported. Please use Firefox >47, Chrome >51, Safari >9 or Edge >25 instead for Sliceform Studio to work correctly."
-		});
-	}, 1);
-	// stop javascript execution
-	throw new Error();
-}
+	bootbox.alert({
+		title: "Browser not supported",
+		message: "Error: your browser is not supported. Please use Firefox >=47, Chrome >=51, Safari >=9.0 or Edge >=13 instead for Sliceform Studio to work correctly."
+	});
+} else {
 
 // options for each different drawer
 
@@ -901,3 +897,6 @@ $(document).ready(function() {
 	}
 
 });
+
+// end brace from foreignobject test
+}

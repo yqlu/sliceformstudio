@@ -67,15 +67,24 @@ var genSVG = function(strips, options) {
 							y2: function(d) {return height2;}
 						})
 						.attr("style", cutstyle);
+						canvas.append("line")
+						.attr({
+							x1: function(d) {return xOffset + width - thickLineOffset;},
+							y1: function(d) {return topHalf[1];},
+							x2: function(d) {return xOffset + width + thickLineOffset;},
+							y2: function(d) {return topHalf[1];}
+						})
+						.attr("style", cutstyle);
+					} else {
+						canvas.append("line")
+						.attr({
+							x1: function(d) {return xOffset + width;},
+							y1: function(d) {return height1;},
+							x2: function(d) {return xOffset + width;},
+							y2: function(d) {return height2;}
+						})
+						.attr("style", cutstyle);
 					}
-					canvas.append("line")
-					.attr({
-						x1: function(d) {return xOffset + width;},
-						y1: function(d) {return height1;},
-						x2: function(d) {return xOffset + width;},
-						y2: function(d) {return height2;}
-					})
-					.attr("style", cutstyle);
 				}
 			});
 			if (idx !== strip.length - 1) {

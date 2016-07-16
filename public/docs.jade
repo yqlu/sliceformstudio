@@ -502,12 +502,58 @@
 				.label-container
 					label The cropped final result
 
-
 		p Click on the #[i.fa.fa-crop.fa-border] Crop button in the toolbar. If “Crop mode” is turned on, your tiling is overlaid with multiple black “crop points” – one for every vertex, edge midpoint and polygon center of every tile.
 
 		p You can click on crop points individually to select them (and unselect them again). The cropped area of the final design will be defined as the convex hull of the selected crop points. The “Select All” button selects every black "crop point" to be part of the convex hull; the “Reset” button unselects everything.
 
 		p If fewer than 3 points are selected, the corresponding convex hull has no internal area and no cropping will be applied.
+
+		h2#optimization Pattern Optimization
+
+		p While Sliceform Studio's tools allows you to rapidly translate the pattern in your head to one on the screen, drawing with a mouse is imprecise. For example, lines you might have intended to be parallel might end up diverging slightly. The pattern optimization feature is inspired by similar constraint satisfaction systems in CAD software like Solidworks and allows you to fine-tune your designs.
+
+		p To activate it, select the "Optimize" button above the tile screen. The individual tiles will fade out of view and you should see a list of constraints in the tool bar and patterns in the tile screen.
+
+		p For each optimization procedure, you can select any number of constraints you would like to impose on the design. Usually for performance reasons, optimizing one or two constraints at a time is much faster than specifying all of them at once.
+
+		h4#specifyConstraints Specifying constraints
+
+		p Pick a constraint (say, "Parallel") from the toolbar. The software will prompt you to pick the segments you want to make parallel. After you pick out a segment, you can drag the "handles" on the ends to make it shorter or longer, as long as the segment remains straight and the ends lie on vertices or intersection points.
+
+		p Next, the software will prompt you to select which control points you want to vary. This is because sometimes you might want a segment #[i AB] to have equal length with #[i CD], but you would only want to vary point #[i A] (not #[i B], #[i C] or #[i D]) to accomplish this.
+
+		.row
+			.col-sm-4.img-with-label
+				.prop4col
+					.content
+						.responsive-sprites
+							img.icon-segment1(src="/images/sprites/docs-sprite.jpg")
+			.col-sm-4.img-with-label
+				.prop4col
+					.content
+						.responsive-sprites
+							img.icon-segment2(src="/images/sprites/docs-sprite.jpg")
+			.col-sm-4.img-with-label
+				.prop4col
+					.content
+						.responsive-sprites
+							img.icon-segment3(src="/images/sprites/docs-sprite.jpg")
+		center.label-container
+			label Examples of valid segments (shaded in blue) and their corresponding control points (circled). Note that the control points may or may not coincide with the end-points of the segment.
+
+		p The constraint you have defined should now show up on the left sidebar.
+
+		h4#constraintSatisfaction Satisfying constraints
+
+		p If there are multiple constraints, you may hover over the constraint to highlight which segments it uses. You can go on to specify more, or actually initiate the optimize by clicking the "Optimize" button.
+
+		p The optimization operation should take a few seconds to run. When it is completed, the patterns on the canvas will update automatically. You can also see its performance by comparing the before and after "objective values" of each constraint. For example, for a Parallel constraint, it might show "30°→0.000447°", indicating that the two segments that were previously 30° away from being parallel are now extremely close to being parallel.
+
+		p Note that the optimization process doesn't just change the lines you picked out; it operates on the underlying tile, and therefore updates every instance of that line in the entire canvas.
+
+		p In most cases you can leave the "Scaling factor" field to its default of 1. It becomes relevant mainly when you specify incompatible constraints that cannot be satisfied simultaneously (e.g. setting the same pair of segments to be both parallel and perpendicular). In those cases, Sliceform Studio will still try to move around the patterns to satisfy the total sum of objectives. If you want finer-grained control to bias the optimizer to solving one constraint in favor of a second one, you can provide a larger scaling factor to the former constraint and a smaller one to the latter.
+
+		p For more detail about the technical implementation of this feature, you can refer to #[a(href='http://archive.bridgesmathart.org/2016/bridges2016-371.html') our Bridges 2016 paper].
 
 		h2#stripTrace Strip tracing
 

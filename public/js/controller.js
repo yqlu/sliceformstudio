@@ -348,7 +348,7 @@ var handleMouseout = function(edgeNode) {
 
 // clicking a pattern
 var patternClick = function(thisNode) {
-	assignStripColor(thisNode, $("#colorpicker").val());
+	assignStripColor(thisNode, $("#spectrum").spectrum('get').toHexString());
 	updateStripTable();
 };
 
@@ -1049,12 +1049,7 @@ var stripViewClick = function() {
 
 				oldColorMap = colorMap;
 
-				colorMap = _.map(stripColors, function(c) {
-					return {
-						color: c,
-						strips: []
-					};
-				});
+				colorMap = [];
 
 				d3.select("#noneSoFar").style("display", "block");
 				sidebarForm.selectAll("div").remove();

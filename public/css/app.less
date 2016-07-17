@@ -423,67 +423,48 @@ li.done a {
 #stripFilename {
   width: 300px;
 }
-/* COLORPICKER 1 EXAMPLE */
-#colorPicker {
-  width: 30px;
-  height: 30px;
-  position: relative;
-  clear: both;
-  margin: 80px auto 20px;
+.sp-palette {
+  max-width: 440px;
 }
-#colorPicker .track {
-  background: #efefef url(../images/text-color.png) no-repeat 50% 50%;
-  height: 150px;
-  width: 150px;
-  padding: 10px;
-  position: absolute;
-  cursor: crosshair;
-  float: left;
-  left: -71px;
-  top: -71px;
-  display: none;
-  border: 1px solid #ccc;
-  z-index: 10;
-  -webkit-border-radius: 150px;
-  -moz-border-radius: 150px;
-  border-radius: 150px;
+.sp-container {
+  border-radius: 4px;
+  background-color: white;
+  border: solid 1px gainsboro;
 }
-#colorPicker .color {
-  width: 25px;
-  height: 25px;
-  padding: 1px;
-  border: 1px solid #ccc;
-  display: block;
-  position: relative;
-  z-index: 11;
-  background-color: #EFEFEF;
-  -webkit-border-radius: 27px;
-  -moz-border-radius: 27px;
-  border-radius: 27px;
+.sp-replacer {
+  background: white;
+  border: 1px solid #cccccc;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+.sp-replacer:hover {
+  border: 1px solid #cccccc;
+}
+.sp-replacer.sp-active {
+  border-color: #66afe9;
+  outline: 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6);
+}
+.sp-color, .sp-hue, .sp-clear {
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+}
+#body .sp-container button {
+  .btn;
+  background-color: rgba(255,255,255,0.8);
+  border-radius: 0;
+  padding: 5px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #333;
+  border-color: #ccc;
+  display: inline-block;
   cursor: pointer;
+  white-space: nowrap;
+  background-image: none;
+  margin: 5px 1px;
 }
-#colorPicker .colorInner {
-  width: 25px;
-  height: 25px;
-  -webkit-border-radius: 27px;
-  -moz-border-radius: 27px;
-  border-radius: 27px;
-}
-#colorPicker .dropdown {
-  list-style: none;
-  display: none;
-  width: 27px;
-  position: absolute;
-  top: 28px;
-  border: 1px solid #ccc;
-  left: 0;
-  z-index: 1000;
-}
-#colorPicker .dropdown li {
-  height: 25px;
-  cursor: pointer;
-}
-
 .select2-wrapper {
   padding: 20px;
 }

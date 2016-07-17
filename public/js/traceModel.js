@@ -517,7 +517,7 @@ var groupPattern = function(patternData, strictMode) {
 		d3.selectAll([overStrip, underStrip]).classed("hover", false);
 	})
 	.on("click", function() {
-		var selectedColor = $("#colorpicker").val();
+		var selectedColor = $("#spectrum").spectrum('get').toHexString();
 		assignStripColor([overStrip, underStrip], strip, selectedColor, _.pluck(traced.patternList, "pattern"));
 		updateStripTable();
 	});
@@ -656,8 +656,7 @@ var updateStripTable = function() {
 
 	update.enter().append("div").classed("color-slot", true);
 
-	update.filter(function(d) { return d.strips.length === 0; })
-	.remove();
+	update.exit().remove();
 
 	// on Firefox the drag-update of a list item fires off mouseover and mouseout events
 	// on previously adjacent nodes. Use mostRecentDrag to only action mouseover and mouseout
@@ -794,6 +793,19 @@ var generateCustomStrip = function() {
 // assign color to relevant strip
 var assignStripColor = function(nodes, strip, color, patternList) {
 	d3.selectAll(nodes).style("stroke", color).attr("assignedColor", true);
+
+	// add to colorMap if doesn't exist
+	if (_.all(colorMap, function(c) {
+		return c.color.hex !== color;
+	})) {
+		var colorString = color.substring(1);
+		// use name from strip colors if it exists
+		// otherwise custom color, use hex as name
+		var exists = _.find(flatColorPalette, function(c) {
+			return c.hex === colorString.toUpperCase();
+		});
+		colorMap.push({color: {hex: color, name: (exists ? exists.name : color), id: colorString}, strips:[]});
+	}
 
 	_.each(colorMap, function(c) {
 		if (c.color.hex !== color) {

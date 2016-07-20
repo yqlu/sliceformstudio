@@ -354,6 +354,8 @@
 													|  No mirror symmetry
 						.col-md-5
 							#patternEditSvg
+							.alert.alert-danger#patternOutsideWarning(style="display: none;") Error: some points of the pattern lie outside the tile.
+							.alert.alert-danger#patternOverUnderWarning(style="display: none;") Error: pattern intersections are too close to each other.
 			.modal-footer
 				a#confirmPattern.btn.btn-primary Confirm
 				button.btn.btn-default(type='button', data-dismiss='modal') Close

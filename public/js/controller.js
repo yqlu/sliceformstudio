@@ -127,21 +127,6 @@ var dragRotate = d3.behavior.drag()
 	d3.select("body").style("cursor", "auto");
 });
 
-// drag handler for editing shape, attached to vertex element
-var dragEdit = d3.behavior.drag()
-.on("drag", function(d,i) {
-	updateVertexAndEdgeEnds(d, i);
-})
-.on("dragstart", function(d, i) {
-	d3.select("body")
-	.style("cursor", "all-scroll");
-})
-.on("dragend", function(d, i) {
-	d3.select("body")
-	.style("cursor", "auto");
-
-	updateDimensions(this.parentNode.__data__);
-});
 
 var dragSvgHandler = d3.behavior.drag()
 .on('dragstart', function(d, i) {
@@ -242,6 +227,10 @@ var dragPatternHandleEdit = d3.behavior.drag()
 	} else {
 		console.error("d3.event.dx/dy too abruptly large: ", d3.event);
 	}
+})
+.on("dragend", function(d, i) {
+	var tile = d.this.parentNode.parentNode.__data__;
+	validatePattern(tile);
 });
 
 // zoom handler for canvas
@@ -456,6 +445,7 @@ var patternUpdate = function() {
 	polygonAddPattern(tile, patternFn);
 	patternEditSVGDrawer.redrawPatterns();
 
+	validatePattern(tile);
 };
 
 var patternPreview = function(motif, customTemplate) {
@@ -496,6 +486,10 @@ var addToLineupManualClick = function() {
 };
 
 var updateTileWithPatternClick = function() {
+
+	if ($("#confirmPattern").attr("disabled")) {
+		return;
+	}
 
 	// deselect custom pattern multiselect to avoid changing existing patterns
 	$("#customPatternSelect").val(null);

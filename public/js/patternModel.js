@@ -440,6 +440,46 @@ var rotatedRay = function(angle, offset) {
 	};
 };
 
+
+var validatePattern = function(tile) {
+	var motifIndex = patternDropdown.node().value;
+	var motif = patternOptions[motifIndex];
+
+	tile.patternParams = {
+		index: motifIndex,
+		param1: patternSlider1.getValue(),
+		param2: patternSlider2.getValue()
+	};
+	var patterns = motif.generator(tile, patternSlider1.getValue(), patternSlider2.getValue());
+	polygonAddPattern(tile, makePatterns(patterns));
+	polygonAddPatternMetadata(tile);
+	drawPatterns(d3.select(tile.this), {});
+
+	var inTilePredicate = generateInRegionPredicate(tile.vertices, num.id);
+	var internalVertices = _.flatten(_.map(tile.patterns, "internalVertices"));
+
+	var inTileError = (!_.all(internalVertices, inTilePredicate));
+	if (inTileError) {
+		$("#patternOutsideWarning").css("display", "block");
+	} else {
+		$("#patternOutsideWarning").css("display", "none");
+	}
+
+	var overUnderError = !overUnderPerTile(tile);
+	if (overUnderError) {
+		$("#patternOverUnderWarning").css("display", "block");
+	} else {
+		$("#patternOverUnderWarning").css("display", "none");
+	}
+
+	if (inTileError || overUnderError) {
+		$("#confirmPattern").attr("disabled", "disabled");
+	} else {
+		$("#confirmPattern").attr("disabled", null);
+	}
+
+};
+
 // specification for the different pattern options
 var patternOptions = [
 	{

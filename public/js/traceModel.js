@@ -318,12 +318,19 @@ var redrawCanvas = function() {
 		d.underPoints = [];
 	});
 
+
+	// initially strictMode is true
+	// groupPattern returns false if a strip of correct parity is found, quitting out of the inner loop
+	// groupPattern returns true if the strip has indeterminate parity
+	// iterate through all the strips to find one that works (which will quit out of inner loop)
+	// but if i == number of patterns, no strips work, so flip strictMode to false
+	// i.e. groupPattern will figure out an arbitrary parity if parity is indeterminate
 	while ($(traceCanvas.node()).find("path.pattern").length > 0) {
 		var i = 0, strictMode = true;
 
 		while (groupPattern($(traceCanvas.node()).find("path.pattern")[i].__data__, strictMode)) {
 			i += 1;
-			if (i == $(traceCanvas.node()).find("path.pattern").length) {
+			if (i === $(traceCanvas.node()).find("path.pattern").length) {
 				i = 0;
 				strictMode = false;
 			}
@@ -334,6 +341,50 @@ var redrawCanvas = function() {
 	.each(function(d, i) {
 		d.id = i;
 	});
+};
+
+// effectively the same loop as redrawCanvas, but done for each tile
+// performed as a check to make sure that individually tiles
+// have patterns that can go over-under in the first place
+var overUnderPerTile = function(tile) {
+	var patterns = _.map(tile.patterns, function(p) {
+		return [_.map(p.intersectedVertices, function(v) {
+			return {x: v.coords[0], y: v.coords[1], intersect: v.intersect};
+		})];
+	});
+
+	var overPoints = [];
+	var underPoints = [];
+
+	var assignAndEjectPattern = function(pattern, overPoints, underPoints, strictMode) {
+		var res = determineOverUnder(pattern, overPoints, underPoints, strictMode);
+		if (res.status === "ERROR") {
+			var msg = "Error: unable to find consistent assignment of over and under.";
+			throw msg;
+		} else if (res.status === "INDETERMINATE") {
+			return true;
+		} else {
+			patterns.splice(_.indexOf(patterns, pattern), 1);
+			return false;
+		}
+	};
+
+	try {
+		while (patterns.length > 0) {
+			var i = 0, strictMode = true;
+
+			while (assignAndEjectPattern(patterns[i], overPoints, underPoints, strictMode)) {
+				i += 1;
+				if (i === patterns.length) {
+					i = 0;
+					strictMode = false;
+				}
+			}
+		}
+		return true;
+	} catch (e) {
+		return false;
+	}
 };
 
 var groupPattern = function(patternData, strictMode) {
@@ -413,55 +464,24 @@ var groupPattern = function(patternData, strictMode) {
 		extendedStart = true;
 	}
 
+	// assign over and under
+	var overPoints = groupNode.__data__.overPoints;
+	var underPoints = groupNode.__data__.underPoints;
+
 	// boolean determined in next block,
 	// used for drawing in alt-line
 	var direction;
 
-	// assign over and under
-
-	var overPoints = groupNode.__data__.overPoints;
-	var underPoints = groupNode.__data__.underPoints;
-
-	if (overPoints.length === 0) {
-		// easy step: no constraints, so just arbitrarily assign over and under
-		direction = true;
-		overPoints.extend(everyOtherIntersect(reducedSegments, true));
-		underPoints.extend(everyOtherIntersect(reducedSegments, false));
+	var res = determineOverUnder(reducedSegments, overPoints, underPoints, strictMode);
+	if (res.status === "ERROR") {
+		console.debug(overPoints, underPoints, traced, reducedSegments[0]);
+		var msg = "Error: unable to find consistent assignment of over and under.";
+		bootbox.alert(msg);
+		throw msg;
+	} else if (res.status === "INDETERMINATE") {
+		return true;
 	} else {
-		// check over and under
-		var potentialOverPoints = everyOtherIntersect(reducedSegments, true);
-		if (_.any(potentialOverPoints, function(p1) {
-			return _.any(overPoints, function(p2) {
-				return approxEq(p1.x, p2.x) && approxEq(p1.y, p2.y);
-		});})) {
-			// cannot go in over; put in under;
-			if (_.any(potentialOverPoints, function(p1) {
-				return _.any(underPoints, function(p2) {
-					return approxEq(p1.x, p2.x) && approxEq(p1.y, p2.y);
-				});
-			})) {
-				console.debug(overPoints, underPoints, traced, reducedSegments[0]);
-				var msg = "Error: unable to find consistent assignment of over and under.";
-				bootbox.alert(msg);
-				throw msg;
-			}
-			direction = false;
-			overPoints.extend(everyOtherIntersect(reducedSegments, false));
-			underPoints.extend(potentialOverPoints);
-		} else {
-			if (strictMode && !_.any(potentialOverPoints, function(p1) {
-				return _.any(underPoints, function(p2) {
-					return approxEq(p1.x, p2.x) && approxEq(p1.y, p2.y);
-				});
-			})) {
-				// current pattern does not intersect existing patterns at all
-				// adding it to list may result in future contradictions
-				return true; // Try next element
-			}
-			direction = true;
-			overPoints.extend(potentialOverPoints);
-			underPoints.extend(everyOtherIntersect(reducedSegments, false));
-		}
+		direction = res.direction;
 	}
 
 	// construct lines corresponding to over and under
@@ -575,6 +595,56 @@ var groupPattern = function(patternData, strictMode) {
 	d3.selectAll(groupedNodes).remove();
 
 	return false; // successful, quit out of loop
+};
+
+// returns {direction: bool, status: "SUCCESS" / "INDETERMINATE" / "ERROR"
+// success: assigned over/under correctly
+// indeterminate: try again later, currently underdefined
+// error: overconstrained, no possible assignment
+var determineOverUnder = function(reducedSegments, overPoints, underPoints, strictMode) {
+
+	var direction;
+	if (overPoints.length === 0) {
+		// easy step: no constraints, so just arbitrarily assign over and under
+		direction = true;
+		overPoints.extend(everyOtherIntersect(reducedSegments, true));
+		underPoints.extend(everyOtherIntersect(reducedSegments, false));
+	} else {
+		// check over and under
+		var potentialOverPoints = everyOtherIntersect(reducedSegments, true);
+		if (_.any(potentialOverPoints, function(p1) {
+			return _.any(overPoints, function(p2) {
+				return approxEq(p1.x, p2.x) && approxEq(p1.y, p2.y);
+		});})) {
+			// cannot go in over; put in under;
+			if (_.any(potentialOverPoints, function(p1) {
+				return _.any(underPoints, function(p2) {
+					return approxEq(p1.x, p2.x) && approxEq(p1.y, p2.y);
+				});
+			})) {
+				// unable to find consistent assignment of over and under
+				// fail
+				return {status: "ERROR"};
+			}
+			direction = false;
+			overPoints.extend(everyOtherIntersect(reducedSegments, false));
+			underPoints.extend(potentialOverPoints);
+		} else {
+			if (strictMode && !_.any(potentialOverPoints, function(p1) {
+				return _.any(underPoints, function(p2) {
+					return approxEq(p1.x, p2.x) && approxEq(p1.y, p2.y);
+				});
+			})) {
+				// current pattern does not intersect existing patterns at all
+				// adding it to list may result in future contradictions
+				return {status: "INDETERMINATE"}; // Try next element
+			}
+			direction = true;
+			overPoints.extend(potentialOverPoints);
+			underPoints.extend(everyOtherIntersect(reducedSegments, false));
+		}
+	}
+	return {status: "SUCCESS", direction: direction};
 };
 
 var emphasizeStrips = function(nodes, color) {

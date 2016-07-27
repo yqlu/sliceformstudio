@@ -868,13 +868,15 @@ var assignStripColor = function(nodes, strip, color, patternList) {
 	if (_.all(colorMap, function(c) {
 		return c.color.hex !== color;
 	})) {
-		var colorString = color.substring(1);
+		var hex = color.substring(1).toUpperCase();
 		// use name from strip colors if it exists
 		// otherwise custom color, use hex as name
 		var exists = _.find(flatColorPalette, function(c) {
-			return c.hex === colorString.toUpperCase();
+			return c.hex === hex;
 		});
-		colorMap.push({color: {hex: color, name: (exists ? exists.name : color), id: colorString}, strips:[]});
+		var colorName = exists ? exists.name : color;
+		var colorId = exists ? exists.name.replace(/ /g, '_').toLowerCase() : color;
+		colorMap.push({color: {hex: color, name: colorName, id: colorId}, strips:[]});
 	}
 
 	_.each(colorMap, function(c) {

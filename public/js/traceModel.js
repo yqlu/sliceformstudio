@@ -545,7 +545,6 @@ var groupPattern = function(patternData, strictMode) {
 	_.each(_.pluck(traced.patternList, "pattern"), function(p) {
 		p.assembleCounterpart.assignStripColor = function(color) {
 			assignStripColor([overStrip, underStrip], strip, color, _.pluck(traced.patternList, "pattern"));
-			updateStripTable();
 		};
 		p.assembleCounterpart.isStripAssigned = function() {
 			return d3.select(overStrip).attr("assignedColor");
@@ -713,8 +712,8 @@ var downloadStripsClick = function(d, filename) {
 // update display for strip table
 var updateStripTable = function() {
 	var collapsedColorSlots = _.filter(colorMap, function(c) {
-		return d3.select("#collapse" + c.color.id)[0][0] &&
-		d3.select("#collapse" + c.color.id).style("display") === "none";
+		return d3.select("#collapse" + c.id)[0][0] &&
+		d3.select("#collapse" + c.id).style("display") === "none";
 	});
 
 	var update = sidebarForm
@@ -734,20 +733,65 @@ var updateStripTable = function() {
 	var mostRecentDrag = new Date(0);
 
 	update.html("").append("a")
-	.classed("pull-right btn btn-primary btn-xs", true).style("margin-right", "10px")
+	.classed("pull-right btn btn-primary btn-xs", true)
 	.on("click", function(d) {
 		downloadStripsClick(d);
 	})
 	.append("i").classed("fa fa-download fa-fw", true);
+
+	update.append("input")
+	.attr("type", "text")
+	.classed("pull-right", true)
+	.attr("id", function(d) { return "spectrum" + d.id; })
+	.each(function(d) {
+		$(this).spectrum({
+			appendTo: "#body",
+			color: d.color.hex,
+			showPaletteOnly: true,
+			showInput: true,
+			showButtons: false,
+			preferredFormat: "rgb",
+			togglePaletteOnly: true,
+			togglePaletteMoreText: 'More',
+			togglePaletteLessText: 'Less',
+			palette: spectrumPalette,
+			show: fixSpectrumTooltips,
+			localStorageKey: "spectrum.sliceformstudio",
+			change: function(color) {
+				var colorSlot = $(this).parent();
+				var oldColor = $(this).parent()[0].__data__;
+
+				var colorHex = color.toHexString().substring(1).toUpperCase();
+				// add to colorMap if doesn't exist
+				var newColor = _.clone(_.find(flatColorPalette, function(c) {
+					return c.hex === colorHex;
+				}));
+
+				if (newColor) {
+					newColor.hex = "#" + newColor.hex;
+					newColor.id = newColor.name.replace(/ /g, '_').toLowerCase();
+				} else {
+					newColor = {hex: "#" + colorHex, name: "#" + colorHex, id: colorHex};
+				}
+				_.extend(oldColor.color, newColor);
+				d3.select(colorSlot[0]).select(".colorLabel span")
+				.text(newColor.name + " (" + oldColor.strips.length + ")");
+				console.log(oldColor, colorSlot);
+
+				colorAllStrips();
+			}
+		});
+	});
+
 	update.append("h5").classed("colorLabel", true)
-	.attr("id", function(d) { return "collapser" + d.color.id; })
+	.attr("id", function(d) { return "collapser" + d.id; })
 	.html(function(d) {
 		var caret = _.contains(collapsedColorSlots, d) ? "fa-caret-right" : "fa-caret-down";
-		return "<i class='fa fa-fw fa-caret-down'></i> <span>" + d.color.name + " (" + d.strips.length + ")</span>";
+		return "<i class='fa fa-fw " + caret + "'></i> <span>" + d.color.name + " (" + d.strips.length + ")</span>";
 	})
 	.each(function(d) {
-		$("#collapser" + d.color.id).click(function() {
-			var collapseDiv = d3.select("#collapse" + d.color.id);
+		$("#collapser" + d.id).click(function() {
+			var collapseDiv = d3.select("#collapse" + d.id);
 			if (collapseDiv.style("display") === "block") {
 				// collapse
 				collapseDiv.style("display", "none");
@@ -772,14 +816,14 @@ var updateStripTable = function() {
 
 	var collapseDiv = update.append("div").style("display", function(d) {
 		return _.contains(collapsedColorSlots, d) ? "none" : "block";
-	}).attr("id", function(d) { return "collapse" + d.color.id; })
+	}).attr("id", function(d) { return "collapse" + d.id; })
 		.append("ul").classed("strip-table-ul", true);
 
 	collapseDiv.each(function(d) {
 		d3.select(this).selectAll("li").data(d.strips)
 		.enter().append("li").classed("strip-table-li", true)
 		.style("cursor", "drag")
-		.html(function(d, i) { return "<a class='strip-table-x' href='#'><i class='fa fa-times'></i></a> Strip #" +
+		.html(function(d, i) { return "<a class='strip-table-x'><i class='fa fa-times'></i></a> Strip #" +
 			(d.nodes[0].__data__.id || d.nodes[1].__data__.id); })
 		.on("mouseover", function(d1) {
 			if (new Date() - mostRecentDrag > 100) {
@@ -807,6 +851,9 @@ var updateStripTable = function() {
 				.select("span").text(function(d) { return d.color.name + " (" + d.strips.length + ")"; });
 				d3.select(this.parentNode).remove();
 			}
+			colorMap = _.filter(colorMap, function(c) {
+				return c.strips.length > 0;
+			});
 			d3.selectAll(thisStrip.nodes).style("stroke", "gainsboro");
 			colorAllStrips();
 		});
@@ -827,6 +874,9 @@ var updateStripTable = function() {
 			d3.select(ui.startparent[0].parentNode.parentNode).select(".colorLabel")
 			.select("span").text(function(d) { return d.color.name + " (" + d.strips.length + ")"; });
 		}
+		colorMap = _.filter(colorMap, function(c) {
+			return c.strips.length > 0;
+		});
 		mostRecentDrag = new Date();
 		emphasizeStrips(ui.item[0].__data__.nodes, ui.endparent[0].__data__.color.hex);
 	});
@@ -860,11 +910,21 @@ var generateCustomStrip = function() {
 	}
 };
 
+// incrementing ctr for assigning unique groupIDs for color map
+var ctr = (function() {
+	var i = 0;
+	return function() {
+		return i++;
+	};
+})();
+
 // assign color to relevant strip
 var assignStripColor = function(nodes, strip, color, patternList) {
 	d3.selectAll(nodes).style("stroke", color).attr("assignedColor", true);
 
 	// add to colorMap if doesn't exist
+	color = color.toUpperCase();
+
 	if (_.all(colorMap, function(c) {
 		return c.color.hex !== color;
 	})) {
@@ -875,8 +935,8 @@ var assignStripColor = function(nodes, strip, color, patternList) {
 			return c.hex === hex;
 		});
 		var colorName = exists ? exists.name : color;
-		var colorId = exists ? exists.name.replace(/ /g, '_').toLowerCase() : color;
-		colorMap.push({color: {hex: color, name: colorName, id: colorId}, strips:[]});
+		var colorId = exists ? exists.name.replace(/ /g, '_').toLowerCase() : hex;
+		colorMap.push({id: ctr(), color: {hex: color, name: colorName, id: colorId}, strips:[]});
 	}
 
 	_.each(colorMap, function(c) {
@@ -894,5 +954,9 @@ var assignStripColor = function(nodes, strip, color, patternList) {
 				n.__data__.colorMapPtr = _.last(c.strips);
 			});
 		}
+	});
+
+	colorMap = _.filter(colorMap, function(c) {
+		return c.strips.length > 0;
 	});
 };

@@ -551,6 +551,7 @@ $("#betaFeaturesBtn").click(function() {
 
 var colorPalette = [[{"name":"Red","hex":"F44336"},{"name":"Pink","hex":"E91E63"},{"name":"Purple","hex":"9C27B0"},{"name":"Deep Purple","hex":"673AB7"},{"name":"Indigo","hex":"3F51B5"},{"name":"Blue","hex":"2196F3"},{"name":"Light Blue","hex":"03A9F4"},{"name":"Cyan","hex":"00BCD4"},{"name":"Teal","hex":"009688"},{"name":"Green","hex":"4CAF50"},{"name":"Light Green","hex":"8BC34A"},{"name":"Lime","hex":"CDDC39"},{"name":"Yellow","hex":"FFEB3B"},{"name":"Amber","hex":"FFC107"},{"name":"Orange","hex":"FF9800"},{"name":"Deep Orange","hex":"FF5722"},{"name":"Brown","hex":"795548"},{"name":"Blue Grey","hex":"607D8B"},{"name":"Grey","hex":"9E9E9E"}],[{"name":"Red 100","hex":"FFCDD2"},{"name":"Pink 100","hex":"F8BBD0"},{"name":"Purple 100","hex":"E1BEE7"},{"name":"Deep Purple 100","hex":"D1C4E9"},{"name":"Indigo 100","hex":"C5CAE9"},{"name":"Blue 100","hex":"BBDEFB"},{"name":"Light Blue 100","hex":"B3E5FC"},{"name":"Cyan 100","hex":"B2EBF2"},{"name":"Teal 100","hex":"B2DFDB"},{"name":"Green 100","hex":"C8E6C9"},{"name":"Light Green 100","hex":"DCEDC8"},{"name":"Lime 100","hex":"F0F4C3"},{"name":"Yellow 100","hex":"FFF9C4"},{"name":"Amber 100","hex":"FFECB3"},{"name":"Orange 100","hex":"FFE0B2"},{"name":"Deep Orange 100","hex":"FFCCBC"},{"name":"Brown 100","hex":"D7CCC8"},{"name":"Blue Grey 100","hex":"CFD8DC"},{"name":"Grey 100","hex":"F5F5F5"}],[{"name":"Red 300","hex":"E57373"},{"name":"Pink 300","hex":"F06292"},{"name":"Purple 300","hex":"BA68C8"},{"name":"Deep Purple 300","hex":"9575CD"},{"name":"Indigo 300","hex":"7986CB"},{"name":"Blue 300","hex":"64B5F6"},{"name":"Light Blue 300","hex":"4FC3F7"},{"name":"Cyan 300","hex":"4DD0E1"},{"name":"Teal 300","hex":"4DB6AC"},{"name":"Green 300","hex":"81C784"},{"name":"Light Green 300","hex":"AED581"},{"name":"Lime 300","hex":"DCE775"},{"name":"Yellow 300","hex":"FFF176"},{"name":"Amber 300","hex":"FFD54F"},{"name":"Orange 300","hex":"FFB74D"},{"name":"Deep Orange 300","hex":"FF8A65"},{"name":"Brown 300","hex":"A1887F"},{"name":"Blue Grey 300","hex":"90A4AE"},{"name":"Grey 300","hex":"E0E0E0"}],[{"name":"Red 700","hex":"D32F2F"},{"name":"Pink 700","hex":"C2185B"},{"name":"Purple 700","hex":"7B1FA2"},{"name":"Deep Purple 700","hex":"512DA8"},{"name":"Indigo 700","hex":"303F9F"},{"name":"Blue 700","hex":"1976D2"},{"name":"Light Blue 700","hex":"0288D1"},{"name":"Cyan 700","hex":"0097A7"},{"name":"Teal 700","hex":"00796B"},{"name":"Green 700","hex":"388E3C"},{"name":"Light Green 700","hex":"689F38"},{"name":"Lime 700","hex":"AFB42B"},{"name":"Yellow 700","hex":"FBC02D"},{"name":"Amber 700","hex":"FFA000"},{"name":"Orange 700","hex":"F57C00"},{"name":"Deep Orange 700","hex":"E64A19"},{"name":"Brown 700","hex":"5D4037"},{"name":"Blue Grey 700","hex":"455A64"},{"name":"Grey 700","hex":"616161"}],[{"name":"Red 900","hex":"B71C1C"},{"name":"Pink 900","hex":"880E4F"},{"name":"Purple 900","hex":"4A148C"},{"name":"Deep Purple 900","hex":"311B92"},{"name":"Indigo 900","hex":"1A237E"},{"name":"Blue 900","hex":"0D47A1"},{"name":"Light Blue 900","hex":"01579B"},{"name":"Cyan 900","hex":"006064"},{"name":"Teal 900","hex":"004D40"},{"name":"Green 900","hex":"1B5E20"},{"name":"Light Green 900","hex":"33691E"},{"name":"Lime 900","hex":"827717"},{"name":"Yellow 900","hex":"F57F17"},{"name":"Amber 900","hex":"FF6F00"},{"name":"Orange 900","hex":"E65100"},{"name":"Deep Orange 900","hex":"BF360C"},{"name":"Brown 900","hex":"3E2723"},{"name":"Blue Grey 900","hex":"263238"},{"name":"Grey 900","hex":"212121"}]];
 var flatColorPalette = _.flatten(colorPalette);
+var spectrumPalette = _.map(colorPalette, function(row) { return _.pluck(row, "hex"); });
 
 var colorMap = [];
 
@@ -782,15 +783,21 @@ var currentFilename = "my_design";
 // wrap jQuery plugins in document.ready
 var patternSelectize;
 
-$(document).ready(function() {
-
-	var fixTooltips = function() {
-		_.map(_.zip(flatColorPalette, $("#spectrum").spectrum("container").find(".sp-palette .sp-thumb-el")), function(pair) {
+var fixSpectrumTooltips = function() {
+	_.each($(".sp-container"), function(container) {
+		_.map(_.zip(flatColorPalette, $(container).find(".sp-palette .sp-thumb-el")), function(pair) {
 			if (pair[0] && pair[1]) {
 				$(pair[1]).attr("title", pair[0].name);
 			}
 		});
-	};
+	});
+};
+
+$(document).ready(function() {
+
+	// use local storage for shared palettes between all color pickers
+	// but don't persist it between sessions
+	localStorage.removeItem("spectrum.sliceformstudio");
 
 	$("#spectrum").spectrum({
 		appendTo: "#body",
@@ -802,20 +809,21 @@ $(document).ready(function() {
 		togglePaletteOnly: true,
 		togglePaletteMoreText: 'More',
 		togglePaletteLessText: 'Less',
-		palette: _.map(colorPalette, function(row) { return _.pluck(row, "hex"); }),
+		palette: spectrumPalette,
 		change: function(color) {
 			stylesheet.deleteRule(0);
 			stylesheet.insertRule("path.strip.hover { stroke: " + color.toHexString() + " !important }", 0);
 		},
-		show: fixTooltips
+		show: fixSpectrumTooltips,
+		localStorageKey: "spectrum.sliceformstudio"
 	});
 
-	$(".sp-palette-button-container button").on("click", fixTooltips);
+	$(".sp-palette-button-container button").on("click", fixSpectrumTooltips);
 
 	$("#spectrum").on("dragstop.spectrum", function(e, color) {
 		stylesheet.deleteRule(0);
 		stylesheet.insertRule("path.strip.hover { stroke: " + color.toHexString() + " !important }", 0);
-		fixTooltips();
+		fixSpectrumTooltips();
 	});
 
     var openTime = new Date().getTime();

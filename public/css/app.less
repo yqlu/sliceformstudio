@@ -433,22 +433,52 @@ li.done a {
 }
 .sp-replacer {
   background: white;
-  border: 1px solid #cccccc;
-  padding: 6px 12px;
-  border-radius: 4px;
+  border: 0px;
 }
 .sp-replacer:hover {
-  border: 1px solid #cccccc;
+  border: 0px;
 }
-.sp-replacer.sp-active {
-  border-color: #66afe9;
-  outline: 0;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6);
-  box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6);
+.sp-dd {
+  display: none;
+}
+.sp-preview {
+  width: 30px;
+  height: 25px;
+  border: 0px;
+}
+.sp-preview-inner {
+  text-align: center
+}
+.sp-preview-inner::before {
+  content: "\f040";
+  font-family: FontAwesome;
+  text-rendering:auto;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale
+}
+.toolbar .sp-preview-inner::before {
+  font-size: 1.5em;
+  line-height: 1.2em;
 }
 .sp-color, .sp-hue, .sp-clear {
   border: 1px solid #cccccc;
   border-radius: 4px;
+}
+.strip-table .sp-replacer {
+  float: right !important;
+  padding: 0px;
+  width: 28px;
+  height: 22px;
+  margin-right: 5px;
+  background: rgba(0,0,0,0);
+  .sp-preview {
+    height: 100%;
+    width: 100%;
+    .sp-preview-inner::before {
+      font-weight: 300;
+      line-height: 1.7em;
+    }
+  }
 }
 #body .sp-container button {
   .btn;
@@ -471,6 +501,7 @@ li.done a {
   border-color: #adadad;
   outline: 0;
   text-decoration: none;
+  background-image: none;
 }
 
 .select2-wrapper {
@@ -536,6 +567,8 @@ li.done a {
   cursor: grabbing;
 }
 .strip-table-x {
+  transition: color 0.2s ease-in-out;
+  cursor: pointer;
   color: #d00;
   margin-right: 8px;
 }

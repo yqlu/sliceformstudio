@@ -1057,6 +1057,7 @@ var stripViewClick = function() {
 						});
 					});
 				});
+				updateStripTable();
 
 				var noStripsOnCanvas = d3.select("#traceSvg").selectAll(".strip")[0].length === 0;
 				d3.select("#traceSvg").select(".shadedOverlay").style("visibility",

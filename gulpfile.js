@@ -6,6 +6,7 @@ var uglify       = require('gulp-uglify');
 var usemin       = require('gulp-usemin');
 var gulpSequence = require('gulp-sequence');
 var imagemin     = require('gulp-imagemin');
+var gzip         = require('gulp-gzip');
 var pngquant     = require('imagemin-pngquant');
 var minifyHtml = require('gulp-minify-html');
 var minifyCss = require('gulp-minify-css');
@@ -79,6 +80,8 @@ gulp.task('scripts', ['compile', 'css-preprocess'], function() {
       js: [uglify(), 'concat'],
       css: ['concat']
     }))
+    .pipe(gulp.dest(projectDest))
+    .pipe(gzip())
     .pipe(gulp.dest(projectDest));
 });
 

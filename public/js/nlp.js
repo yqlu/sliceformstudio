@@ -135,7 +135,6 @@ var powell = function(x0, f, eps, callback) {
 				all_xs.splice(0, 0, new_xs);
 				directions.splice(0, 1);
 				directions.push(d);
-				console.log(mf(all_xs[0][0]), all_xs[0][0]);
 				if (Math.abs(mf(all_xs[0][0]) - mf(all_xs[1][0])) >= eps) {
 					// call loop iteration again
 					window.setTimeout(loopIteration, 0);

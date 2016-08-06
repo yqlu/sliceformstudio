@@ -185,7 +185,9 @@ var drawPatternHelperLines = function (patternHelpers, options) {
 		.insert("path", "circle.patternHandle")
 		.classed("patternHelperLine", true)
 		.attr("d", function(d, i) {
-			var startEdge = this.parentNode.parentNode.__data__.edges[d.startEdge];
+			var tile = this.parentNode.parentNode.__data__;
+			var n = tile.edges.length;
+			var startEdge = this.parentNode.parentNode.__data__.edges[((d.startEdge % n) + n) % n];
 			var startPoint = num.edgeInterpolate(startEdge.ends, d.startProportion);
 			var thisTemplate = this.parentNode.__data__;
 			thisTemplate.allPoints = [startPoint].concat(_.map(thisTemplate.points, function(i) {

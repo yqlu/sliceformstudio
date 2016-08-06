@@ -738,17 +738,18 @@ var patternOptions = [
 						throw new Error("Edge parameters must be numeric.");
 					}
 
-					if (!((patternInterval > 0) && (patternStart >= 0) && (patternDepth > 0))) {
+					if (!((patternInterval > 0) && (patternDepth !== 0))) {
 						throw new Error("Edge parameters must be non-negative.");
 					}
 
 					applicableEdges = _.map(
 						_.filter(_.range(n), function(i) {
-							return (i-patternStart) % patternInterval === 0 && i >= patternStart;
+							return (i-patternStart) % patternInterval === 0;
 						}), function(i) {
-							return [i, i + patternDepth];
+							var start = ((i % n) + n) % n;
+							var end = (((i + patternDepth) % n) + n) %n;
+							return [start, end];
 						});
-
 				} else {
 					console.assert(edgesSpec === "manual");
 					manualEdges = JSON.parse($("#manualEdges").val());
@@ -828,16 +829,18 @@ var patternOptions = [
 				// return all the templates mapped to their applicable edges to be drawn
 				return _.flatten(_.map(tile.customTemplate, function(t, tIdx) {
 
-					var correctionAngle = num.getAngle(num.vectorFromEnds(tile.edges[t.startEdge].ends));
+					var startEdge = ((t.startEdge % n) + n) % n;
+					var correctionAngle = num.getAngle(num.vectorFromEnds(tile.edges[startEdge].ends));
 
 					var transformed = _.map(t.points, function(point) {
+						var startEdge = ((t.startEdge % n) + n) % n;
 						var absVector = num.vecSub(num.getTranslation(point.transform),
-							num.edgeInterpolate(tile.edges[t.startEdge].ends, t.startProportion));
+							num.edgeInterpolate(tile.edges[startEdge].ends, t.startProportion));
 						absVector.push(1);
 						var corrected = num.rotateBy(absVector, correctionAngle);
 						corrected.pop();
 						return _.map(corrected, function(i) {
-							return i / tile.edges[patternStart].length;
+							return i / tile.edges[((patternStart % n) + n) % n].length;
 						});
 					});
 

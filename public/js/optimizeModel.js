@@ -678,7 +678,7 @@ var updateCustomTemplates = function(vector, customInterface, evaluator) {
 		var value = evaluator() + _.sum(_.map(tiles, getRepulsionForce));
 		return value;
 	} else {
-		console.log("HERE");
+		// went out of bounds
 		return Math.pow(10,10);
 	}
 };

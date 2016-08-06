@@ -776,8 +776,6 @@ var updateStripTable = function() {
 				_.extend(oldColor.color, newColor);
 				d3.select(colorSlot[0]).select(".colorLabel span")
 				.text(newColor.name + " (" + oldColor.strips.length + ")");
-				console.log(oldColor, colorSlot);
-
 				colorAllStrips();
 			}
 		});

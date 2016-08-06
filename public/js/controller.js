@@ -27,6 +27,8 @@ var dragMove = d3.behavior.drag()
 	d3.event.sourceEvent.stopPropagation();
 	d3.select(this).attr('pointer-events', 'none');
 })
+
+
 .on("dragend", function(d, i) {
 	d.transform = num.matrixRound(d.transform);
 	d3.select(this).attr("transform", num.getTransform);

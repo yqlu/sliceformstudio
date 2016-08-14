@@ -8,7 +8,7 @@ var genSVG = function(strips, options) {
 	var yOffset = 5;
 	var margin = {top: 25, left: 60, right: 0, bottom: 0};
 	var svgSize = options.forDisplay ? [950, 450] : [options.printWidth, options.printHeight];
-	var size = options.forDisplay ? [950 - margin.top - margin.bottom, 500 - margin.left - margin.right] : svgSize;
+	var size = options.forDisplay ? [950 - margin.left - margin.right, 500 - margin.top - margin.bottom] : svgSize;
 	var colors = ['#ff0000','#000000','#0000ff'];
 	var height = options.stripHeight;
 
@@ -51,18 +51,27 @@ var genSVG = function(strips, options) {
 		var scaleFactor = transform[0][0];
 
 		zoom = d3.behavior.zoom()
-		.scaleExtent([0.5,10])
+		.scaleExtent([0.1,10])
 		.x(x)
 		.y(y)
 		.scale(transform[0][0])
 		.translate([transform[0][2],transform[1][2]])
 		.on("zoom", function(d, i) {
+			//cap translation to panning limits
+			var panExtentBorder = 20;
+			var translate = zoom.translate();
+			translate[0] = Math.max(- (panExtentBorder + options.printWidth * zoom.scale() - size[0]), translate[0]);
+			translate[0] = Math.min(panExtentBorder, translate[0]);
+			translate[1] = Math.max(- (panExtentBorder + options.printHeight * zoom.scale() - size[1]), translate[1]);
+			translate[1] = Math.min(panExtentBorder, translate[1]);
+			zoom.translate(translate);
+
 			var canvas = d3.select(this.parentNode).selectAll(".canvas");
 			canvas.each(function(d) {
 				d.transform = num.matrixRound(num.translateBy(num.scaleBy(num.id, zoom.scale()), zoom.translate()[0], zoom.translate()[1]));
 			})
 			.attr("transform", num.getTransform);
-			canvas.selectAll("line")
+			canvas.selectAll("line, rect")
 			.style("stroke-width", 1 / zoom.scale());
 			d3.select(this.parentNode).select(".x.axis").call(xAxis);
 			d3.select(this.parentNode).select(".y.axis").call(yAxis);
@@ -91,6 +100,19 @@ var genSVG = function(strips, options) {
 		g.append("g")
 		.attr("class", "y axis")
 		.call(yAxis);
+
+		// draw outline of paper sheet
+		canvas.append("rect")
+		.attr({
+			x: 0,
+			y: 0,
+			width: options.printWidth,
+			height: options.printHeight
+		})
+		.style({
+			fill: "none",
+			stroke: "black"
+		});
 
 	} else {
 		canvas = svg;
@@ -187,7 +209,7 @@ var genSVG = function(strips, options) {
 	});
 
 	if (options.forDisplay) {
-		canvas.selectAll("line")
+		canvas.selectAll("line, rect")
 		.style("stroke-width", 1 / zoom.scale());
 	}
 };

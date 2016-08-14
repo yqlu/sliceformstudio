@@ -777,8 +777,17 @@ var updateStripTable = function() {
 				d3.select(colorSlot[0]).select(".colorLabel span")
 				.text(newColor.name + " (" + oldColor.strips.length + ")");
 				colorAllStrips();
+			},
+			move: function(color) {
+				d3.select(this.parentNode).select(".sp-preview-inner")
+				.classed("sp-preview-dark", color.toHsl().l < 0.5)
+				.classed("sp-preview-light", color.toHsl().l >= 0.5);
 			}
 		});
+		d3.select(this.parentNode).select(".sp-preview-inner")
+		.classed("sp-preview-dark", tinycolor(d.color.hex).toHsl().l < 0.5)
+		.classed("sp-preview-light", tinycolor(d.color.hex).toHsl().l >= 0.5);
+
 	});
 
 	update.append("h5").classed("colorLabel", true)

@@ -814,6 +814,11 @@ $(document).ready(function() {
 			stylesheet.deleteRule(0);
 			stylesheet.insertRule("path.strip.hover { stroke: " + color.toHexString() + " !important }", 0);
 		},
+		move: function(color) {
+			d3.select(this.parentNode).select(".sp-preview-inner")
+			.classed("sp-preview-dark", color.toHsl().l < 0.5)
+			.classed("sp-preview-light", color.toHsl().l >= 0.5);
+		},
 		show: fixSpectrumTooltips,
 		localStorageKey: "spectrum.sliceformstudio"
 	});

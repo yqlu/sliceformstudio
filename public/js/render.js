@@ -6,7 +6,9 @@ var genSVG = function(strips, options) {
 
 	var xOffset = 5;
 	var yOffset = 5;
-	var size = [options.printWidth, options.printHeight];
+	var margin = {top: 25, left: 60, right: 0, bottom: 0};
+	var svgSize = options.forDisplay ? [950, 450] : [options.printWidth, options.printHeight];
+	var size = options.forDisplay ? [950 - margin.top - margin.bottom, 500 - margin.left - margin.right] : svgSize;
 	var colors = ['#ff0000','#000000','#0000ff'];
 	var height = options.stripHeight;
 
@@ -17,15 +19,79 @@ var genSVG = function(strips, options) {
 
 	d3.select(options.selector).selectAll("svg").remove();
 	var svg = d3.select(options.selector).append("svg")
-		.attr("width", size[0])
-		.attr("height", size[1])
+		.attr("width", svgSize[0])
+		.attr("height", svgSize[1])
 		.attr("version", 1.1);
 
-	var canvas;
+	var canvas, zoom;
 
 	if (options.forDisplay) {
-		var bg = buildBg(svg, true, false, d3.behavior.zoom().on("zoom", zoomBehavior));
-		canvas = buildDisplay(svg, transform, true);
+		var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+		var invTransform = num.inv(transform);
+
+		var x = d3.scale.linear()
+		.domain([0, size[0]])
+		.range([0, size[0]]);
+
+		var y = d3.scale.linear()
+		.domain([0, size[1]])
+		.range([0, size[1]]);
+
+		var xAxis = d3.svg.axis()
+		.scale(x)
+		.tickFormat(function(d) { return d + "px"; })
+		.orient("top");
+
+		var yAxis = d3.svg.axis()
+		.scale(y)
+		.tickFormat(function(d) { return d + "px"; })
+		.orient("left");
+
+		var scaleFactor = transform[0][0];
+
+		zoom = d3.behavior.zoom()
+		.scaleExtent([0.5,10])
+		.x(x)
+		.y(y)
+		.scale(transform[0][0])
+		.translate([transform[0][2],transform[1][2]])
+		.on("zoom", function(d, i) {
+			var canvas = d3.select(this.parentNode).selectAll(".canvas");
+			canvas.each(function(d) {
+				d.transform = num.matrixRound(num.translateBy(num.scaleBy(num.id, zoom.scale()), zoom.translate()[0], zoom.translate()[1]));
+			})
+			.attr("transform", num.getTransform);
+			canvas.selectAll("line")
+			.style("stroke-width", 1 / zoom.scale());
+			d3.select(this.parentNode).select(".x.axis").call(xAxis);
+			d3.select(this.parentNode).select(".y.axis").call(yAxis);
+		});
+
+		var bg = buildBg(g, true, false, zoom);
+		canvas = buildDisplay(g, transform, true);
+
+		// add white rectangles to mask out strips underneath the axes
+		g.append("rect").classed("axisMask", true)
+		.attr("width", "100%")
+		.attr("height", margin.top)
+		.attr("x", -margin.left)
+		.attr("y", -margin.top);
+
+		g.append("rect").classed("axisMask", true)
+		.attr("width", margin.left)
+		.attr("height", "100%")
+		.attr("x", -margin.left)
+		.attr("y", -margin.top);
+
+		// actually create axes
+		g.append("g")
+		.attr("class", "x axis")
+		.call(xAxis);
+		g.append("g")
+		.attr("class", "y axis")
+		.call(yAxis);
+
 	} else {
 		canvas = svg;
 	}
@@ -119,6 +185,11 @@ var genSVG = function(strips, options) {
 
 		yOffset += options.stripHeight + options.interSpacing;
 	});
+
+	if (options.forDisplay) {
+		canvas.selectAll("line")
+		.style("stroke-width", 1 / zoom.scale());
+	}
 };
 
 var exportImageInTmpSvg = function() {

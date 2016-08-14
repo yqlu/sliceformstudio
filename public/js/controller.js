@@ -368,11 +368,11 @@ var patternDropdownChange = function() {
 		patternSlider2.destroy();
 
 		d3.select("#patternLabel1").text(motif.parameters[0].name);
-		patternSlider1 = new Slider("#patternSlider1", motif.parameters[0].options(n))
+		patternSlider1 = new ExactSlider("#patternSlider1", motif.parameters[0].options(n))
 		.on("change", patternUpdate);
 
 		d3.select("#patternLabel2").text(motif.parameters[1].name);
-		patternSlider2 = new Slider("#patternSlider2", motif.parameters[1].options(n))
+		patternSlider2 = new ExactSlider("#patternSlider2", motif.parameters[1].options(n))
 		.on("change", patternUpdate);
 	} else {
 		d3.selectAll("#presets").style("display", "none");

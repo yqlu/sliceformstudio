@@ -424,14 +424,12 @@ var addToLineupButton = d3.select("#addToLineup")
 var addToLineupManualButton = d3.select("#addToLineupManual")
 	.on("click", addToLineupManualClick);
 
-var sideNumberSlider = new Slider("#sideNumber", {
+var sideNumberSlider = new ExactSlider("#sideNumber", {
 	min: 3,
 	max: 18,
 	step: 1,
 	value: 9,
-	formatter: function(value) {
-		return 'Current value: ' + value;
-	}
+	tooltip: 'hide'
 }).on("change", shapeEditCustomDraw);
 
 d3.selectAll("#assembleOrigZoom, #traceOrigZoom")
@@ -481,24 +479,20 @@ var newCustomPatternButton = d3.select("#newCustomPattern")
 var deleteCustomPatternButton = d3.select("#deleteCustomPattern")
 	.on("click", deleteCustomPatternClick);
 
-var startOffset = new Slider('#startOffset', {
+var startOffset = new ExactSlider('#startOffset', {
 	value: 0,
 	min: -0.5,
 	max: 0.5,
 	step: 0.01,
-	formatter: function(value) {
-		return 'Current value: ' + value;
-	}
+	tooltip: 'hide'
 }).on("change", patternUpdate);
 
-var endOffset = new Slider('#endOffset', {
+var endOffset = new ExactSlider('#endOffset', {
 	value: 0,
 	min: -0.5,
 	max: 0.5,
 	step: 0.01,
-	formatter: function(value) {
-		return 'Current value: ' + value;
-	}
+	tooltip: 'hide'
 }).on("change", patternUpdate);
 
 $('form input[name=symmetryRadios][type=radio]')
@@ -507,14 +501,12 @@ $('form input[name=symmetryRadios][type=radio]')
 $('form input[name=edgeRadios][type=radio]')
 .change(patternUpdate);
 
-var degreesOfFreedom = new Slider('#degreesOfFreedom', {
+var degreesOfFreedom = new ExactSlider('#degreesOfFreedom', {
 	value: 1,
 	min: 0,
 	max: 6,
 	step: 1,
-	formatter: function(value) {
-		return 'Current value: ' + value;
-	}
+	tooltip: 'hide'
 }).on("change", patternUpdate);
 
 $("#patternInterval, #patternStart, #patternDepth")
@@ -528,14 +520,14 @@ $("#manualEdges").focus(function() {
 	patternUpdate();
 }).blur(patternUpdate);
 
-var patternSlider1 = new Slider("#patternSlider1", {
+var patternSlider1 = new ExactSlider("#patternSlider1", {
 	value: 0,
 	min: 0,
 	max: 1,
 	step: 0.01
 });
 
-var patternSlider2 = new Slider("#patternSlider2", {
+var patternSlider2 = new ExactSlider("#patternSlider2", {
 	value: 0,
 	min: 0,
 	max: 1,
@@ -602,22 +594,24 @@ var toggleStripSettingsBtn = d3.select("#toggleStripSettings")
 
 var stripSvgInput = [];
 
-var stripHeight = new Slider("#stripHeight", {
+var stripHeight = new ExactSlider("#stripHeight", {
 	min: 10,
 	max: 50,
 	step: 1,
 	value: 15,
+	unit: ' px',
 	formatter: function(value) {
 		var mm = Math.round(value / config.pixelToMm * 10) / 10;
 		return value + " px = " + mm + " mm";
 	}
 }).on("change", stripSvgSliderChange);
 
-var widthFactor = new Slider("#widthFactor", {
+var widthFactor = new ExactSlider("#widthFactor", {
 	min: 0.1,
 	max: 5,
 	step: 0.1,
 	value: 1.2,
+	unit: 'x',
 	formatter: function(value) {
 		var totalWidthPx;
 
@@ -644,54 +638,71 @@ var widthFactor = new Slider("#widthFactor", {
 	}
 }).on("change", stripSvgSliderChange);
 
-var interSpacing = new Slider("#interSpacing", {
+var interSpacing = new ExactSlider("#interSpacing", {
 	min: 0,
 	max: 50,
 	step: 1,
 	value: 15,
+	unit: ' px',
 	formatter: function(value) {
 		var mm = Math.round(value / config.pixelToMm * 10) / 10;
 		return value + " px = " + mm + " mm";
 	}
 }).on("change", stripSvgSliderChange);
 
-var printHeight = new Slider("#printHeight", {
+var printHeight = new ExactSlider("#printHeight", {
 	min: 0,
 	max: 3000,
 	step: 10,
 	value: 1620,
+	unit: ' px',
 	formatter: function(value) {
 		var mm = Math.round(value / config.pixelToMm * 10) / 10;
 		return value + " px = " + mm + " mm";
 	}
 }).on("change", stripSvgSliderChange);
 
-var printWidth = new Slider("#printWidth", {
+var printWidth = new ExactSlider("#printWidth", {
 	min: 0,
 	max: 3000,
 	step: 10,
 	value: 2880,
+	unit: ' px',
 	formatter: function(value) {
 		var mm = Math.round(value / config.pixelToMm * 10) / 10;
 		return value + " px = " + mm + " mm";
 	}
 }).on("change", stripSvgSliderChange);
 
-var thicknessSlider = new Slider("#thickness", {
+$("#printHeight").siblings(".slider").hide();
+$("#printWidth").siblings(".slider").hide();
+
+var thicknessSlider = new ExactSlider("#thickness", {
 	min: 0,
 	max: 10,
 	step: 0.1,
 	value: 5,
+	unit: ' px',
 	formatter: function(value) {
-		return value + ' px';
+		var mm = Math.round(value / config.pixelToMm * 10) / 10;
+		return value + " px = " + mm + " mm";
 	}
 }).on("change", thicknessSliderChange);
 
-var extensionSlider = new Slider("#extensionLength", {
+var extensionSlider = new ExactSlider("#extensionLength", {
 	min: 0,
 	max: 0.8,
 	step: 0.01,
 	value: 0.3,
+	unit: ' px',
+	converter: {
+		forward: function(value) {
+			return Math.round(value * config.sidelength * widthFactor.getValue());
+		},
+		backward: function(value) {
+			return value / config.sidelength / widthFactor.getValue();
+		}
+	},
 	formatter: function(value) {
 		var pixels = value * config.sidelength * widthFactor.getValue();
 		var mm = Math.round(pixels / config.pixelToMm * 10) / 10;

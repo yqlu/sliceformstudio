@@ -117,12 +117,12 @@
 				form.form-horizontal
 					.form-group
 						label.control-label.col-xs-2 Strip width
-						.col-xs-4
+						.col-xs-6
 							input#thickness(type='text')
 						input#outlineToggle(type="checkbox", checked="true", data-label-text="Draw outline", data-label-width=110)
 					.form-group
 						label.control-label.col-xs-2 Extension length
-						.col-xs-4
+						.col-xs-6
 							input#extensionLength(type='text')
 		#customStripPanel.toolbar.betaFeature.betaHidden
 			.panel.panel-default
@@ -159,22 +159,20 @@
 							| Specify parameters for the generated paper strip SVG files here. The defaults work well for generic laser cutters, but you can tweak them to your own preferences.
 						form.form-horizontal
 							.form-group
-								label.control-label.col-md-2 Strip height
-								.col-md-3
-									input#stripHeight(type='text')
-								label.control-label.col-md-3 Printbed width
-								.col-md-3
+								label.control-label.col-md-2 Printbed
+								.col-md-4.standalone
 									input#printWidth(type='text')
-							.form-group
-								label.control-label.col-md-2 Width factor
-								.col-md-3#widthFactorDiv
-									input#widthFactor(type='text')
-								label.control-label.col-md-3 Printbed height
-								.col-md-3
+									| x
 									input#printHeight(type='text')
+								label.control-label.col-md-2 Width factor
+								.col-md-4#widthFactorDiv
+									input#widthFactor(type='text')
 							.form-group
-								label.control-label.col-md-2 Inter-strip spacing
-								.col-md-3
+								label.control-label.col-md-2 Strip height
+								.col-md-4
+									input#stripHeight(type='text')
+								label.control-label.col-md-2 Vertical spacing
+								.col-md-4
 									input#interSpacing(type='text')
 				#stripCutSvg
 			.modal-footer
@@ -228,7 +226,7 @@
 					#shapeEditSvg
 					form.form-horizontal
 						.form-group(style="text-align: center;")
-							label.control-label No. of sides:&nbsp;
+							label.control-label.centeredlabel No. of sides:&nbsp;
 							input#sideNumber(type='text')
 			.modal-footer
 				a#addToLineup.btn.btn-primary Add to lineup

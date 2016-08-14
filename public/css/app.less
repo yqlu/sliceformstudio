@@ -12,7 +12,6 @@ body#body,
   min-width: 1024px;
 }
 
-
 .container .navbar-header,
 .container .navbar-collapse {
   margin-right: 0;
@@ -415,6 +414,55 @@ li.done a {
 }
 .slider-selection {
   background: #BABABA;
+}
+.sliderDisplay {
+  display: inline-block;
+  margin-left: 10px;
+  width: 60px;
+  margin-top: 5px;
+}
+.sliderDisplay.wide {
+  width: 200px;
+}
+.sliderLabel {
+  padding: 2px;
+  text-align: left;
+}
+.sliderText, .sliderLabel {
+  display: inline-block;
+  width: 60px;
+  height: 28px;
+  padding-left: 5px;
+}
+.sliderUnit {
+  position: absolute;
+  margin-left: -60px;
+  width: 60px;
+  text-align: right;
+  padding-top: 4px;
+  padding-right: 5px;
+  pointer-events: none;
+}
+.sliderText, .sliderUnit {
+  margin-top: -2px;
+  margin-bottom: 2px;
+}
+.sliderDisplay:hover .sliderLabel {
+  cursor: pointer;
+  background-color: lighten(rgba(102,175,233,1),20%);
+}
+.standalone {
+  padding-left: 0px;
+
+  .sliderDisplay, .sliderText, .sliderLabel, .sliderUnit {
+    width: 80px;
+  }
+  .sliderUnit {
+    margin-left: -80px;
+  }
+}
+.centeredlabel {
+  padding-right: 10px;
 }
 .label {
   font-family: sans-serif;

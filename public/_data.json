@@ -100,6 +100,12 @@
 				"description": "12-gons",
 				"slfm": "royalty"
 			}, {
+				"filename": "royalty_ii",
+				"title": "Royalty II",
+				"year": 2016,
+				"description": "12-gons",
+				"slfm": "royalty_ii"
+			}, {
 				"filename": "rampart",
 				"title": "Rampart",
 				"year": 2015,
@@ -114,6 +120,18 @@
 				"year": 2015,
 				"description": "Girih tiles",
 				"slfm": "dendrite"
+			}, {
+				"filename": "fireworks",
+				"title": "Fireworks",
+				"year": 2016,
+				"description": "16-gons and octagons",
+				"slfm": "fireworks"
+			}, {
+				"filename": "fireworks_ii",
+				"title": "Fireworks II",
+				"year": 2016,
+				"description": "18-gons and 9-gons",
+				"slfm": "fireworks_ii"
 			}, {
 				"filename": "vineyard",
 				"title": "Vineyard",
@@ -139,6 +157,12 @@
 				"description": "Girih tiles",
 				"slfm": "girih_ii"
 			}, {
+				"filename": "lucky_7",
+				"title": "Lucky 7",
+				"year": 2016,
+				"description": "14-gons and heptagons",
+				"slfm": "lucky_7"
+			}, {
 				"filename": "whirlpool",
 				"title": "Whirlpool",
 				"year": 2016,
@@ -150,6 +174,12 @@
 				"year": 2015,
 				"description": "12-gons and triangles",
 				"slfm": "brimstone"
+			}, {
+				"filename": "strata",
+				"title": "Strata",
+				"year": 2016,
+				"description": "12-gons, hexagons and squares",
+				"slfm": "strata"
 			}]
 		}, {
 			"title": "Designs without diagrams",

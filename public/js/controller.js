@@ -672,6 +672,8 @@ var editSpecificPattern = function(tiles) {
 			// unbind mouseenter event, reset original version of tile before pattern previews
 			$('body').off('mouseenter', '.select2-results__option', optionMouseenter);
 			tiles[0] = originalTile;
+			patternEditSVGDrawer.set(tiles);
+			patternEditSVGDrawer.draw();
 			patternUpdate();
 		});
 	};

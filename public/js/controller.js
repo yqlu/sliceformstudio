@@ -641,6 +641,7 @@ var editSpecificPattern = function(tiles) {
 			var defaultOption = isRegular ? "0" : "3";
 			patternSelectize.setValue(defaultOption);
 			patternEditSVGDrawer.draw();
+			$("#patternDropdown").trigger('change');
 		}
 
 		var dim = tiles[0].dimensions;

@@ -322,17 +322,21 @@ var greedyInference = function(rays) {
 
 	_.map(rays, function(ray1) {
 		_.map(rays, function(ray2) {
-			if (ray1 !== ray2 && ray1.index !== ray2.index) {
+			if (ray1 !== ray2 && ray1.index < ray2.index && ray1.angle * ray2.angle < 0) {
 				var a1 = ray1.ends[0], a2 = ray1.ends[1], b1 = ray2.ends[0], b2 = ray2.ends[1];
 
-				var ua_t=(b2[0]-b1[0])*(a1[1]-b1[1])-(b2[1]-b1[1])*(a1[0]-b1[0]);
-				var ub_t=(a2[0]-a1[0])*(a1[1]-b1[1])-(a2[1]-a1[1])*(a1[0]-b1[0]);
-				var u_b=(b2[1]-b1[1])*(a2[0]-a1[0])-(b2[0]-b1[0])*(a2[1]-a1[1]);
+				// determinant of [vectorA vectorB], i.e. area of parallelogram
+				var det = ray1.vector[0] * ray2.vector[1] - ray1.vector[1] * ray2.vector[0];
+				// if area is positive, the two rays are not parallel
+				if (Math.abs(det) > 1e-6) {
 
-				if(u_b!==0){
-					var ua=ua_t/u_b;
-					var ub=ub_t/u_b;
+					var ua_t = (b2[0]-b1[0])*(a1[1]-b1[1])-(b2[1]-b1[1])*(a1[0]-b1[0]);
+					var ub_t = (a2[0]-a1[0])*(a1[1]-b1[1])-(a2[1]-a1[1])*(a1[0]-b1[0]);
+					var ua = ua_t/det;
+					var ub = ub_t/det;
 
+					// get only pairs where the intersection point lies in the
+					// positive extension of the rays
 					if (ua > 0 && ub > 0) {
 						var angle = num.angleBetweenEnds(ray1.ends, ray2.ends);
 						allPairs.push({
@@ -340,6 +344,20 @@ var greedyInference = function(rays) {
 							rays: [ray1, ray2],
 							distance: parseFloat((ua + ub).toFixed(0)),
 							template: [num.vecSum(ray1.ends[0], num.vecProd(ray1.vector, ua))]
+						});
+					}
+				} else {
+					var crossVector = num.vectorFromEnds([a1, b2]);
+					var crossDet = ray1.vector[0] * crossVector[1] - ray1.vector[1] * crossVector[0];
+
+					// if the two rays are approximately collinear
+					if (Math.abs(crossDet) < 1e-6) {
+						var angle = num.angleBetweenEnds(ray1.ends, ray2.ends);
+						allPairs.push({
+							angle: parseFloat((angle).toFixed(1)),
+							rays: [ray1, ray2],
+							distance: parseFloat(num.edgeLength([a1, b1]).toFixed(0)),
+							template: []
 						});
 					}
 				}
@@ -351,21 +369,42 @@ var greedyInference = function(rays) {
 		return isFinite(p.angle) && isFinite(p.distance);
 	}), "angle").reverse(), "distance");
 
-	var greedy = [];
-
-	while (allSortedPairs.length > 0) {
-		var nextPair = _.first(allSortedPairs);
-		allSortedPairs = _.reject(allSortedPairs, function(pair) {
-			return _.contains(pair.rays, nextPair.rays[0]) || _.contains(pair.rays, nextPair.rays[1]);
-		});
-		greedy.push(nextPair);
-	}
-
-	if (greedy.length !== rays.length / 2) {
+	result = hankinDFS(allSortedPairs, rays.length / 2, []);
+	if (result === null) {
 		console.error("Hankin inference incomplete.");
+		return [];
+	} else {
+		return result;
 	}
+};
 
-	return greedy;
+var hankinDFS = function(sortedPairs, requiredLength, soFar) {
+	if (requiredLength == 1) {
+		return [sortedPairs[0]];
+	}
+	var candidates = [];
+
+	for (var i = 0; i < sortedPairs.length; i++) {
+		var headPair = sortedPairs[i];
+		// if sortedPair distances look like [25, 25, 25, 63, 63, 63, ...]
+		// only scan among first 3 to break ties
+		if (headPair.distance > sortedPairs[0].distance) {
+			break;
+		}
+		var tailPairs = _.reject(sortedPairs.slice(i), function(pair) {
+			var sharePoint = _.contains(pair.rays, headPair.rays[0]) || _.contains(pair.rays, headPair.rays[1]);
+			return sharePoint;
+		});
+		if (tailPairs.length < requiredLength - 1) {
+			continue;
+		}
+		// recursive call
+		var result = hankinDFS(tailPairs, requiredLength - 1, soFar.concat([headPair]));
+		if (result !== null) {
+			return [headPair].concat(result);
+		}
+	}
+	return null;
 };
 
 // this is called when tiles are converted to strips
@@ -446,13 +485,6 @@ var validatePattern = function(tile) {
 	var motif = patternOptions[motifIndex];
 
 	if (motif !== null && typeof motif !== 'undefined') {
-		tile.patternParams = {
-			index: motifIndex,
-			param1: patternSlider1.getValue(),
-			param2: patternSlider2.getValue()
-		};
-		var patterns = motif.generator(tile, patternSlider1.getValue(), patternSlider2.getValue());
-		polygonAddPattern(tile, makePatterns(patterns));
 		polygonAddPatternMetadata(tile);
 		drawPatterns(d3.select(tile.this), {});
 

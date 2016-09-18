@@ -83,7 +83,8 @@ var ExactSlider = function (element, options) {
 		return this.bootstrapSlider.getValue();
 	};
     this.setValue = function(val) {
-		return this.bootstrapSlider.setValue(val);
+    	// trigger change event in bootstrap slider
+		return this.bootstrapSlider.setValue(val, true, true);
 	};
 	this.on = function(evt, callback) {
 		this.bootstrapSlider.on(evt, callback);

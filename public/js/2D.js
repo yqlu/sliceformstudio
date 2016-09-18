@@ -106,6 +106,13 @@ Intersection.intersectEllipsePolygon=function(c,rx,ry,points){var result=new Int
 Intersection.intersectEllipseRectangle=function(c,rx,ry,r1,r2){var min=r1.min(r2);var max=r1.max(r2);var topRight=new Point2D(max.x,min.y);var bottomLeft=new Point2D(min.x,max.y);var inter1=Intersection.intersectEllipseLine(c,rx,ry,min,topRight);var inter2=Intersection.intersectEllipseLine(c,rx,ry,topRight,max);var inter3=Intersection.intersectEllipseLine(c,rx,ry,max,bottomLeft);var inter4=Intersection.intersectEllipseLine(c,rx,ry,bottomLeft,min);var result=new Intersection("No Intersection");result.appendPoints(inter1.points);result.appendPoints(inter2.points);result.appendPoints(inter3.points);result.appendPoints(inter4.points);if(result.points.length>0)result.status="Intersection";return result;};
 Intersection.intersectLineLine=function(a1,a2,b1,b2){
 	var result;
+	if (a1.x === null || typeof a1.x === 'undefined') {
+		// try using arr format instead
+		a1 = {x: a1[0], y: a1[1]};
+		a2 = {x: a2[0], y: a2[1]};
+		b1 = {x: b1[0], y: b1[1]};
+		b2 = {x: b2[0], y: b2[1]};
+	}
 	var ua_t=(b2.x-b1.x)*(a1.y-b1.y)-(b2.y-b1.y)*(a1.x-b1.x);
 	var ub_t=(a2.x-a1.x)*(a1.y-b1.y)-(a2.y-a1.y)*(a1.x-b1.x);
 	var u_b=(b2.y-b1.y)*(a2.x-a1.x)-(b2.x-b1.x)*(a2.y-a1.y);

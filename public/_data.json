@@ -26,6 +26,11 @@
 		"label": "Docs",
 		"url": "docs.html",
 		"source": "docs"
+	},
+	{
+		"label": "Changelog",
+		"url": "changelog.html",
+		"source": "changelog"
 	}],
 	"gallery": {
 		"categories": [{

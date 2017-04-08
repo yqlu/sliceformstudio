@@ -327,11 +327,12 @@ var draw = function(container, inputlist, options) {
 
 			innerBtn.on("click", editSpecificPattern(this.parentNode.__data__.tiles));
 
-			var bBox = innerBtn[0][0].getBoundingClientRect();
+			var width = innerBtn[0][0].offsetWidth;
+			var height = innerBtn[0][0].offsetHeight;
 
-			fo.attr("height", bBox.height).attr("width", Math.max(bBox.width, 44))
-				.attr("y", - bBox.height / 2)
-				.attr("x", - bBox.width / 2);
+			fo.attr("height", height).attr("width", width)
+				.attr("y", - height / 2)
+				.attr("x", - width / 2);
 		});
 
 		container.each(function(d, i) {

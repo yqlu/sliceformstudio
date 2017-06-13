@@ -500,7 +500,7 @@ var enforceLengthDifference = enforceConstructor({
 
 var createObjectives = function(objectives) {
 	var evaluate = function() {
-		var evaluatedValues = _.map(objectives, function(f) { return f.evaluate(); });
+		var evaluatedValues = _.map(objectives, function(f) { return f.evaluate() * f.factor; });
 		return _.reduce(evaluatedValues,function(a,b) { return a + b; });
 	};
 	var getInterface = function() {
@@ -565,7 +565,7 @@ var createObjectives = function(objectives) {
 		var optimizer = this;
 		return new Promise(function(resolve, reject) {
 			console.time("powell");
-			powell(initialVector, fnc, 0.01, function(result) {
+			powell(initialVector, fnc, 0.001, function(result) {
 				console.timeEnd("powell");
 				redrawTiles();
 				invalidateStripCache();

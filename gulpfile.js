@@ -74,10 +74,11 @@ gulp.task('css-preprocess', ['compile'], function (done) {
 });
 
 gulp.task('scripts', ['compile', 'css-preprocess'], function() {
+  console.log(projectDest);
   return gulp.src(projectDest + '/*.html')
     .pipe(usemin({
       assetsDir: 'public',
-      js: [uglify(), 'concat'],
+      js: [uglify, 'concat'],
       css: ['concat']
     }))
     .pipe(gulp.dest(projectDest))

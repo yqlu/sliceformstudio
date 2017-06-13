@@ -173,8 +173,7 @@ var updateUIForCustomTemplate = function(template, forceFlag) {
 			($("#customPatternSelect").val() && $("#customPatternSelect").val().length === 1 &&
 			$("#customPatternSelect").val()[0] !== ""+thisIndex)) {
 
-			var templateClone = template;
-
+			var templateClone = _.clone(template);
 			$("#customPatternSelect").val(thisIndex);
 			$(":radio[value=" + templateClone.edgesSpec + "]").prop("checked", true);
 			$(":radio[value=" + templateClone.symmetrySpec + "]").prop("checked", true);

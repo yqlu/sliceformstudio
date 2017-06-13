@@ -864,7 +864,6 @@ var patternOptions = [
 						});
 					});
 
-
 					return _.map(t.applicableEdges, function(i) {
 						return {
 							customIndex: tIdx,
